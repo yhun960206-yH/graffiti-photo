@@ -54,6 +54,18 @@ node tools/build-series.mjs
 - 字体走 Google Fonts，国内建议自托管；失败时回退系统宋体
 - 有了域名后，把 `og:image` 改成线上绝对地址；国内服务器需要 ICP 备案号，可加在页脚
 
+## 线上地址与更新
+- 网站：https://yhun960206-yh.github.io/graffiti-photo/
+- 仓库：https://github.com/yhun960206-yH/graffiti-photo（公开，GitHub Pages 从 main 分支根目录发布）
+- 改完内容后，在网站文件夹里运行（便携版 Git 在 `~/tools/mingit`）：
+  ```
+  node tools/build-series.mjs
+  git add -A
+  git commit -m "更新作品"
+  git push
+  ```
+  推送后约 1 分钟，线上自动更新。
+
 ## 本地预览
 ```
 python -m http.server 5178

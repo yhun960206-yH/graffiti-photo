@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import * as data from './series-data.mjs';
 const { volumes, AUTHOR, BOOK } = data;
 const upcoming = data.upcoming || [];
+const SITE = 'https://yhun960206-yh.github.io/graffiti-photo/';   // the published address, for share previews
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'series');
@@ -117,7 +118,8 @@ function volumePage(v, i) {
   <meta name="theme-color" content="${v.theme === 'night' ? '#17171a' : '#f2efe7'}">
   <meta property="og:title" content="${esc(v.title)} · ${BOOK}">
   <meta property="og:description" content="${esc(v.lede)}">
-  <meta property="og:image" content="../images/series/${v.slug}/${pad(v.cover)}.jpg">
+  <meta property="og:image" content="${SITE}images/series/${v.slug}/${pad(v.cover)}.jpg">
+  <meta property="og:url" content="${SITE}series/${v.slug}.html">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
