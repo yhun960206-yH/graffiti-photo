@@ -1,0 +1,65 @@
+/* ==========================================================
+   涂鸦写真帖 · 每一卷
+   封面 → 简介（偏右，左侧一条细线）→ 一段一段的图 → 卷尾
+   每一段有自己的位置：偏左 / 偏右 / 居中 / 挂轴 / 屏风 / 错落 / 宽幅 / 宽银幕 / 绘卷
+   ========================================================== */
+@layer page {
+  /* ───── intro ───── */
+  .vi { padding: var(--sec) var(--gutter) 0; }
+  .vi__text { color: var(--ink-soft); }
+  .vi__text p:first-child { font-family: var(--f-serif); font-weight: 300; font-size: var(--t-head); line-height: 1.9; letter-spacing: .12em; color: var(--ink); }
+  .vi__text p + p { margin-top: 14px; }
+  .vi__meta { margin-top: 26px; }
+
+  /* ───── the sequence (phone first) ───── */
+  .plates { padding-bottom: var(--sec); }
+  .sp { padding: var(--sec) var(--gutter) 0; }
+  .sp--l .plate { width: 86%; }
+  .sp--r .plate { width: 86%; margin-left: auto; }
+  .sp--c .plate { width: 76%; margin-inline: auto; }
+  .sp--scroll .plate { width: 58%; margin-inline: auto; }
+  .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }
+  .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
+  .sp--emaki .plate + .plate { margin-top: 0; }
+  .sp--emaki .plate { padding-bottom: 66px; }
+  .pair { display: grid; gap: 0; }
+  .pair .plate:last-child { width: 62%; margin-left: auto; }
+
+  /* ───── end ───── */
+  .vend { padding: var(--sec) var(--gutter) calc(var(--sec) * .6); display: grid; justify-items: start; gap: 10px; }
+  .vend__t { font-family: var(--f-serif); font-weight: 300; font-size: var(--t-head); letter-spacing: .3em; margin-top: 10px; }
+  .vols { display: grid; border-top: 1px solid var(--hair); }
+  .vols a { display: grid; gap: 4px; padding: 26px var(--gutter); border-bottom: 1px solid var(--hair); }
+  .vols a:last-child { text-align: right; }
+  .vols__t { font-family: var(--f-serif); font-weight: 300; font-size: var(--t-head); letter-spacing: .26em; }
+  .vols a:hover .vols__t { opacity: .55; }
+  .foot { display: flex; justify-content: space-between; gap: 12px; padding: 24px var(--gutter) calc(24px + var(--safe-b)); font-size: var(--t-note); letter-spacing: .14em; color: var(--mute); }
+  .plate__frame { cursor: zoom-in; }
+
+  @media (min-width: 1024px) {
+    .vi, .vend, .sp { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); }
+    .vi > * { grid-column: 7 / 12; }
+    .vi::before { content: ""; grid-column: 6 / 7; grid-row: 1 / 3; justify-self: end; width: 1px; background: var(--hair); margin-right: 2vw; }
+    .vi__text { grid-row: 1; } .vi__meta { grid-row: 2; }
+    .vend > * { grid-column: 7 / 12; }
+
+    /* singles sit off-centre; their width is capped so they fit the screen */
+    .sp .plate { width: min(100%, calc(76vh * var(--r))); margin: 0; }
+    .sp--l .plate { grid-column: 1 / 9; justify-self: start; }
+    .sp--r .plate { grid-column: 5 / 13; justify-self: end; }
+    .sp--c .plate { grid-column: 3 / 11; justify-self: center; }
+    .sp--scroll .plate { grid-column: 5 / 9; justify-self: center; width: min(100%, calc(84vh * var(--r))); }
+    .sp--screen .row { grid-column: 1 / -1; }
+    .sp--wide .plate { grid-column: 1 / -1; justify-self: center; width: min(100%, calc(80vh * var(--r))); margin: 0; --note-in: 20px; }
+    .sp--cinema .plate, .sp--emaki .plate { grid-column: 1 / -1; width: 100%; margin: 0; --note-in: 22px; }
+    .sp--emaki { row-gap: 0; }
+    .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: 0; }
+    .pair { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); align-items: start; }
+    .pair .plate:first-child { grid-column: 1 / 8; width: min(100%, calc(74vh * var(--r))); }
+    .pair .plate:last-child { grid-column: 9 / 13; width: 100%; margin: 14vw 0 0; }
+
+    .vols { grid-template-columns: 1fr 1fr; }
+    .vols a { padding: 48px var(--gutter); border-bottom: 0; }
+    .vols a + a { border-left: 1px solid var(--hair); }
+  }
+}

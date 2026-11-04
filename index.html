@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!--
+    涂鸦写真帖 · 个人摄影作品站
+    · 「作品」部分由 tools/build-series.mjs 生成（@works 之间不要手改）
+    · 以后想公开联系方式，加在页尾 .close 里，写法见 README
+  -->
+  <title>涂鸦写真帖</title>
+  <meta name="description" content="涂鸦的个人摄影作品。为了记住，按下快门——人像为主，也拍人文风景与扫街。">
+  <meta name="theme-color" content="#f2efe7">
+  <meta property="og:title" content="涂鸦写真帖">
+  <meta property="og:description" content="为了记住，按下快门。">
+  <meta property="og:image" content="images/series/summer/01.jpg">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="home.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"ProfilePage","mainEntity":{"@type":"Person","name":"涂鸦","description":"个人摄影，人像为主，也拍人文风景与扫街"}}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#works">跳到作品</a>
+
+  <header class="bar" data-bar>
+    <a class="bar__home" href="#top">涂鸦写真帖</a>
+    <a href="#works">作品</a>
+    <a href="#about">关于</a>
+  </header>
+
+  <main id="top">
+    <section class="cv" data-rest="top">
+      <div class="cv__img">
+        <img src="images/series/summer/01.jpg" alt="树荫下，穿白衬衫的女孩" style="object-position:50% 40%" fetchpriority="high">
+        <h1 class="cv__t" data-float=".12">涂鸦写真帖</h1>
+      </div>
+      <div class="cv__side">
+        <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
+        <p class="cv__lede">为了记住，按下快门。</p>
+        <p class="cv__meta t-note">第一号<br>二〇二六 冬<br><!-- @total -->六卷 · 78 张<!-- /@total --></p>
+      </div>
+    </section>
+
+    <section class="about" id="about" data-rest aria-labelledby="about-t">
+      <h2 class="sr" id="about-t">关于</h2>
+      <p class="about__lede">我的记性不太好。三年前拿起相机，只是想把自己的回忆留下来。</p>
+      <div class="about__text">
+        <p>后来因为拍照，认识了很多人。原本只是为了记住，慢慢地，却真的喜欢上了摄影。</p>
+        <p>所以这里拍得最多的是人，也有一些街道和风景——那些我怕自己会忘记的地方和时刻。</p>
+      </div>
+      <p class="about__meta t-note">涂鸦<br>拍摄三年 · 人像为主，也拍人文风景与扫街<br>Nikon Z 8 · Canon EOS R5 Mark II</p>
+    </section>
+
+    <section class="works" id="works" aria-label="作品">
+<!-- @works:start -->
+      <article class="wk wk--l" aria-labelledby="wk-lane" style="--r:1.5">
+        <a class="wk__img" href="series/lane.html" data-rest style="aspect-ratio:3/2">
+          <img src="images/series/lane/08.jpg" alt="红砖" style="object-position:50% 50%" loading="lazy" decoding="async">
+          <span class="wk__t" id="wk-lane" data-float=".1" data-float-max="18">巷子里</span>
+        </a>
+        <div class="wk__info">
+          <p class="wk__no t-note">第一卷　2026.02.04</p>
+          <p class="wk__lede">二月的一个下午，在巷子里走了三个小时。</p>
+          <p class="t-note">人像 · 街头 · 25 张</p>
+          <a class="wk__go" href="series/lane.html">翻开</a>
+        </div>
+      </article>
+
+      <article class="wk wk--r" aria-labelledby="wk-yearend" style="--r:2.35">
+        <a class="wk__img" href="series/yearend.html" data-rest style="aspect-ratio:2.35/1">
+          <img src="images/series/yearend/02.jpg" alt="对望" style="object-position:50% 50%" loading="lazy" decoding="async">
+          <span class="wk__t" id="wk-yearend" data-float=".1" data-float-max="18">年末的光</span>
+        </a>
+        <div class="wk__info">
+          <p class="wk__no t-note">第二卷　2025.12.31</p>
+          <p class="wk__lede">一年的最后一天，下午两点四十分，光从窗户斜着照进来。</p>
+          <p class="t-note">人像 · 15 张</p>
+          <a class="wk__go" href="series/yearend.html">翻开</a>
+        </div>
+      </article>
+
+      <article class="wk wk--l" aria-labelledby="wk-bear" style="--r:0.8">
+        <a class="wk__img" href="series/bear.html" data-rest style="aspect-ratio:4/5">
+          <img src="images/series/bear/03.jpg" alt="举起相机" style="object-position:50% 30%" loading="lazy" decoding="async">
+          <span class="wk__t" id="wk-bear" data-float=".1" data-float-max="18">小熊帽</span>
+        </a>
+        <div class="wk__info">
+          <p class="wk__no t-note">第三卷　2025.01.19</p>
+          <p class="wk__lede">一顶小熊帽，一台旧相机，一个下午。</p>
+          <p class="t-note">人像 · 室内 · 5 张</p>
+          <a class="wk__go" href="series/bear.html">翻开</a>
+        </div>
+      </article>
+
+      <article class="wk wk--r" aria-labelledby="wk-train" style="--r:1.5">
+        <a class="wk__img" href="series/train.html" data-rest style="aspect-ratio:3/2">
+          <img src="images/series/train/02.jpg" alt="围巾" style="object-position:50% 40%" loading="lazy" decoding="async">
+          <span class="wk__t" id="wk-train" data-float=".1" data-float-max="18">冬日的列车</span>
+        </a>
+        <div class="wk__info">
+          <p class="wk__no t-note">第四卷　2025.01.10</p>
+          <p class="wk__lede">一月，下午四点，停着的列车和很低的太阳。</p>
+          <p class="t-note">人像 · 8 张</p>
+          <a class="wk__go" href="series/train.html">翻开</a>
+        </div>
+      </article>
+
+      <article class="wk wk--l" aria-labelledby="wk-summer" style="--r:1.5">
+        <a class="wk__img" href="series/summer.html" data-rest style="aspect-ratio:3/2">
+          <img src="images/series/summer/10.jpg" alt="托腮" style="object-position:50% 40%" loading="lazy" decoding="async">
+          <span class="wk__t" id="wk-summer" data-float=".1" data-float-max="18">五月的树荫</span>
+        </a>
+        <div class="wk__info">
+          <p class="wk__no t-note">第五卷　2024.05.01</p>
+          <p class="wk__lede">五月的一个下午，树荫很深，光从叶子的缝里漏下来。</p>
+          <p class="t-note">人像 · 19 张</p>
+          <a class="wk__go" href="series/summer.html">翻开</a>
+        </div>
+      </article>
+
+      <article class="wk wk--r" aria-labelledby="wk-cafe" style="--r:1.7778">
+        <a class="wk__img" href="series/cafe.html" data-rest style="aspect-ratio:16/9">
+          <img src="images/series/cafe/04.jpg" alt="睡着了" style="object-position:50% 55%" loading="lazy" decoding="async">
+          <span class="wk__t" id="wk-cafe" data-float=".1" data-float-max="18">咖啡凉了</span>
+        </a>
+        <div class="wk__info">
+          <p class="wk__no t-note">第六卷　2024.03.11</p>
+          <p class="wk__lede">从四点到六点，两个小时，六张照片。</p>
+          <p class="t-note">人像 · 室内 · 6 张</p>
+          <a class="wk__go" href="series/cafe.html">翻开</a>
+        </div>
+      </article>
+      <ul class="wk-later">
+        <li><span class="t-note">第七卷</span><span class="wk-later__t">街</span><span class="t-note">人文 · 扫街 · 整理中</span></li>
+      </ul>
+<!-- @works:end -->
+    </section>
+
+    <section class="close" data-rest aria-label="结尾">
+      <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
+      <p class="close__l">这些照片，替我记得。</p>
+      <p class="t-note">谢谢你看到这里。</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>© 2026 涂鸦　图片未经许可请勿转载</span>
+    <a href="#top">回到顶部 ↑</a>
+  </footer>
+
+  <script src="flow.js" defer></script>
+  <script src="home.js" defer></script>
+</body>
+</html>
