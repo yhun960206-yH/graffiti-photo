@@ -3,8 +3,8 @@
   const dir = document.querySelector('.dir');
   const bg = document.querySelector('.hx__bg');
   if (!dir || !bg) return;
-  const forced = new URLSearchParams(location.search).has('motion');
-  const reduce = !forced && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // motion is part of the book: kept even when the system asks for less (add ?still to see it at rest)
+  const reduce = new URLSearchParams(location.search).has('still');
   const base = bg.querySelector('img');
   const heads = [...dir.querySelectorAll('button.dir__h')];
   const layers = new Map();

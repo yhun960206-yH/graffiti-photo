@@ -11,8 +11,8 @@
 (() => {
   const want = (document.body.dataset.decor || '').split(/\s+/).filter(Boolean);
   if (!want.length) return;
-  const forced = new URLSearchParams(location.search).has('motion');
-  const still = !forced && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // motion is part of the book: kept even when the system asks for less (add ?still to see it at rest)
+  const still = new URLSearchParams(location.search).has('still');
 
   /* ── the motifs ───────────────────────────────────────────────
      svg: drawn in a 100×100 box · move: how it moves · size: px · w: how often · a: opacity

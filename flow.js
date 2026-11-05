@@ -16,8 +16,8 @@
    ========================================================== */
 (() => {
   const root = document.documentElement;
-  const forced = new URLSearchParams(location.search).has('motion');
-  const reduce = !forced && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // motion is part of the book: kept even when the system asks for less (add ?still to see it at rest)
+  const reduce = new URLSearchParams(location.search).has('still');
   const captureMQ = matchMedia('(max-aspect-ratio: 1/3)');
   const still = () => reduce || captureMQ.matches;
   root.classList.add('js');
