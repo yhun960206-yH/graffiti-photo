@@ -223,3 +223,19 @@ const total = volumes.reduce((s, v) => s + count(v), 0);
 html = html.replace(/<!-- @total -->[^<]*<!-- \/@total -->/g, `<!-- @total -->${CN[volumes.length]}卷 · ${total} 张<!-- /@total -->`);
 writeFileSync(indexPath, html);
 console.log(`index.html  ·  ${volumes.length} volumes · ${total} photos`);
+
+/* ═════════ cache busting ═════════
+   GitHub Pages lets browsers keep css/js for ~10 minutes; after an update a page could pair new HTML with old styles.
+   every local css/js link gets ?v=<content hash>, so a changed file is always fetched fresh. */
+import { createHash } from 'node:crypto';
+import { readdirSync } from 'node:fs';
+const ASSETS = readdirSync(root).filter(f => /\.(css|js)$/.test(f));
+const hash = f => createHash('sha1').update(readFileSync(join(root, f))).digest('hex').slice(0, 8);
+const ver = Object.fromEntries(ASSETS.map(f => [f, hash(f)]));
+const stamp = file => {
+  const h = readFileSync(file, 'utf8').replace(/((?:href|src)=")((?:\.\.\/)?)([\w-]+\.(?:css|js))(?:\?v=\w+)?"/g,
+    (m, a, pre, f) => ver[f] ? `${a}${pre}${f}?v=${ver[f]}"` : m);
+  writeFileSync(file, h);
+};
+[indexPath, join(root, '404.html'), ...volumes.map(v => join(outDir, `${v.slug}.html`))].forEach(stamp);
+console.log(`cache  ·  ${ASSETS.map(f => `${f}?v=${ver[f]}`).join(' ')}`);

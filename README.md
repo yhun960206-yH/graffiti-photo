@@ -66,7 +66,7 @@ node tools/build-series.mjs
   git commit -m "更新作品"
   git push
   ```
-  推送后约 1 分钟，线上自动更新。
+  推送后约 1 分钟，线上自动更新。生成器会给 css/js 链接加上 `?v=版本号`，浏览器不会混用新页面和旧样式。
 
 ## 本地预览
 ```
