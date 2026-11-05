@@ -1,4 +1,4 @@
-/* 每一卷：点开看大图。顶栏在 home.js，节奏在 flow.js，背景在 ambient.js。 */
+/* 每一卷：点开看大图。顶栏在 home.js，节奏在 flow.js，背景在 decor.js，文字在 text.js。 */
 (() => {
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
