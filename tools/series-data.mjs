@@ -93,7 +93,7 @@ export const volumes = [
     ],
   },
   {
-    slug: 'yearend', title: '年末的光', kind: '人像', year: '2025', date: '2025.12.31',
+    slug: 'yearend', title: '新一与毛利兰', kind: '人像', year: '2025', date: '2025.12.31',
     decor: ['beam', 'mote'],
     gear: NZ_TAM, theme: 'night',
     cover: 5, coverPos: '45% 40%',
