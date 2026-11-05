@@ -37,6 +37,10 @@
      layout, and it only touches what is near the screen. */
   let Y = scrollY, VH = innerHeight;
   const near = (top, h, before = 1.5, after = .6) => top < VH * before && top + h > -VH * after;
+  // where a picture's top sits when it is best seen: the picture and the caption under it centred together
+  // (a picture too tall for that sits just under the top bar). Everything about it is finished by then.
+  const CAP = 56;
+  const readAt = h => h + CAP < VH * .9 ? (VH - h - CAP) / 2 : VH * .07;
 
   /* ── 1. notes ─────────────────────────────────────────────────── */
   const plates = $$('.plate').map(el => ({
@@ -50,8 +54,8 @@
       const top = p.top - Y;
       let cp = 1;
       if (!still() && top + p.h > 0 && top < VH + 48) {
-        const readTop = p.h < VH * .9 ? (VH - p.h) / 2 : VH * .06;
-        cp = smooth(clamp((readTop - top) / (VH * .3)));            // on the photo until it has been seen, then it settles below
+        // on the photo while it comes up the screen; settled below, with date and settings, by the time it is centred
+        cp = smooth(clamp((readAt(p.h) + VH * .36 - top) / (VH * .32)));
       }
       cp = Math.round(cp * 40) / 40;
       if (cp === p.cp) continue;
@@ -90,10 +94,10 @@
     for (const t of tales) {
       const top = t.p.top - Y, h = t.p.h;
       let sp = 1;
-      if (!still() && top < VH * 1.05 && top + h > 0) {
-        const readTop = h < VH * .9 ? (VH - h) / 2 : VH * .06;
-        sp = t.float ? smooth(clamp((readTop - top + VH * .32) / (VH * .45)))     // on the picture: as it arrives
-                     : smooth(clamp((readTop - top + VH * .12) / (VH * .42)));    // beside / below: once it has been seen
+      if (!still() && top < VH * 1.2 && top + h > 0) {
+        const at = readAt(h);
+        sp = t.float ? smooth(clamp((at + VH * .5 - top) / (VH * .42)))           // on the picture: as it arrives
+                     : smooth(clamp((at + VH * .34 - top) / (VH * .32)));         // beside / below: right after the caption, done at the centre
       }
       sp = Math.round(sp * 24) / 24;                                   // a few steps; CSS transitions fill between them
       if (sp === t.sp) continue;
@@ -118,12 +122,18 @@
     el.removeAttribute('data-float');
     words.push({ el, f, max, off: 0, top: 0, h: 0 });
   }
+  // a caption or story drifts only while it is still arriving: once settled it sits exactly in place
+  for (const w of words) {
+    const p = plates.find(p => p.note === w.el), t = tales.find(t => t.el === w.el);
+    if (p) w.k = () => 1 - Math.max(0, p.cp);
+    else if (t) w.k = () => 1 - Math.max(0, t.sp);
+  }
   function depth() {
     const calm = still();
     for (const w of words) {
       const top = w.top - Y;
       let off = 0;
-      if (!calm && near(top, w.h, 1.6, .6)) off = Math.max(-w.max, Math.min(w.max, (top + w.h / 2 - VH / 2) * (w.f - 1)));
+      if (!calm && near(top, w.h, 1.6, .6)) off = Math.max(-w.max, Math.min(w.max, (top + w.h / 2 - VH / 2) * (w.f - 1))) * (w.k ? w.k() : 1);
       off = Math.round(off * 2) / 2;
       if (off === w.off) continue;
       w.off = off;
