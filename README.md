@@ -99,5 +99,5 @@ node tools/build-series.mjs
 
 ## 本地预览
 ```
-python -m http.server 5178
+python -m http.server 5191 --bind 127.0.0.1
 ```
