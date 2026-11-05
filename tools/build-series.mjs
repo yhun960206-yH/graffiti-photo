@@ -10,6 +10,8 @@ import * as data from './series-data.mjs';
 // the colour each picture casts on the paper, and its glow (made by tools/light.py)
 const LIGHT = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'light.json'), 'utf8'));
 const lightOf = (slug, n) => (LIGHT[slug] && LIGHT[slug].plates[n]) || '';
+// dark paper: whatever light.py decided from the pictures, or the volume's own theme
+const darkOf = v => (LIGHT[v.slug] && LIGHT[v.slug].night) || v.theme === 'night';
 const { volumes, AUTHOR, BOOK } = data;
 const upcoming = data.upcoming || [];
 const SITE = 'https://yhun960206-yh.github.io/graffiti-photo/';   // the published address, for share previews
@@ -135,7 +137,7 @@ function volumePage(v, i) {
   <!-- 由 tools/build-series.mjs 生成：请改 tools/series-data.mjs 后重新运行，不要直接改这个文件 -->
   <title>${esc(v.title)} · ${BOOK}</title>
   <meta name="description" content="${esc(v.lede)}　${AUTHOR}的摄影作品。">
-  <meta name="theme-color" content="${lightOf(v.slug, v.cover) || (v.theme === 'night' ? '#17171a' : '#f2efe7')}">
+  <meta name="theme-color" content="${lightOf(v.slug, v.cover) || (darkOf(v) ? '#17171a' : '#f2efe7')}">
   <meta property="og:title" content="${esc(v.title)} · ${BOOK}">
   <meta property="og:description" content="${esc(v.lede)}">
   <meta property="og:image" content="${SITE}images/series/${v.slug}/${pad(v.cover)}.jpg">
@@ -148,7 +150,7 @@ function volumePage(v, i) {
   <link rel="stylesheet" href="../base.css">
   <link rel="stylesheet" href="../book.css">
 </head>
-<body class="book${v.theme === 'night' ? ' theme-night' : ''}" style="background-color:${lightOf(v.slug, v.cover) || 'var(--paper)'}" data-decor="${(v.decor || []).join(' ')}">
+<body class="book${darkOf(v) ? ' theme-night' : ''}" style="background-color:${lightOf(v.slug, v.cover) || 'var(--paper)'}" data-decor="${(v.decor || []).join(' ')}">
   <a class="skip" href="#plates">跳到作品</a>
   <header class="bar" data-bar>
     <a class="bar__home" href="../index.html#works">${BOOK}</a>

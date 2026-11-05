@@ -4,10 +4,9 @@ tools/light.py —— 把每张照片当成一张被光照透的幻灯片：光�
     python3 tools/light.py        # 加了新照片后跑一次，再跑 node tools/build-series.mjs
 
 对每张照片算两样东西：
-  1. 它投下的光的颜色（写进 tools/light.json）
-     光穿过照片时，亮处透过的光多、暗处几乎不透，所有透过的光混在一起，就是它投到纸上的颜色。
-     做法：在线性光空间里对所有像素取平均（亮的像素自然占得多）。
-     页面背景顺着每张照片的位置，变成「纸被这种光照着」的颜色，照片之间慢慢过渡。
+  1. 它下面的纸的颜色（写进 tools/light.json）
+     这里的照片大多是低调的，所以纸是深色的：照片越暗纸越深，色相取自照片本身、但更安静（toned_paper）。
+     页面背景顺着每张照片的位置变成它的颜色，照片之间慢慢过渡；文字一律浅色，长截图里也始终看得清。
   2. 它四周的光晕（images/series/<卷>/glow-NN.webp）
      光不止照在正后方，还会洇开一圈：哪一侧照片亮、是什么颜色，那一侧的纸就被染成什么颜色，越远越淡。
      预先做成很小的模糊图（几 KB），网页上放大铺在照片后面——浏览器不用做任何实时模糊。
@@ -38,6 +37,25 @@ def lit_paper(hue, t, night):
     k = min(.5, .18 + t * .9)                               # brighter pictures cast more colour
     return srgb(p * ((1 - k) + k * hue))
 
+# ── OKLab, to set the paper's lightness and colourfulness on a scale the eye agrees with ──
+M1 = np.array([[.4122214708, .5363325363, .0514459929], [.2119034982, .6806995451, .1073969566], [.0883024619, .2817188376, .6299787005]])
+M2 = np.array([[.2104542553, .7936177850, -.0040720468], [1.9779984951, -2.4285922050, .4505937099], [.0259040371, .7827717662, -.8086757660]])
+oklab = lambda c: M2 @ np.cbrt(M1 @ c)
+def from_oklab(L):
+    l = np.linalg.solve(M2, L) ** 3
+    return np.linalg.solve(M1, l)
+
+def toned_paper(img_lin):
+    """the paper in the picture's own key: the photographs here are mostly low-key, so the paper is dark,
+    darker for a darker picture, tinted with the picture's own colour but quieter than it.
+    Stays dark enough that light text on it always reads."""
+    px = img_lin.reshape(-1, 3)
+    labs = np.array([oklab(c) for c in px[::max(1, len(px) // 2000)]])
+    L, a, b = np.median(labs[:, 0]), labs[:, 1].mean(), labs[:, 2].mean()
+    Lp = float(np.clip(.2 + (L - .25) * .34, .2, .32))      # picture L .25 → .20 … L .6 → .32
+    c = np.hypot(a, b); k = min(1, .04 / max(c, 1e-6)) * .8   # keep the hue, soften the colour
+    return srgb(np.clip(from_oklab(np.array([Lp, a * k, b * k])), 0, 1))
+
 def glow(img_lin, night, out):
     """a small, blurred map of the light spilling round the picture: the picture in the middle, the same size
     again of paper around it on every side, so light fades outward"""
@@ -64,15 +82,14 @@ night = set(json.loads(subprocess.check_output(['node', '-e',
 
 out = {}
 for d in sorted(glob.glob(os.path.join(ROOT, 'images/series/*'))):
-    slug = os.path.basename(d); dark = slug in night
+    slug = os.path.basename(d); dark = True                  # every volume is set on dark paper now (see toned_paper)
     per = {}
     for f in sorted(glob.glob(d + '/sm-*.jpg')):
         n = int(os.path.basename(f)[3:5])
         im = Image.open(f).convert('RGB')
         small = im.copy(); small.thumbnail((96, 96))
         L = lin(np.asarray(small).astype(float) / 255)
-        hue, t = light_through(L)
-        per[str(n)] = hexof(lit_paper(hue, t, dark))
+        per[str(n)] = hexof(toned_paper(L))
         g = im.copy(); g.thumbnail((40, 40))
         glow(lin(np.asarray(g).astype(float) / 255), dark, os.path.join(d, f'glow-{n:02d}.webp'))
     out[slug] = {'night': dark, 'plates': per}
