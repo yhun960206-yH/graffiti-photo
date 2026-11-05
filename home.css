@@ -10,6 +10,8 @@
   .about__text p + p { margin-top: 12px; }
   .about__meta { margin-top: 28px; }
 
+  body { transition: background-color 1.4s var(--e-soft); }
+
   /* ───── cover: one picture, the directory set on it ─────
      the picture stays on screen while a volume opens below its line, and turns into that volume */
   .hx { display: grid; color: #fff; isolation: isolate; background: #141416; }

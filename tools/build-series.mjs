@@ -6,6 +6,10 @@ import { writeFileSync, readFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as data from './series-data.mjs';
+
+// the colour each picture casts on the paper, and its glow (made by tools/light.py)
+const LIGHT = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'light.json'), 'utf8'));
+const lightOf = (slug, n) => (LIGHT[slug] && LIGHT[slug].plates[n]) || '';
 const { volumes, AUTHOR, BOOK } = data;
 const upcoming = data.upcoming || [];
 const SITE = 'https://yhun960206-yh.github.io/graffiti-photo/';   // the published address, for share previews
@@ -59,15 +63,19 @@ function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   // the small picture comes first; flow.js swaps in the full one only while the page is at rest,
   // so scrolling never waits for a big picture to load or decode
   const img = `<img src="${sm}" data-full="${src}" alt="${esc(p.t)}" loading="lazy" decoding="async">`;
+  const lit = lightOf(v.slug, it.n);
+  // the light through the picture, spilling onto the paper around it
+  const glow = lit ? `<img class="glow" src="${prefix}images/series/${v.slug}/glow-${pad(it.n)}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+          ` : '';
   const frame = href
     ? `<a class="plate__frame" href="${href}">${img}</a>`
     : `<button class="plate__frame" type="button" data-title="图 ${pad(no)} · ${esc(p.t)}" aria-label="放大：${esc(p.t)}">${img}</button>`;
   const detail = [p.d, p.x].filter(Boolean).map(esc).join('　');
   const float = p.s && FLOATS.has(layout);
   const tale = p.s && !float ? `<p class="tale" data-fx="tale">${esc(p.s)}</p>` : '';
-  return { tale, html: `<figure class="plate${p.s ? ' has-tale' : ''}" style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
+  return { tale, html: `<figure class="plate${p.s ? ' has-tale' : ''}"${lit ? ` data-light="${lit}"` : ''} style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
         <div class="plate__body">
-          ${frame}${float ? `
+          ${glow}${frame}${float ? `
           <p class="tale tale--float" data-fx="tale">${esc(p.s)}</p>` : ''}
           <figcaption class="note"><span class="note__t"><span class="note__n">图 ${pad(no)}</span>${esc(p.t)}</span><span class="note__d">${detail}</span></figcaption>
         </div>
@@ -127,7 +135,7 @@ function volumePage(v, i) {
   <!-- 由 tools/build-series.mjs 生成：请改 tools/series-data.mjs 后重新运行，不要直接改这个文件 -->
   <title>${esc(v.title)} · ${BOOK}</title>
   <meta name="description" content="${esc(v.lede)}　${AUTHOR}的摄影作品。">
-  <meta name="theme-color" content="${v.theme === 'night' ? '#17171a' : '#f2efe7'}">
+  <meta name="theme-color" content="${lightOf(v.slug, v.cover) || (v.theme === 'night' ? '#17171a' : '#f2efe7')}">
   <meta property="og:title" content="${esc(v.title)} · ${BOOK}">
   <meta property="og:description" content="${esc(v.lede)}">
   <meta property="og:image" content="${SITE}images/series/${v.slug}/${pad(v.cover)}.jpg">
@@ -140,7 +148,7 @@ function volumePage(v, i) {
   <link rel="stylesheet" href="../base.css">
   <link rel="stylesheet" href="../book.css">
 </head>
-<body class="book${v.theme === 'night' ? ' theme-night' : ''}" data-decor="${(v.decor || []).join(' ')}">
+<body class="book${v.theme === 'night' ? ' theme-night' : ''}" style="background-color:${lightOf(v.slug, v.cover) || 'var(--paper)'}" data-decor="${(v.decor || []).join(' ')}">
   <a class="skip" href="#plates">跳到作品</a>
   <header class="bar" data-bar>
     <a class="bar__home" href="../index.html#works">${BOOK}</a>
@@ -206,7 +214,7 @@ function entry(v, i) {
   const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
   return `
         <li class="dir__i" style="--k:${i}">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-bg="images/series/${v.slug}/${pad(f.plate)}.jpg" data-pos="${f.pos || fp.pos || '50% 50%'}">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${LIGHT[v.slug] && !LIGHT[v.slug].night ? lightOf(v.slug, f.plate) : ''}" data-bg="images/series/${v.slug}/${pad(f.plate)}.jpg" data-pos="${f.pos || fp.pos || '50% 50%'}">
             <span class="dir__no">${CN[v.no]}</span><span class="dir__t">${esc(v.title)}</span><span class="dir__m">${esc(v.date.slice(0, 7))}</span>
           </button>
           <div class="dir__p" id="dir-${v.slug}" role="region" aria-label="${esc(v.title)}">

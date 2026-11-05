@@ -8,6 +8,8 @@
    3. ZOOM   图片离最佳位置越近越大：从它所在的一侧（偏左的从左下角、偏右的从右下角）长出来，
              里面的照片同时轻轻退远一点。屏幕外、长截图里都是原大。
    4. TALE   图的故事（.tale）随图片滑过一个字一个字出来；往回滑，又一个字一个字收回去。
+   6. LIGHT  页面背景是「被照片透过的光照着的纸」：每张图那一段的纸是它投下的颜色，图与图之间慢慢过渡。
+             整页是一条预先算好的渐变（尺寸变了才重算），滚动时不用做任何事；顶栏跟着当前位置的颜色。
    5. DEPTH  层次全靠滚动时的速度差：图片与页面同速（基准）；背景插画比它快（在后，decor.js）；
              文字比它慢（在前）——图注稍慢，正文、故事更慢，大标题最慢。
              每个字块在屏幕正中时回到原位，所以静止阅读时版式不变；长截图里一律原位。
@@ -129,6 +131,44 @@
     }
   }
 
+  /* ── 6. light: the paper, lit by whatever picture is above it ──── */
+  const bar = document.querySelector('.bar'), meta = document.querySelector('meta[name="theme-color"]');
+  let stops = [];                                                       // [pagePos, [r,g,b]]
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  function paint() {
+    const lit = plates.filter(p => p.el.dataset.light);
+    if (!lit.length) return;
+    stops = [];
+    let last = -1e9;
+    for (const p of lit) {                                              // side by side → the first one speaks for the row
+      if (p.top - last < 60) continue;
+      last = p.top;
+      const c = rgb(p.el.dataset.light), hold = p.h * .25;
+      stops.push([p.top + hold, c], [p.top + p.h - hold, c]);           // held while the picture is there, blending between
+    }
+    const H = document.documentElement.scrollHeight;
+    stops.unshift([0, stops[0][1]]); stops.push([H, stops[stops.length - 1][1]]);
+    const css = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+    document.body.style.backgroundImage = `linear-gradient(to bottom, ${stops.map(([y, c]) => `${css(c)} ${Math.round(y)}px`).join(', ')})`;
+    document.body.style.backgroundSize = `100% ${H}px`;
+    document.body.style.backgroundRepeat = 'no-repeat';
+    barTint = '';
+  }
+  let barTint = '';
+  function tint() {
+    if (!stops.length || !bar) return;
+    const y = Y + 30;
+    let i = 1; while (i < stops.length - 1 && stops[i][0] < y) i++;
+    const [y0, a] = stops[i - 1], [y1, b] = stops[i];
+    const t = y1 > y0 ? clamp((y - y0) / (y1 - y0)) : 0;
+    const c = a.map((v, k) => Math.round(v + (b[k] - v) * t));
+    const key = c.join(',');
+    if (key === barTint) return;
+    barTint = key;
+    bar.style.backgroundColor = `rgba(${key},.97)`;
+    if (meta) meta.content = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+
   /* ── measuring (only when the page changes size) ──────────────── */
   function measure() {
     VH = innerHeight; Y = scrollY;
@@ -137,6 +177,7 @@
     for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
     tales.forEach(t => t.sp = -1);
     plates.forEach(p => p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')));
+    paint();
     window.__flow.measured = Date.now();
   }
 
@@ -169,7 +210,7 @@
     ticking = false;
     if (dirty) { dirty = false; measure(); }
     Y = scrollY;
-    notes(); zoom(); tell(); depth();
+    notes(); zoom(); tell(); depth(); tint();
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
   const remeasure = () => { dirty = true; request(); };

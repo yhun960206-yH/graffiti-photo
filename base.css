@@ -119,6 +119,8 @@
      --cp 1 = it has settled under the photo (ink, with date and settings) — the rest state */
   .plate { margin: 0; padding-bottom: var(--capspace, 64px); --cp: 1; --l1: 21px; }
   .plate__body { position: relative; }
+  /* the light through the picture on the paper around it (tools/light.py): a tiny blurred map, stretched */
+  .glow { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; max-width: none; z-index: -1; pointer-events: none; user-select: none; }
   .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
   .plate__body::before {
@@ -193,6 +195,7 @@
 
 /* ───── layer 1 · the paper: little things from the photos, drawn and drifting (decor.js) ───── */
 @layer parts {
+  html { background: transparent; }
   .decor { position: absolute; left: 0; top: 0; width: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
   .decor__band { position: absolute; left: 0; top: 0; width: 100%; will-change: transform; }
   .dc { position: absolute; display: block; transition: opacity .5s var(--e-soft); }

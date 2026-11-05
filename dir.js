@@ -45,6 +45,7 @@
       set(btn, opening);
       dir.classList.toggle('has-open', opening);
       showBg(opening ? btn.dataset.bg : null, btn.dataset.pos);
+      document.body.style.backgroundColor = opening && btn.dataset.light ? btn.dataset.light : '';   // the page below takes that volume's light
     });
   });
 
