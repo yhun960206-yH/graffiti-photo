@@ -45,6 +45,37 @@
       <defs><radialGradient id="g-mote"><stop offset="0" stop-color="#f3d79c"/><stop offset="1" stop-color="#f3d79c" stop-opacity="0"/></radialGradient></defs>
       <circle cx="50" cy="50" r="50" fill="url(#g-mote)"/>` },
 
+    // 新一与毛利兰：侦探的小物件（原创的绘本风，不画人物）· 放大镜 · 红领结 · 圆框眼镜 · 足球 · 樱花（blossom）· 光尘（mote）
+    loupe: { move: 'bob', size: [34, 56], w: 2, a: .9, svg: `
+      <g transform="rotate(-38 50 50)">
+        <rect x="45" y="60" width="10" height="36" rx="5" fill="#7a4f2e"/><rect x="46.5" y="66" width="3" height="24" rx="1.5" fill="#a87650"/>
+        <rect x="42" y="54" width="16" height="10" rx="3" fill="#c9a24a"/>
+        <circle cx="50" cy="32" r="25" fill="#cfe3ea" fill-opacity=".38" stroke="#c9a24a" stroke-width="6"/>
+        <path d="M35 26 a17 17 0 0 1 13 -11" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+      </g>` },
+    bowtie: { move: 'drift', size: [26, 40], w: 3, a: .92, svg: `
+      <g stroke="#8f1f27" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M50 50 C 38 34, 16 28, 10 38 C 5 46, 5 56, 10 64 C 16 74, 38 66, 50 50 Z" fill="#c8323a"/>
+        <path d="M50 50 C 62 34, 84 28, 90 38 C 95 46, 95 56, 90 64 C 84 74, 62 66, 50 50 Z" fill="#c8323a"/>
+        <rect x="41" y="40" width="18" height="20" rx="6" fill="#a8262f"/>
+      </g>
+      <path d="M20 44 q9 6 18 4 M20 58 q9 -4 18 -2 M80 44 q-9 6 -18 4 M80 58 q-9 -4 -18 -2" fill="none" stroke="#e86a70" stroke-width="2" stroke-linecap="round" opacity=".7"/>` },
+    specs: { move: 'bob', size: [34, 52], w: 1, a: .85, svg: `
+      <g fill="#cfe3ea" fill-opacity=".22" stroke="#e8e2d6" stroke-width="5">
+        <circle cx="28" cy="54" r="17"/><circle cx="72" cy="54" r="17"/>
+      </g>
+      <path d="M45 50 q5 -7 10 0 M11 50 L4 44 M89 50 L96 44" fill="none" stroke="#e8e2d6" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M20 46 a10 10 0 0 1 8 -5 M64 46 a10 10 0 0 1 8 -5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>` },
+    ball: { move: 'tumble', size: [24, 38], w: 2, a: .9, svg: `
+      <defs><clipPath id="dc-ball-clip"><circle cx="50" cy="50" r="43"/></clipPath></defs>
+      <circle cx="50" cy="50" r="43" fill="#f2efe7"/>
+      <g clip-path="url(#dc-ball-clip)" fill="#2b2a27" stroke="#2b2a27" stroke-width="2.5">
+        <polygon points="50,36 63,46 58,61 42,61 37,46"/>
+        ${[-54, 18, 90, 162, 234].map(a => { const r = a * Math.PI / 180, x = 50 + 46 * Math.cos(r), y = 50 + 46 * Math.sin(r); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13"/>`; }).join('')}
+        ${[-90, -18, 54, 126, 198].map(a => { const r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return `<line x1="${(50 + 14 * c).toFixed(1)}" y1="${(50 + 14 * s).toFixed(1)}" x2="${(50 + 33 * c).toFixed(1)}" y2="${(50 + 33 * s).toFixed(1)}" fill="none"/>`; }).join('')}
+      </g>
+      <circle cx="50" cy="50" r="43" fill="none" stroke="#2b2a27" stroke-width="3"/>` },
+
     // 小熊帽：熊耳帽 · 羊羔毛的卷 · 她举起的旧相机
     bear: { move: 'bob', size: [28, 46], w: 3, a: .9, svg: `
       <circle cx="24" cy="30" r="14" fill="#8b5e3c"/><circle cx="76" cy="30" r="14" fill="#8b5e3c"/>
