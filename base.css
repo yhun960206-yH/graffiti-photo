@@ -169,11 +169,27 @@
   }
 
   .ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+}
 
-  /* ───── the pause ───── */
-  html.snap { scroll-snap-type: y proximity; }
-  [data-rest] { scroll-snap-align: center; }
-  [data-rest="top"] { scroll-snap-align: start; }
+
+/* ───── text effects (text.js) ─────
+   ink    each character bleeds out of a blur, like ink on paper
+   rise   characters float up one by one as the line comes into view
+   decode random characters settle into the real ones */
+@layer motion {
+  .fx [data-fx] .ch { display: inline-block; }
+  .fx [data-fx="ink"] .ch {
+    opacity: 0; filter: blur(14px); transform: scale(1.35);
+    transition: opacity 1.4s var(--e-soft), filter 1.8s var(--e-soft), transform 2s var(--e-soft);
+    transition-delay: calc(200ms + var(--i) * 150ms);
+  }
+  .fx [data-fx="rise"] .ch {
+    opacity: 0; transform: translateY(.55em);
+    transition: opacity .9s var(--e-soft), transform 1.1s var(--e-soft);
+    transition-delay: calc(var(--i) * 42ms);
+  }
+  .fx [data-fx].is-in .ch { opacity: 1; filter: none; transform: none; }
+  .is-decoding .ch:not(.ok) { opacity: .4; }
 }
 
 @layer capture {
@@ -182,6 +198,7 @@
     .note__t { color: var(--ink) !important; }
     [data-float] { transform: none !important; }
     .ambient { display: none !important; }
+    [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
     .bar { position: absolute !important; transform: none !important; }
   }
   @media print { .bar, .lb { display: none !important; } }

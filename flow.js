@@ -5,12 +5,7 @@
              （白字，只有编号与标题）；图片继续往上走，说明落到图下，
              补出日期与参数。屏幕外的图一律是「落在图下」的成品状态，
              所以长截图、打印永远完整。
-   2. PAUSE  [data-rest] 是每一段的最佳观看位置。滚轮或触控板经过时，
-             页面会在这里「卡」一下：滑到位、停约三分之一秒，再继续。
-             手指滑动时由浏览器吸附（仅在手指操作期间开启）。
-             停下后若离某个位置很近，也会轻轻对齐。
-             只响应你自己的操作 —— 截图工具的程序滚动不受影响。
-   3. FLOAT  [data-float] 压在图上的标题随滚动略慢于图片，像浮在图上。
+   2. FLOAT  [data-float] 压在图上的标题随滚动略慢于图片，像浮在图上。
    ========================================================== */
 (() => {
   const root = document.documentElement;
@@ -48,7 +43,7 @@
     }
   }
 
-  /* ── 3. float ─────────────────────────────────────────────────── */
+  /* ── 2. float ─────────────────────────────────────────────────── */
   // the text lags a little behind its image as the image scrolls past — never more than `max` px
   const floats = $$('[data-float]').map(el => ({ el, k: parseFloat(el.dataset.float) || .2, max: parseFloat(el.dataset.floatMax) || 36, host: el.closest('section, header, figure, a') || el.parentElement }));
   function float() {
@@ -61,75 +56,10 @@
     }
   }
 
-  /* ── 2. pause ─────────────────────────────────────────────────── */
-  const rests = $$('[data-rest]');
-  const barH = () => parseFloat(getComputedStyle(root).getPropertyValue('--bar')) || 52;
-  const maxY = () => root.scrollHeight - innerHeight;
-  function stopOf(el) {
-    const r = el.getBoundingClientRect(), vh = innerHeight;
-    const t = el.dataset.rest === 'top' || r.height > vh * 0.9
-      ? scrollY + r.top - (el.dataset.rest === 'top' ? 0 : barH() * .5)
-      : scrollY + r.top + r.height / 2 - vh / 2;
-    return Math.round(clamp(t, 0, maxY()));
-  }
-
-  let anim = 0, holdUntil = 0, lastStop = null, lastInput = 0;
-  function glide(to, dur, done) {
-    cancelAnimationFrame(anim);
-    const from = scrollY, t0 = performance.now();
-    const step = now => {
-      const k = clamp((now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
-      scrollTo(0, from + (to - from) * e);
-      if (k < 1) anim = requestAnimationFrame(step); else { anim = 0; done && done(); }
-    };
-    anim = requestAnimationFrame(step);
-  }
-
-  // wheel & trackpad: if this step would carry the page past a viewing position, stop there for a beat
-  addEventListener('wheel', e => {
-    lastInput = performance.now();
-    if (still() || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-    if (anim || performance.now() < holdUntil) { e.preventDefault(); return; }   // gliding into, or resting at, a stop
-    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);
-    const y = scrollY;
-    if (lastStop !== null && Math.abs(y - lastStop) > innerHeight * 0.25) lastStop = null;
-    let best = null;
-    for (const el of rests) {
-      const t = stopOf(el), d = t - y;
-      if (t === lastStop || Math.abs(d) < 2 || Math.sign(d) !== Math.sign(dy)) continue;
-      if (Math.abs(d) <= Math.abs(dy) + 4 && (best === null || Math.abs(d) < Math.abs(best - y))) best = t;
-    }
-    if (best === null) return;
-    e.preventDefault();
-    lastStop = best;
-    glide(best, 240, () => { holdUntil = performance.now() + 360; });
-  }, { passive: false });
-
-  // touch: let the browser snap, only while a finger is moving the page
-  let snapOff = 0;
-  addEventListener('touchstart', () => { lastInput = performance.now(); if (!still()) { clearTimeout(snapOff); root.classList.add('snap'); } }, { passive: true });
-  addEventListener('touchend', () => { lastInput = performance.now(); clearTimeout(snapOff); snapOff = setTimeout(() => root.classList.remove('snap'), 1600); }, { passive: true });
-  ['keydown', 'pointerdown'].forEach(t => addEventListener(t, () => { lastInput = performance.now(); if (anim) { cancelAnimationFrame(anim); anim = 0; } }, { passive: true }));
-
-  // after the reader stops close to a viewing position, ease the last few centimetres
-  let settleT = 0;
-  function settle() {
-    if (still() || anim || performance.now() - lastInput > 1200 || root.classList.contains('snap')) return;
-    const y = scrollY, vh = innerHeight;
-    let best = null;
-    for (const el of rests) { const t = stopOf(el); if (best === null || Math.abs(t - y) < Math.abs(best - y)) best = t; }
-    if (best === null) return;
-    const d = Math.abs(best - y);
-    if (d > 3 && d < vh * 0.12) { lastStop = best; glide(best, 380 + d); }
-  }
-
   /* ── loop ─────────────────────────────────────────────────────── */
   let ticking = false;
   const frame = () => { ticking = false; notes(); float(); };
-  addEventListener('scroll', () => {
-    if (!ticking) { ticking = true; requestAnimationFrame(frame); }
-    clearTimeout(settleT); if (!anim) settleT = setTimeout(settle, 180);
-  }, { passive: true });
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
   addEventListener('resize', () => { plates.forEach(p => { p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')); p.cp = -1; }); frame(); });
   captureMQ.addEventListener('change', frame);
   frame();
@@ -145,5 +75,5 @@
     (window.requestIdleCallback || (f => setTimeout(f, 300)))(next);
   });
 
-  window.__flow = { plates, rests, stopOf };
+  window.__flow = { plates };
 })();

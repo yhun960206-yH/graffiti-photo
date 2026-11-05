@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <!--
     涂鸦写真帖 · 个人摄影作品站
-    · 「作品」部分由 tools/build-series.mjs 生成（@works 之间不要手改）
+    · 封面上的「目录」由 tools/build-series.mjs 生成（@works 之间不要手改）
     · 以后想公开联系方式，加在页尾 .close 里，写法见 README
   -->
   <title>涂鸦写真帖</title>
@@ -26,7 +26,7 @@
   </script>
 </head>
 <body>
-  <a class="skip" href="#works">跳到作品</a>
+  <a class="skip" href="#works">跳到目录</a>
 
   <header class="bar" data-bar>
     <a class="bar__home" href="#top">涂鸦写真帖</a>
@@ -35,21 +35,109 @@
   </header>
 
   <main id="top">
-    <section class="cv" data-rest="top">
-      <div class="cv__img">
-        <img src="images/series/summer/01.jpg" alt="树荫下，穿白衬衫的女孩" style="object-position:50% 40%" fetchpriority="high">
-        <h1 class="cv__t" data-float=".12">涂鸦写真帖</h1>
+    <section class="hx" id="works" aria-label="封面与目录">
+      <div class="hx__bg" aria-hidden="true">
+        <img class="is-on" src="images/series/summer/01.jpg" alt="" style="object-position:50% 40%" fetchpriority="high">
       </div>
-      <div class="cv__side">
-        <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-        <p class="cv__lede">为了记住，按下快门。</p>
-        <p class="cv__meta t-note">第一号<br>二〇二六 冬<br><!-- @total -->六卷 · 78 张<!-- /@total --></p>
+      <div class="hx__fg">
+        <div class="hx__top">
+          <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
+          <p class="hx__lede" data-fx="rise" data-fx-delay="900">为了记住，按下快门。</p>
+          <p class="hx__meta">第一号　二〇二六 冬　<!-- @total -->六卷 · 78 张<!-- /@total --></p>
+        </div>
+        <h1 class="hx__t" data-fx="ink">涂鸦写真帖</h1>
+        <nav class="hx__dir" aria-label="作品目录">
+          <p class="hx__dirt">目录</p>
+<!-- @works:start -->
+      <ol class="dir">
+        <li class="dir__i" style="--k:0">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-lane" data-bg="images/series/lane/08.jpg" data-pos="50% 50%">
+            <span class="dir__no">一</span><span class="dir__t">巷子里</span><span class="dir__m">2026.02</span>
+          </button>
+          <div class="dir__p" id="dir-lane" role="region" aria-label="巷子里">
+            <div class="dir__in">
+              <p class="dir__lede">二月的一个下午，在巷子里走了三个小时。</p>
+              <p class="dir__meta">人像 · 街头 · 25 张</p>
+              <div class="dir__strip"><a href="series/lane.html" tabindex="-1"><img data-src="images/series/lane/sm-24.jpg" alt="白墙" style="aspect-ratio:3/2" decoding="async"></a><a href="series/lane.html" tabindex="-1"><img data-src="images/series/lane/sm-01.jpg" alt="古着店" style="aspect-ratio:3/2" decoding="async"></a><a href="series/lane.html" tabindex="-1"><img data-src="images/series/lane/sm-02.jpg" alt="古着店 · 二" style="aspect-ratio:2/3" decoding="async"></a><a href="series/lane.html" tabindex="-1"><img data-src="images/series/lane/sm-03.jpg" alt="瓷片门" style="aspect-ratio:2/3" decoding="async"></a><a href="series/lane.html" tabindex="-1"><img data-src="images/series/lane/sm-04.jpg" alt="瓷片门 · 二" style="aspect-ratio:2/3" decoding="async"></a><a href="series/lane.html" tabindex="-1"><img data-src="images/series/lane/sm-05.jpg" alt="抱着书" style="aspect-ratio:3/2" decoding="async"></a></div>
+              <a class="dir__go" href="series/lane.html">翻开这一卷</a>
+            </div>
+          </div>
+        </li>
+        <li class="dir__i" style="--k:1">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-yearend" data-bg="images/series/yearend/02.jpg" data-pos="50% 50%">
+            <span class="dir__no">二</span><span class="dir__t">年末的光</span><span class="dir__m">2025.12</span>
+          </button>
+          <div class="dir__p" id="dir-yearend" role="region" aria-label="年末的光">
+            <div class="dir__in">
+              <p class="dir__lede">一年的最后一天，下午两点四十分，光从窗户斜着照进来。</p>
+              <p class="dir__meta">人像 · 15 张</p>
+              <div class="dir__strip"><a href="series/yearend.html" tabindex="-1"><img data-src="images/series/yearend/sm-05.jpg" alt="半张脸" style="aspect-ratio:1/1" decoding="async"></a><a href="series/yearend.html" tabindex="-1"><img data-src="images/series/yearend/sm-01.jpg" alt="背对背" style="aspect-ratio:2.35/1" decoding="async"></a><a href="series/yearend.html" tabindex="-1"><img data-src="images/series/yearend/sm-02.jpg" alt="对望" style="aspect-ratio:2.35/1" decoding="async"></a><a href="series/yearend.html" tabindex="-1"><img data-src="images/series/yearend/sm-03.jpg" alt="楼梯间" style="aspect-ratio:2.35/1" decoding="async"></a><a href="series/yearend.html" tabindex="-1"><img data-src="images/series/yearend/sm-04.jpg" alt="侧影" style="aspect-ratio:1/1" decoding="async"></a><a href="series/yearend.html" tabindex="-1"><img data-src="images/series/yearend/sm-06.jpg" alt="低头" style="aspect-ratio:1/1" decoding="async"></a></div>
+              <a class="dir__go" href="series/yearend.html">翻开这一卷</a>
+            </div>
+          </div>
+        </li>
+        <li class="dir__i" style="--k:2">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-bear" data-bg="images/series/bear/03.jpg" data-pos="50% 30%">
+            <span class="dir__no">三</span><span class="dir__t">小熊帽</span><span class="dir__m">2025.01</span>
+          </button>
+          <div class="dir__p" id="dir-bear" role="region" aria-label="小熊帽">
+            <div class="dir__in">
+              <p class="dir__lede">一顶小熊帽，一台旧相机，一个下午。</p>
+              <p class="dir__meta">人像 · 室内 · 5 张</p>
+              <div class="dir__strip"><a href="series/bear.html" tabindex="-1"><img data-src="images/series/bear/sm-03.jpg" alt="举起相机" style="aspect-ratio:2/3" decoding="async"></a><a href="series/bear.html" tabindex="-1"><img data-src="images/series/bear/sm-01.jpg" alt="坐在地上" style="aspect-ratio:2/3" decoding="async"></a><a href="series/bear.html" tabindex="-1"><img data-src="images/series/bear/sm-02.jpg" alt="比划" style="aspect-ratio:2/3" decoding="async"></a><a href="series/bear.html" tabindex="-1"><img data-src="images/series/bear/sm-04.jpg" alt="伸手" style="aspect-ratio:2/3" decoding="async"></a><a href="series/bear.html" tabindex="-1"><img data-src="images/series/bear/sm-05.jpg" alt="打电话" style="aspect-ratio:2/3" decoding="async"></a></div>
+              <a class="dir__go" href="series/bear.html">翻开这一卷</a>
+            </div>
+          </div>
+        </li>
+        <li class="dir__i" style="--k:3">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-train" data-bg="images/series/train/02.jpg" data-pos="50% 40%">
+            <span class="dir__no">四</span><span class="dir__t">冬日的列车</span><span class="dir__m">2025.01</span>
+          </button>
+          <div class="dir__p" id="dir-train" role="region" aria-label="冬日的列车">
+            <div class="dir__in">
+              <p class="dir__lede">一月，下午四点，停着的列车和很低的太阳。</p>
+              <p class="dir__meta">人像 · 8 张</p>
+              <div class="dir__strip"><a href="series/train.html" tabindex="-1"><img data-src="images/series/train/sm-07.jpg" alt="暖光" style="aspect-ratio:2/3" decoding="async"></a><a href="series/train.html" tabindex="-1"><img data-src="images/series/train/sm-02.jpg" alt="围巾" style="aspect-ratio:3/2" decoding="async"></a><a href="series/train.html" tabindex="-1"><img data-src="images/series/train/sm-03.jpg" alt="花架" style="aspect-ratio:3/2" decoding="async"></a><a href="series/train.html" tabindex="-1"><img data-src="images/series/train/sm-04.jpg" alt="远处的楼" style="aspect-ratio:3/2" decoding="async"></a><a href="series/train.html" tabindex="-1"><img data-src="images/series/train/sm-05.jpg" alt="栏杆" style="aspect-ratio:3/2" decoding="async"></a><a href="series/train.html" tabindex="-1"><img data-src="images/series/train/sm-06.jpg" alt="等车" style="aspect-ratio:3/2" decoding="async"></a></div>
+              <a class="dir__go" href="series/train.html">翻开这一卷</a>
+            </div>
+          </div>
+        </li>
+        <li class="dir__i" style="--k:4">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-summer" data-bg="images/series/summer/10.jpg" data-pos="50% 40%">
+            <span class="dir__no">五</span><span class="dir__t">五月的树荫</span><span class="dir__m">2024.05</span>
+          </button>
+          <div class="dir__p" id="dir-summer" role="region" aria-label="五月的树荫">
+            <div class="dir__in">
+              <p class="dir__lede">五月的一个下午，树荫很深，光从叶子的缝里漏下来。</p>
+              <p class="dir__meta">人像 · 19 张</p>
+              <div class="dir__strip"><a href="series/summer.html" tabindex="-1"><img data-src="images/series/summer/sm-05.jpg" alt="抬头" style="aspect-ratio:3/2" decoding="async"></a><a href="series/summer.html" tabindex="-1"><img data-src="images/series/summer/sm-22.jpg" alt="冰饮" style="aspect-ratio:2/3" decoding="async"></a><a href="series/summer.html" tabindex="-1"><img data-src="images/series/summer/sm-02.jpg" alt="叶影" style="aspect-ratio:3/2" decoding="async"></a><a href="series/summer.html" tabindex="-1"><img data-src="images/series/summer/sm-04.jpg" alt="叶影 · 二" style="aspect-ratio:3/2" decoding="async"></a><a href="series/summer.html" tabindex="-1"><img data-src="images/series/summer/sm-01.jpg" alt="躲在树后" style="aspect-ratio:2/3" decoding="async"></a><a href="series/summer.html" tabindex="-1"><img data-src="images/series/summer/sm-06.jpg" alt="伸手" style="aspect-ratio:3/2" decoding="async"></a></div>
+              <a class="dir__go" href="series/summer.html">翻开这一卷</a>
+            </div>
+          </div>
+        </li>
+        <li class="dir__i" style="--k:5">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-cafe" data-bg="images/series/cafe/04.jpg" data-pos="50% 55%">
+            <span class="dir__no">六</span><span class="dir__t">咖啡凉了</span><span class="dir__m">2024.03</span>
+          </button>
+          <div class="dir__p" id="dir-cafe" role="region" aria-label="咖啡凉了">
+            <div class="dir__in">
+              <p class="dir__lede">从四点到六点，两个小时，六张照片。</p>
+              <p class="dir__meta">人像 · 室内 · 6 张</p>
+              <div class="dir__strip"><a href="series/cafe.html" tabindex="-1"><img data-src="images/series/cafe/sm-01.jpg" alt="对视" style="aspect-ratio:3/2" decoding="async"></a><a href="series/cafe.html" tabindex="-1"><img data-src="images/series/cafe/sm-02.jpg" alt="消息" style="aspect-ratio:3/2" decoding="async"></a><a href="series/cafe.html" tabindex="-1"><img data-src="images/series/cafe/sm-03.jpg" alt="一口" style="aspect-ratio:3/2" decoding="async"></a><a href="series/cafe.html" tabindex="-1"><img data-src="images/series/cafe/sm-04.jpg" alt="睡着了" style="aspect-ratio:2.35/1" decoding="async"></a><a href="series/cafe.html" tabindex="-1"><img data-src="images/series/cafe/sm-05.jpg" alt="日记" style="aspect-ratio:1/1" decoding="async"></a><a href="series/cafe.html" tabindex="-1"><img data-src="images/series/cafe/sm-06.jpg" alt="伸懒腰" style="aspect-ratio:3/2" decoding="async"></a></div>
+              <a class="dir__go" href="series/cafe.html">翻开这一卷</a>
+            </div>
+          </div>
+        </li>
+        <li class="dir__i is-later" style="--k:6"><span class="dir__h"><span class="dir__no">七</span><span class="dir__t">街</span><span class="dir__m">整理中</span></span></li>
+      </ol>
+<!-- @works:end -->
+        </nav>
       </div>
     </section>
 
-    <section class="about" id="about" data-rest aria-labelledby="about-t">
+    <section class="about" id="about" aria-labelledby="about-t">
       <h2 class="sr" id="about-t">关于</h2>
-      <p class="about__lede">我的记性不太好。三年前拿起相机，只是想把自己的回忆留下来。</p>
+      <p class="about__lede" data-fx="rise">我的记性不太好。三年前拿起相机，只是想把自己的回忆留下来。</p>
       <div class="about__text">
         <p>后来因为拍照，认识了很多人。原本只是为了记住，慢慢地，却真的喜欢上了摄影。</p>
         <p>所以这里拍得最多的是人，也有一些街道和风景——那些我怕自己会忘记的地方和时刻。</p>
@@ -57,94 +145,9 @@
       <p class="about__meta t-note">涂鸦<br>拍摄三年 · 人像为主，也拍人文风景与扫街<br>Nikon Z 8 · Canon EOS R5 Mark II</p>
     </section>
 
-    <section class="works" id="works" aria-label="作品">
-<!-- @works:start -->
-      <article class="wk wk--l" aria-labelledby="wk-lane" style="--r:1.5">
-        <a class="wk__img" href="series/lane.html" data-rest style="aspect-ratio:3/2">
-          <img src="images/series/lane/08.jpg" alt="红砖" style="object-position:50% 50%" loading="lazy" decoding="async">
-          <span class="wk__t" id="wk-lane" data-float=".1" data-float-max="18">巷子里</span>
-        </a>
-        <div class="wk__info">
-          <p class="wk__no t-note">第一卷　2026.02.04</p>
-          <p class="wk__lede">二月的一个下午，在巷子里走了三个小时。</p>
-          <p class="t-note">人像 · 街头 · 25 张</p>
-          <a class="wk__go" href="series/lane.html">翻开</a>
-        </div>
-      </article>
-
-      <article class="wk wk--r" aria-labelledby="wk-yearend" style="--r:2.35">
-        <a class="wk__img" href="series/yearend.html" data-rest style="aspect-ratio:2.35/1">
-          <img src="images/series/yearend/02.jpg" alt="对望" style="object-position:50% 50%" loading="lazy" decoding="async">
-          <span class="wk__t" id="wk-yearend" data-float=".1" data-float-max="18">年末的光</span>
-        </a>
-        <div class="wk__info">
-          <p class="wk__no t-note">第二卷　2025.12.31</p>
-          <p class="wk__lede">一年的最后一天，下午两点四十分，光从窗户斜着照进来。</p>
-          <p class="t-note">人像 · 15 张</p>
-          <a class="wk__go" href="series/yearend.html">翻开</a>
-        </div>
-      </article>
-
-      <article class="wk wk--l" aria-labelledby="wk-bear" style="--r:0.8">
-        <a class="wk__img" href="series/bear.html" data-rest style="aspect-ratio:4/5">
-          <img src="images/series/bear/03.jpg" alt="举起相机" style="object-position:50% 30%" loading="lazy" decoding="async">
-          <span class="wk__t" id="wk-bear" data-float=".1" data-float-max="18">小熊帽</span>
-        </a>
-        <div class="wk__info">
-          <p class="wk__no t-note">第三卷　2025.01.19</p>
-          <p class="wk__lede">一顶小熊帽，一台旧相机，一个下午。</p>
-          <p class="t-note">人像 · 室内 · 5 张</p>
-          <a class="wk__go" href="series/bear.html">翻开</a>
-        </div>
-      </article>
-
-      <article class="wk wk--r" aria-labelledby="wk-train" style="--r:1.5">
-        <a class="wk__img" href="series/train.html" data-rest style="aspect-ratio:3/2">
-          <img src="images/series/train/02.jpg" alt="围巾" style="object-position:50% 40%" loading="lazy" decoding="async">
-          <span class="wk__t" id="wk-train" data-float=".1" data-float-max="18">冬日的列车</span>
-        </a>
-        <div class="wk__info">
-          <p class="wk__no t-note">第四卷　2025.01.10</p>
-          <p class="wk__lede">一月，下午四点，停着的列车和很低的太阳。</p>
-          <p class="t-note">人像 · 8 张</p>
-          <a class="wk__go" href="series/train.html">翻开</a>
-        </div>
-      </article>
-
-      <article class="wk wk--l" aria-labelledby="wk-summer" style="--r:1.5">
-        <a class="wk__img" href="series/summer.html" data-rest style="aspect-ratio:3/2">
-          <img src="images/series/summer/10.jpg" alt="托腮" style="object-position:50% 40%" loading="lazy" decoding="async">
-          <span class="wk__t" id="wk-summer" data-float=".1" data-float-max="18">五月的树荫</span>
-        </a>
-        <div class="wk__info">
-          <p class="wk__no t-note">第五卷　2024.05.01</p>
-          <p class="wk__lede">五月的一个下午，树荫很深，光从叶子的缝里漏下来。</p>
-          <p class="t-note">人像 · 19 张</p>
-          <a class="wk__go" href="series/summer.html">翻开</a>
-        </div>
-      </article>
-
-      <article class="wk wk--r" aria-labelledby="wk-cafe" style="--r:1.7778">
-        <a class="wk__img" href="series/cafe.html" data-rest style="aspect-ratio:16/9">
-          <img src="images/series/cafe/04.jpg" alt="睡着了" style="object-position:50% 55%" loading="lazy" decoding="async">
-          <span class="wk__t" id="wk-cafe" data-float=".1" data-float-max="18">咖啡凉了</span>
-        </a>
-        <div class="wk__info">
-          <p class="wk__no t-note">第六卷　2024.03.11</p>
-          <p class="wk__lede">从四点到六点，两个小时，六张照片。</p>
-          <p class="t-note">人像 · 室内 · 6 张</p>
-          <a class="wk__go" href="series/cafe.html">翻开</a>
-        </div>
-      </article>
-      <ul class="wk-later">
-        <li><span class="t-note">第七卷</span><span class="wk-later__t">街</span><span class="t-note">人文 · 扫街 · 整理中</span></li>
-      </ul>
-<!-- @works:end -->
-    </section>
-
-    <section class="close" data-rest aria-label="结尾">
+    <section class="close" aria-label="结尾">
       <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-      <p class="close__l">这些照片，替我记得。</p>
+      <p class="close__l" data-fx="rise">这些照片，替我记得。</p>
       <p class="t-note">谢谢你看到这里。</p>
     </section>
   </main>
@@ -155,6 +158,8 @@
   </footer>
 
   <script src="flow.js" defer></script>
+  <script src="text.js" defer></script>
   <script src="home.js" defer></script>
+  <script src="dir.js" defer></script>
 </body>
 </html>

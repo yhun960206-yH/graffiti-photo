@@ -28,26 +28,26 @@
   </header>
 
   <main>
-    <section class="cv" data-rest="top">
+    <section class="cv">
       <div class="cv__img">
         <img src="../images/series/bear/03.jpg" alt="举起相机" style="object-position:50% 30%" fetchpriority="high">
-        <h1 class="cv__t" data-float=".12">小熊帽</h1>
+        <h1 class="cv__t" data-float=".12" data-fx="ink">小熊帽</h1>
       </div>
       <div class="cv__side">
         <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-        <p class="cv__lede">一顶小熊帽，一台旧相机，一个下午。</p>
+        <p class="cv__lede" data-fx="rise" data-fx-delay="700">一顶小熊帽，一台旧相机，一个下午。</p>
         <p class="cv__meta t-note">第三卷<br>2025.01.19<br>5 张</p>
       </div>
     </section>
 
-    <section class="vi" data-rest>
-      <div class="vi__text"><p>房间里有老电视、旧电话和一扇很大的窗。她戴着小熊帽，一会儿学着打电话，一会儿举起相机对着我。</p><p>那天光线很暗，感光度开到了一千多。颗粒也留了下来，像那个下午本来的样子。</p></div>
+    <section class="vi">
+      <div class="vi__text"><p data-fx="rise">房间里有老电视、旧电话和一扇很大的窗。她戴着小熊帽，一会儿学着打电话，一会儿举起相机对着我。</p><p>那天光线很暗，感光度开到了一千多。颗粒也留了下来，像那个下午本来的样子。</p></div>
       <p class="vi__meta t-note">2025.01.19<br>Nikon Z 8 · Tamron 28–75mm F2.8<br>5 张</p>
     </section>
 
     <div class="plates" id="plates">
     <section class="sp sp--screen">
-    <div class="row row--2" style="--sum:1.3333; --n:2" data-rest>
+    <div class="row row--2" style="--sum:1.3333; --n:2">
       <figure class="plate" style="--ar:2/3; --r:0.6667; --pos:50% 50%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 02 · 坐在地上" aria-label="放大：坐在地上"><img src="../images/series/bear/01.jpg" alt="坐在地上" loading="lazy" decoding="async"></button>
@@ -63,7 +63,7 @@
     </div>
     </section>
     <section class="sp sp--scroll">
-    <figure class="plate" style="--ar:1/2; --r:0.5; --pos:50% 30%" data-rest>
+    <figure class="plate" style="--ar:1/2; --r:0.5; --pos:50% 30%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 04 · 伸手" aria-label="放大：伸手"><img src="../images/series/bear/04.jpg" alt="伸手" loading="lazy" decoding="async"></button>
           <figcaption class="note"><span class="note__t"><span class="note__n">图 04</span>伸手</span><span class="note__d">2025.01.19 · 16:41　f/2.8 · 1/200 · ISO 1100</span></figcaption>
@@ -71,7 +71,7 @@
       </figure>
     </section>
     <section class="sp sp--single sp--r">
-    <figure class="plate" style="--ar:2/3; --r:0.6667; --pos:50% 50%" data-rest>
+    <figure class="plate" style="--ar:2/3; --r:0.6667; --pos:50% 50%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 05 · 打电话" aria-label="放大：打电话"><img src="../images/series/bear/05.jpg" alt="打电话" loading="lazy" decoding="async"></button>
           <figcaption class="note"><span class="note__t"><span class="note__n">图 05</span>打电话</span><span class="note__d">2025.01.19 · 17:27　f/2.8 · 1/125 · ISO 1250</span></figcaption>
@@ -80,9 +80,9 @@
     </section>
     </div>
 
-    <section class="vend" data-rest>
+    <section class="vend">
       <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-      <p class="vend__t">小熊帽</p>
+      <p class="vend__t" data-fx="rise">小熊帽</p>
       <p class="t-note">第三卷 · 2025.01.19 · 5 张 · 摄影 涂鸦</p>
       <p class="t-note">© 2026 涂鸦　图片未经许可请勿转载</p>
     </section>
@@ -104,6 +104,7 @@
   </dialog>
 
   <script src="../flow.js" defer></script>
+  <script src="../text.js" defer></script>
   <script src="../home.js" defer></script>
   <script src="../book.js" defer></script>
   <script src="../ambient.js" defer></script>

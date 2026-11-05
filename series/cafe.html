@@ -28,26 +28,26 @@
   </header>
 
   <main>
-    <section class="cv" data-rest="top">
+    <section class="cv">
       <div class="cv__img">
         <img src="../images/series/cafe/01.jpg" alt="对视" style="object-position:55% 35%" fetchpriority="high">
-        <h1 class="cv__t" data-float=".12">咖啡凉了</h1>
+        <h1 class="cv__t" data-float=".12" data-fx="ink">咖啡凉了</h1>
       </div>
       <div class="cv__side">
         <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-        <p class="cv__lede">从四点到六点，两个小时，六张照片。</p>
+        <p class="cv__lede" data-fx="rise" data-fx-delay="700">从四点到六点，两个小时，六张照片。</p>
         <p class="cv__meta t-note">第六卷<br>2024.03.11<br>6 张</p>
       </div>
     </section>
 
-    <section class="vi" data-rest>
-      <div class="vi__text"><p>春天的一个下午，我们在咖啡馆坐到天黑。</p><p>她看手机，喝咖啡，趴在桌上睡了一会儿，又翻开日记写了几行。我没有让她做什么，只是在旁边把这些记下来。窗外的光一点点暗下去，咖啡也凉了。</p></div>
+    <section class="vi">
+      <div class="vi__text"><p data-fx="rise">春天的一个下午，我们在咖啡馆坐到天黑。</p><p>她看手机，喝咖啡，趴在桌上睡了一会儿，又翻开日记写了几行。我没有让她做什么，只是在旁边把这些记下来。窗外的光一点点暗下去，咖啡也凉了。</p></div>
       <p class="vi__meta t-note">2024.03.11<br>Nikon Z 8 · 50mm f/1.8<br>6 张</p>
     </section>
 
     <div class="plates" id="plates">
     <section class="sp sp--screen">
-    <div class="row row--2" style="--sum:3; --n:2" data-rest>
+    <div class="row row--2" style="--sum:3; --n:2">
       <figure class="plate" style="--ar:3/2; --r:1.5; --pos:50% 50%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 02 · 消息" aria-label="放大：消息"><img src="../images/series/cafe/02.jpg" alt="消息" loading="lazy" decoding="async"></button>
@@ -63,7 +63,7 @@
     </div>
     </section>
     <section class="sp sp--cinema">
-    <figure class="plate" style="--ar:2.35/1; --r:2.35; --pos:50% 55%" data-rest>
+    <figure class="plate" style="--ar:2.35/1; --r:2.35; --pos:50% 55%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 04 · 睡着了" aria-label="放大：睡着了"><img src="../images/series/cafe/04.jpg" alt="睡着了" loading="lazy" decoding="async"></button>
           <figcaption class="note"><span class="note__t"><span class="note__n">图 04</span>睡着了</span><span class="note__d">2024.03.11 · 16:45　f/2 · 1/60 · ISO 360</span></figcaption>
@@ -71,7 +71,7 @@
       </figure>
     </section>
     <section class="sp sp--single sp--c">
-    <figure class="plate" style="--ar:1/1; --r:1; --pos:50% 50%" data-rest>
+    <figure class="plate" style="--ar:1/1; --r:1; --pos:50% 50%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 05 · 日记" aria-label="放大：日记"><img src="../images/series/cafe/05.jpg" alt="日记" loading="lazy" decoding="async"></button>
           <figcaption class="note"><span class="note__t"><span class="note__n">图 05</span>日记</span><span class="note__d">2024.03.11 · 17:39　f/2.8 · 1/60 · ISO 72</span></figcaption>
@@ -79,7 +79,7 @@
       </figure>
     </section>
     <section class="sp sp--single sp--l">
-    <figure class="plate" style="--ar:3/2; --r:1.5; --pos:50% 50%" data-rest>
+    <figure class="plate" style="--ar:3/2; --r:1.5; --pos:50% 50%">
         <div class="plate__body">
           <button class="plate__frame" type="button" data-title="图 06 · 伸懒腰" aria-label="放大：伸懒腰"><img src="../images/series/cafe/06.jpg" alt="伸懒腰" loading="lazy" decoding="async"></button>
           <figcaption class="note"><span class="note__t"><span class="note__n">图 06</span>伸懒腰</span><span class="note__d">2024.03.11 · 18:15　f/1.8 · 1/60 · ISO 560</span></figcaption>
@@ -88,9 +88,9 @@
     </section>
     </div>
 
-    <section class="vend" data-rest>
+    <section class="vend">
       <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-      <p class="vend__t">咖啡凉了</p>
+      <p class="vend__t" data-fx="rise">咖啡凉了</p>
       <p class="t-note">第六卷 · 2024.03.11 · 6 张 · 摄影 涂鸦</p>
       <p class="t-note">© 2026 涂鸦　图片未经许可请勿转载</p>
     </section>
@@ -112,6 +112,7 @@
   </dialog>
 
   <script src="../flow.js" defer></script>
+  <script src="../text.js" defer></script>
   <script src="../home.js" defer></script>
   <script src="../book.js" defer></script>
   <script src="../ambient.js" defer></script>
