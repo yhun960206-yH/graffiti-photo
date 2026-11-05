@@ -216,7 +216,7 @@ function entry(v, i) {
   const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
   return `
         <li class="dir__i" style="--k:${i}">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${LIGHT[v.slug] && !LIGHT[v.slug].night ? lightOf(v.slug, f.plate) : ''}" data-bg="images/series/${v.slug}/${pad(f.plate)}.jpg" data-pos="${f.pos || fp.pos || '50% 50%'}">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${lightOf(v.slug, f.plate)}" data-bg="images/series/${v.slug}/${pad(f.plate)}.jpg" data-pos="${f.pos || fp.pos || '50% 50%'}">
             <span class="dir__no">${CN[v.no]}</span><span class="dir__t">${esc(v.title)}</span><span class="dir__m">${esc(v.date.slice(0, 7))}</span>
           </button>
           <div class="dir__p" id="dir-${v.slug}" role="region" aria-label="${esc(v.title)}">
