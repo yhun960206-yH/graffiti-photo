@@ -121,7 +121,8 @@
   .plate { margin: 0; padding-bottom: var(--capspace, 64px); --cp: 1; --l1: 21px; }
   .plate__body { position: relative; }
   /* the light through the picture on the paper around it (tools/light.py): a tiny blurred map, stretched */
-  .glow { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; max-width: none; z-index: -1; pointer-events: none; user-select: none; }
+  main { overflow-x: clip; }                                          /* the glows spread past the screen's sides: cut them there */
+  .glow { position: absolute; left: -100%; top: -100%; width: 300%; height: 300%; max-width: none; z-index: -1; pointer-events: none; user-select: none; }
   .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); border-radius: var(--rs, var(--r-img)); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
   .plate__body::before {
@@ -197,6 +198,12 @@
 /* ───── layer 1 · the paper: little things from the photos, drawn and drifting (decor.js) ───── */
 @layer parts {
   html { background: transparent; }
+  /* a fine grain over the paper (never over the pictures or words): breaks the steps a smooth dark
+     gradient falls into on 8-bit screens, and reads as the tooth of the paper */
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .07;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 1.6 0 0 0 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
   .decor { position: absolute; left: 0; top: 0; width: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
   .decor__band { position: absolute; left: 0; top: 0; width: 100%; will-change: transform; }
   .dc { position: absolute; display: block; transition: opacity .5s var(--e-soft); }

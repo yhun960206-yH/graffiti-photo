@@ -153,7 +153,7 @@
     for (const p of lit) {                                              // side by side → the first one speaks for the row
       if (p.top - last < 60) continue;
       last = p.top;
-      const c = rgb(p.el.dataset.light), hold = p.h * .25;
+      const c = rgb(p.el.dataset.light), hold = p.h * .4;              // held only round its middle: long, soft blends
       stops.push([p.top + hold, c], [p.top + p.h - hold, c]);           // held while the picture is there, blending between
     }
     const H = document.documentElement.scrollHeight;

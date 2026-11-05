@@ -57,24 +57,34 @@ def toned_paper(img_lin):
     return srgb(np.clip(from_oklab(np.array([Lp, a * k, b * k])), 0, 1))
 
 def glow(img_lin, night, out):
-    """a small, blurred map of the light spilling round the picture: the picture in the middle, the same size
-    again of paper around it on every side, so light fades outward"""
+    """a small, blurred map of the light spilling round the picture: the picture in the middle, a whole picture's
+    width and height of paper on every side (shown at 300% in base.css), so the light has room to fade out by itself"""
     h, w, _ = img_lin.shape
-    W, H = w * 2, h * 2
+    W, H = w * 3, h * 3
     canvas = np.zeros((H, W, 3))
-    canvas[h // 2:h // 2 + h, w // 2:w // 2 + w] = img_lin
-    im = Image.fromarray((canvas * 65535 / 65535 * 255).clip(0, 255).astype('uint8'))  # temp, linear values
-    im = im.filter(ImageFilter.GaussianBlur(w * .16))
-    L = np.asarray(im).astype(float) / 255                 # light arriving at each point of the paper
+    canvas[h:2 * h, w:2 * w] = img_lin
+    # blurred in floating point (no 8-bit steps), wide enough that the light has no visible edge
+    from scipy.ndimage import gaussian_filter
+    L = np.dstack([gaussian_filter(canvas[..., k], min(w, h) * .3, mode='constant') for k in range(3)])
     lum = L @ LUM
     hue = L / np.maximum(L.max(-1, keepdims=True), 1e-4)
+    # strength saturates softly — a hard ceiling leaves a flat plateau whose rim reads as a stripe
+    soft = lambda x, top: top * (1 - np.exp(-x / top))
     if night:
-        rgb, a = hue, np.clip(lum * 2.2, 0, .5)
+        rgb, a = hue, soft(lum * 2.2, .5)
     else:
         p = lin(np.array(PAPER['day']) / 255)
-        rgb, a = p * hue, np.clip(lum * 2.6, 0, .55)         # paper × light, laid over the paper
+        rgb, a = p * hue, soft(lum * 2.6, .55)               # paper × light, laid over the paper
+    # by the edge the light is all but gone; a gentle fade over the outer band makes sure it ends at exactly zero
+    ss = lambda t: (lambda c: c * c * (3 - 2 * c))(np.clip(t, 0, 1))
+    yy, xx = np.mgrid[0:H, 0:W]
+    a = a * ss(np.minimum(xx, W - 1 - xx) / (W * .16)) * ss(np.minimum(yy, H - 1 - yy) / (H * .16))
+    # enlarged here with a smooth (cubic) curve: the browser's own stretch is linear, and stretched ten-fold
+    # its corners show on dark paper as faint stripes. Saved without loss, so no blocks either.
+    from scipy.ndimage import zoom
     rgba = np.dstack([srgb(rgb), a])
-    Image.fromarray((rgba * 255).round().astype('uint8'), 'RGBA').save(out, 'WEBP', quality=82, method=6)
+    rgba = np.dstack([zoom(rgba[..., k], 3, order=3, mode='nearest') for k in range(4)])
+    Image.fromarray((rgba * 255).round().clip(0, 255).astype('uint8'), 'RGBA').save(out, 'WEBP', lossless=True, method=6)
 
 import importlib.util, subprocess
 night = set(json.loads(subprocess.check_output(['node', '-e',
@@ -90,7 +100,7 @@ for d in sorted(glob.glob(os.path.join(ROOT, 'images/series/*'))):
         small = im.copy(); small.thumbnail((96, 96))
         L = lin(np.asarray(small).astype(float) / 255)
         per[str(n)] = hexof(toned_paper(L))
-        g = im.copy(); g.thumbnail((40, 40))
+        g = im.copy(); g.thumbnail((56, 56))
         glow(lin(np.asarray(g).astype(float) / 255), dark, os.path.join(d, f'glow-{n:02d}.webp'))
     out[slug] = {'night': dark, 'plates': per}
     print(f'{slug:9s}', ' '.join(per.values()))
