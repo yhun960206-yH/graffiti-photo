@@ -18,10 +18,7 @@
   .sp--r .plate { width: 86%; margin-left: auto; }
   .sp--c .plate { width: 76%; margin-inline: auto; }
   .sp--scroll .plate { width: 58%; margin-inline: auto; }
-  .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }
-  /* edge to edge on a phone: a rounded corner against the screen's edge looks like a mistake */
-  @media (max-width: 1023px) { .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { --r-k: 0; } }
-  .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
+  .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }  .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
   .sp--emaki .plate + .plate { margin-top: 0; }
   .sp--emaki .plate { padding-bottom: 66px; }
   .pair { display: grid; gap: 0; }

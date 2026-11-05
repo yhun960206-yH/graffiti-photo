@@ -174,10 +174,10 @@
     VH = innerHeight; Y = scrollY;
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; }
-    // the corner follows the picture: about 2.8% of its shorter side (a small panel ~4px, a big print ~16px)
+    // the corner follows the picture: about 1.8% of its shorter side (a small panel ~2px, a big print ~10px)
     for (const p of plates) if (p.frame) {
       const s = Math.min(p.frame.offsetWidth, p.frame.offsetHeight);
-      if (s) p.frame.style.setProperty('--rs', Math.round(Math.min(16, Math.max(3, s * .028))) + 'px');
+      if (s) p.frame.style.setProperty('--rs', Math.round(Math.min(10, Math.max(2, s * .018))) + 'px');
     }
     for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
     tales.forEach(t => t.sp = -1);
