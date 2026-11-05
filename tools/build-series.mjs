@@ -143,9 +143,8 @@ function volumePage(v, i) {
   <meta property="og:image" content="${SITE}images/series/${v.slug}/${pad(v.cover)}.jpg">
   <meta property="og:url" content="${SITE}series/${v.slug}.html">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" href="../fonts/serif.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="../fonts/sans.woff2" crossorigin>
   <link rel="preload" as="image" href="../images/series/${v.slug}/${pad(v.cover)}.jpg">
   <link rel="stylesheet" href="../base.css">
   <link rel="stylesheet" href="../book.css">

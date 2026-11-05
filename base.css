@@ -10,6 +10,10 @@
    ========================================================== */
 @layer reset, tokens, base, parts, page, motion, capture;
 
+/* the site's own fonts (tools/fonts.py): only the characters it uses, so nothing is fetched from Google */
+@font-face { font-family: "Noto Serif SC"; src: url("fonts/serif.woff2") format("woff2"); font-weight: 200 400; font-display: swap; }
+@font-face { font-family: "Noto Sans SC"; src: url("fonts/sans.woff2") format("woff2"); font-weight: 300 400; font-display: swap; }
+
 @layer reset {
   *, *::before, *::after { box-sizing: border-box; }
   html, body, h1, h2, h3, p, figure, dl, dd, ol, ul { margin: 0; padding: 0; }

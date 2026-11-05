@@ -85,7 +85,9 @@ node tools/build-series.mjs
 ## 部署前
 - 图片日期、时间、参数取自原片 EXIF；网页用图已去除全部元数据（包括可能的位置信息）
 - 每卷的简介是代拟稿，可按你的记忆改写（`tools/series-data.mjs` 的 `lede` 与 `essay`）
-- 字体走 Google Fonts，国内建议自托管；失败时回退系统宋体
+- 字体是网站自带的（`fonts/`，只含网站用到的字，宋体约 200KB、黑体约 170KB），不连 Google。
+  改了文字、加了新卷之后，在 `node tools/build-series.mjs` 之后再跑一次
+  `python tools/fonts.py <原始字体文件夹>`，新出现的字才会被收进去（原始字体的下载地址写在 `tools/fonts.py` 开头）
 - 有了域名后，把 `og:image` 改成线上绝对地址；国内服务器需要 ICP 备案号，可加在页脚
 
 ## 线上地址与更新
