@@ -39,6 +39,7 @@
     --t-note: 12px;        /* 注释 */
 
     --gutter: 22px;
+    --r-img: 3px; /* photos: only a hint of a rounded corner */
     --gap: 6px;            /* 屏风的缝 */
     --sec: 130px;          /* 段与段之间的「間」 */
     --bar: 52px;
@@ -121,7 +122,7 @@
   .plate__body { position: relative; }
   /* the light through the picture on the paper around it (tools/light.py): a tiny blurred map, stretched */
   .glow { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; max-width: none; z-index: -1; pointer-events: none; user-select: none; }
-  .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); }
+  .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); border-radius: var(--r-img); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
   .plate__body::before {
     content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 38%; z-index: 1; pointer-events: none;
@@ -153,7 +154,7 @@
   .lb[open] { display: flex; flex-direction: column; justify-content: center; }
   .lb::backdrop { background: transparent; }
   .lb__fig { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; min-height: 0; }
-  .lb__fig img { width: 100%; max-height: calc(100dvh - 150px); object-fit: contain; transition: opacity .4s var(--e-soft); }
+  .lb__fig img { width: 100%; max-height: calc(100dvh - 150px); object-fit: contain; border-radius: var(--r-img); transition: opacity .4s var(--e-soft); }
   .lb__fig img.is-swap { opacity: 0; }
   .lb__fig figcaption { margin-top: 14px; padding-inline: var(--gutter); display: flex; gap: 18px; font-size: var(--t-note); letter-spacing: .16em; color: var(--mute); }
   .lb__t { color: var(--ink); font-family: var(--f-serif); }

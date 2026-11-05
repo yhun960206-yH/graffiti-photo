@@ -63,7 +63,7 @@
   .dir__strip { display: flex; gap: 4px; margin: 12px calc(var(--gutter) * -1) 0; padding-inline: var(--gutter); overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
   .dir__strip::-webkit-scrollbar { display: none; }
   .dir__strip a { flex: none; }
-  .dir__strip img { height: 92px; width: auto; object-fit: cover; background: rgba(255, 255, 255, .08); }
+  .dir__strip img { height: 92px; width: auto; object-fit: cover; background: rgba(255, 255, 255, .08); border-radius: var(--r-img); }
   .dir__go { display: inline-block; margin: 12px 0 16px; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, .5); font-size: 12px; letter-spacing: .4em; }
   .dir__go::after { content: " →"; display: inline-block; transition: transform .6s var(--e-soft); }
   .dir__go:hover::after { transform: translateX(6px); }
