@@ -117,8 +117,9 @@
   const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const BLOCK = '.plate__frame, .cv__img, .hx, .bar, img';
   const WORDS = 'p, h1, h2, .plate, .note, .seal, .vols a, .foot, .dir';
+  const TEXT = 'p, h1, h2, .note, .tale, .dir, .vols a';           // what a passing motif must not cover
 
-  let items = [], built = '';
+  let items = [], built = '', wordRects = [];
   function build() {
     const was = layer.style.height;
     layer.style.height = '0px';                      // measure the page without this layer holding it open
@@ -133,6 +134,7 @@
     const rect = (el, pad) => { const r = el.getBoundingClientRect(); return r.width ? [r.left - pad, r.top + Y - pad, r.right + pad, r.bottom + Y + pad] : null; };
     const blocks = [...document.querySelectorAll(BLOCK)].map(el => rect(el, 6)).filter(Boolean);
     const words = [...document.querySelectorAll(WORDS)].map(el => rect(el, 14)).filter(Boolean);
+    wordRects = [...document.querySelectorAll(TEXT)].map(el => rect(el, 26)).filter(Boolean);
     const hit = (list, x0, y0, x1, y1) => list.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
 
     // the page is cut into bands; each band has its own fixed random numbers,
@@ -163,7 +165,7 @@
     }
     if (placed.length > 260) placed.length = 260;
     layer.innerHTML = placed.map(p => `<i class="dc${p.soft ? ' dc--soft' : ''}" style="left:${p.x.toFixed(0)}px;top:${p.y.toFixed(0)}px;width:${p.s.toFixed(0)}px;height:${p.s.toFixed(0)}px"><i class="dc__m dc--${p.m.move}" style="--a:${(p.m.a * (.55 + p.z * .45)).toFixed(2)};--d:${p.d.toFixed(1)}s;--dl:-${(p.ph * p.d).toFixed(1)}s;--dir:${p.dir};--rot:${p.rot.toFixed(0)}deg;--sw:${p.sw.toFixed(0)}px"><svg><use href="#dc-${p.k}-${p.v}"/></svg></i></i>`).join('');
-    items = [...layer.children].map((el, i) => ({ el, z: placed[i].z, cy: placed[i].cy, on: false }));
+    items = [...layer.children].map((el, i) => ({ el, z: placed[i].z, cy: placed[i].cy, x0: placed[i].x, y0: placed[i].y, s: placed[i].s, soft: placed[i].soft, on: false, hush: false }));
     if (!still) items.forEach(it => io.observe(it.el));
     parallax();
   }
@@ -173,14 +175,27 @@
   const io = new IntersectionObserver(es => es.forEach(e => {
     const it = items.find(i => i.el === e.target); if (!it) return;
     it.on = e.isIntersecting; e.target.classList.toggle('on', it.on);
-  }), { rootMargin: '25% 0px' });
+  }), { rootMargin: '60% 0px' });
 
-  // depth: as the page scrolls, far things lag a little behind
+  // depth: the paper is the back layer, so it moves fastest — and the farther a thing, the faster
+  //   speed f = 1.2 … 1.5;  offset = (centre − screen middle) × (f − 1)
   const capture = matchMedia('(max-aspect-ratio: 1/3), print');
   function parallax() {
     if (still || capture.matches) { items.forEach(it => it.el.style.translate = ''); return; }
     const mid = scrollY + innerHeight / 2;
-    for (const it of items) if (it.on) it.el.style.translate = `0 ${((it.cy - mid) * (1 - it.z) * .5).toFixed(1)}px`;
+    const near = innerHeight * 1.6;
+    for (const it of items) {
+      const d = it.cy - mid;
+      if (Math.abs(d) > near) continue;
+      const off = d * (.2 + (1 - it.z) * .66);
+      it.el.style.translate = `0 ${off.toFixed(1)}px`;
+      // passing behind words, it steps aside: almost gone until it is clear again
+      if (!it.soft) {
+        const y0 = it.y0 + off, y1 = y0 + it.s, x0 = it.x0, x1 = x0 + it.s;
+        const hush = wordRects.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
+        if (hush !== it.hush) { it.hush = hush; it.el.classList.toggle('hush', hush); }
+      }
+    }
   }
   let tick = false;
   addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(() => { tick = false; parallax(); }); } }, { passive: true });

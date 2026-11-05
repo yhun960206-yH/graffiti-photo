@@ -117,7 +117,7 @@
   /* ───── a plate: on the image while you look, below it once you move on ─────
      --cp 0 = the note sits on the photo (white, title only)
      --cp 1 = it has settled under the photo (ink, with date and settings) — the rest state */
-  .plate { margin: 0; padding-bottom: var(--capspace, 76px); --cp: 1; }
+  .plate { margin: 0; padding-bottom: var(--capspace, 64px); --cp: 1; --l1: 21px; }
   .plate__body { position: relative; }
   .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
@@ -130,19 +130,19 @@
     position: absolute; left: 0; right: 0; top: calc(100% + 14px); z-index: 2; pointer-events: none;
     transform: translate(calc((1 - var(--cp)) * var(--note-in, 20px)), calc((var(--cp) - 1) * (var(--l1, 26px) + 14px + var(--note-in, 20px))));
   }
-  .note__t { display: flex; align-items: baseline; gap: 14px; font-family: var(--f-serif); font-weight: 400; font-size: 15px; line-height: var(--l1, 26px); letter-spacing: .22em; color: var(--ink); text-shadow: 0 0 16px rgba(0, 0, 0, calc(.5 * (1 - var(--cp)))); white-space: nowrap; }
-  .note__n { font-family: var(--f-sans); font-weight: 300; font-size: var(--t-note); letter-spacing: .16em; opacity: .75; }
-  .note__d { display: block; margin-top: 4px; font-size: var(--t-note); letter-spacing: .14em; color: var(--mute); opacity: calc((var(--cp) - .55) * 2.2); }
+  .note__t { display: flex; align-items: baseline; gap: 14px; font-family: var(--f-serif); font-weight: 400; font-size: 13px; line-height: var(--l1, 21px); letter-spacing: .2em; color: var(--ink); text-shadow: 0 0 16px rgba(0, 0, 0, calc(.5 * (1 - var(--cp)))); white-space: nowrap; }
+  .note__n { font-family: var(--f-sans); font-weight: 300; font-size: 10px; letter-spacing: .16em; opacity: .75; }
+  .note__d { display: block; margin-top: 3px; font-size: 10px; line-height: 1.7; letter-spacing: .12em; color: var(--mute); opacity: calc((var(--cp) - .55) * 2.2); }
 
   /* ───── screen (屏风): a row of equal-height panels with hairline gaps ───── */
   .row { display: flex; align-items: flex-start; gap: var(--gap); }
   .row > .plate { flex: var(--r) 1 0; min-width: 0; --note-in: 12px; }
-  .row .note__t { font-size: 13px; letter-spacing: .14em; }
+  .row .note__t { font-size: 12px; letter-spacing: .12em; }
   .row .note__n { display: none; }
   @media (min-width: 1024px) {
     .row { --rowh: 72vh; width: min(100%, calc(var(--rowh) * var(--sum) + var(--gap) * (var(--n) - 1))); margin-inline: auto; }
     .row > .plate { --note-in: 18px; }
-    .row .note__t { font-size: 14px; letter-spacing: .18em; }
+    .row .note__t { font-size: 12.5px; letter-spacing: .16em; }
     .row .note__n { display: inline; }
   }
 
@@ -194,7 +194,8 @@
 /* ───── layer 1 · the paper: little things from the photos, drawn and drifting (decor.js) ───── */
 @layer parts {
   .decor { position: absolute; left: 0; top: 0; width: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-  .dc { position: absolute; display: block; will-change: translate; }
+  .dc { position: absolute; display: block; will-change: translate; transition: opacity .5s var(--e-soft); }
+  .dc.hush { opacity: .12; }
   .dc__m { display: block; width: 100%; height: 100%; opacity: var(--a); transform-origin: 50% 50%; }
   .dc svg { display: block; width: 100%; height: 100%; overflow: visible; }
   .dc--sway { transform-origin: 50% 100%; }
@@ -254,7 +255,7 @@
 @layer parts {
   .tale { font-family: var(--f-serif); font-weight: 300; font-size: 14px; line-height: 2.1; letter-spacing: .14em; color: var(--ink-soft); text-wrap: pretty; }
   .tale--side { margin-top: 18px; max-width: 30em; }
-  .plate > .tale { margin-top: calc(var(--capspace, 76px) + 18px); }
+  .plate > .tale { margin-top: calc(var(--capspace, 64px) + 16px); }
   .plate:has(> .tale) { padding-bottom: 36px; }
   .sp--l > .tale--side { width: 86%; }
   .sp--r > .tale--side { width: 86%; margin-left: auto; }
@@ -264,14 +265,14 @@
   /* on a wide picture the words float on it */
   .tale--float {
     position: absolute; top: 12px; right: var(--gutter); z-index: 2; max-width: 70%; margin: 0; padding: 0;
-    text-align: right; font-size: 13px; line-height: 1.9; color: #fff; text-shadow: 0 0 18px rgba(0, 0, 0, .55), 0 0 2px rgba(0, 0, 0, .3);
+    text-align: right; font-size: 12px; line-height: 1.85; color: #fff; text-shadow: 0 0 18px rgba(0, 0, 0, .55), 0 0 2px rgba(0, 0, 0, .3);
     pointer-events: none;
   }
   @media (min-width: 1024px) {
     .tale { font-size: 15px; }
     /* beside the picture, set vertically in the empty columns, its foot level with the picture's foot */
     .sp > .tale--side {
-      grid-row: 1; align-self: end; width: auto; max-width: none; margin: 0 0 var(--capspace, 76px);
+      grid-row: 1; align-self: end; width: auto; max-width: none; margin: 0 0 var(--capspace, 64px);
       writing-mode: vertical-rl; max-height: min(62vh, 26em); font-size: clamp(16px, 1.25vw, 19px); letter-spacing: .3em; line-height: 2.3; color: var(--ink);
     }
     .sp--l > .tale--side { grid-column: 10 / 12; justify-self: start; }
@@ -279,7 +280,7 @@
     .sp--c > .tale--side { grid-column: 11 / 13; justify-self: start; }
     .sp--scroll > .tale--side { grid-column: 9 / 11; justify-self: center; }
     .sp--l .plate, .sp--r .plate, .sp--c .plate, .sp--scroll .plate { grid-row: 1; }
-    .tale--float { top: 8%; right: 4%; max-width: none; max-height: 76%; writing-mode: vertical-rl; text-align: left; font-size: clamp(14px, 1.15vw, 18px); letter-spacing: .3em; line-height: 2.1; }
+    .tale--float { top: 8%; right: 4%; max-width: none; max-height: 76%; writing-mode: vertical-rl; text-align: left; font-size: clamp(13px, 1vw, 16px); letter-spacing: .3em; line-height: 2.1; }
   }
 }
 @layer motion {
@@ -294,6 +295,7 @@
     [data-float] { transform: none !important; }
     [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
     .plate__frame, .plate__frame img { transform: none !important; }
+    .note, .tale, .vi__text p, .vi__meta, .vend > *, .about > *, .close > *, .cv__t, .cv__lede, .cv__meta, .cv__no, .hx__top, .hx__t, .hx__dir { translate: none !important; }
     .dc__m { animation: none !important; }
     .dc { translate: none !important; }
     .bar { position: absolute !important; transform: none !important; }
