@@ -6,6 +6,9 @@
              补出日期与参数。屏幕外的图一律是「落在图下」的成品状态，
              所以长截图、打印永远完整。
    2. FLOAT  [data-float] 压在图上的标题随滚动略慢于图片，像浮在图上。
+   3. ZOOM   图片离最佳位置越近越大：从它所在的一侧（偏左的从左下角、偏右的从右下角）长出来，
+             里面的照片同时轻轻退远一点。屏幕外、长截图里都是原大。
+   4. TALE   图的故事（.tale）随图片滑过一个字一个字出来；往回滑，又一个字一个字收回去。
    ========================================================== */
 (() => {
   const root = document.documentElement;
@@ -56,12 +59,51 @@
     }
   }
 
+  /* ── 3. zoom ──────────────────────────────────────────────────── */
+  function zoom() {
+    const vh = innerHeight;
+    for (const p of plates) {
+      const r = p.body.getBoundingClientRect();
+      let zs = 1, zi = 1;
+      if (!still() && r.bottom > -vh * .5 && r.top < vh * 1.5) {
+        const d = (r.top + r.height / 2 - vh / 2) / vh;          // 0 = centred on screen
+        const e = smooth(clamp(1 - Math.abs(d) / .85));
+        zs = .9 + .1 * e; zi = 1.14 - .14 * e;
+      }
+      if (Math.abs(zs - (p.zs ?? -1)) < .0008) continue;
+      p.zs = zs;
+      p.el.style.setProperty('--zs', zs.toFixed(4));
+      p.el.style.setProperty('--zi', zi.toFixed(4));
+    }
+  }
+
+  /* ── 4. tales ─────────────────────────────────────────────────── */
+  const tales = $$('.tale').map(el => {
+    const host = el.closest('.plate') || el.previousElementSibling;
+    return { el, body: host && host.querySelector('.plate__body'), float: el.classList.contains('tale--float'), sp: -1 };
+  }).filter(t => t.body);
+  function tell() {
+    const vh = innerHeight;
+    for (const t of tales) {
+      const r = t.body.getBoundingClientRect();
+      let sp = 1;
+      if (!still() && r.top < vh * 1.05 && r.bottom > 0) {
+        const readTop = r.height < vh * .9 ? (vh - r.height) / 2 : vh * .06;
+        sp = t.float ? smooth(clamp((readTop - r.top + vh * .32) / (vh * .45)))     // on the picture: as it arrives
+                     : smooth(clamp((readTop - r.top + vh * .12) / (vh * .42)));    // beside / below: once it has been seen
+      }
+      if (Math.abs(sp - t.sp) < .002) continue;
+      t.sp = sp;
+      t.el.style.setProperty('--sp', sp.toFixed(3));
+    }
+  }
+
   /* ── loop ─────────────────────────────────────────────────────── */
   let ticking = false;
-  const frame = () => { ticking = false; notes(); float(); };
+  const frame = () => { ticking = false; notes(); float(); zoom(); tell(); };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
-  addEventListener('resize', () => { plates.forEach(p => { p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')); p.cp = -1; }); frame(); });
-  captureMQ.addEventListener('change', frame);
+  addEventListener('resize', () => { plates.forEach(p => { p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')); p.cp = -1; p.zs = -1; }); tales.forEach(t => t.sp = -1); frame(); });
+  captureMQ.addEventListener('change', () => { plates.forEach(p => p.zs = -1); tales.forEach(t => t.sp = -1); frame(); });
   frame();
 
   /* fetch every remaining image once the first screen is in, so a long screenshot has them all */

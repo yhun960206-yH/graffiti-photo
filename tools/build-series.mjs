@@ -48,7 +48,11 @@ function numbers(v) {
   return m;
 }
 
-function plate(v, x, no, { prefix = '../', href, rest = false, ar: forceAr } = {}) {
+/* a plate. its story (p.s), if any:
+     float — on wide, cinema and emaki pictures it floats on the image
+     side  — otherwise it is returned separately, so the spread can set it beside the picture */
+const FLOATS = new Set(['wide', 'cinema', 'emaki']);
+function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   const it = item(x), p = v.plates[it.n];
   const a = forceAr || it.ar || p.ar;
   const src = `${prefix}images/series/${v.slug}/${pad(it.n)}.jpg`;
@@ -57,28 +61,34 @@ function plate(v, x, no, { prefix = '../', href, rest = false, ar: forceAr } = {
     ? `<a class="plate__frame" href="${href}">${img}</a>`
     : `<button class="plate__frame" type="button" data-title="图 ${pad(no)} · ${esc(p.t)}" aria-label="放大：${esc(p.t)}">${img}</button>`;
   const detail = [p.d, p.x].filter(Boolean).map(esc).join('　');
-  return `<figure class="plate" style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
+  const float = p.s && FLOATS.has(layout);
+  const tale = p.s && !float ? `<p class="tale" data-fx="tale">${esc(p.s)}</p>` : '';
+  return { tale, html: `<figure class="plate${p.s ? ' has-tale' : ''}" style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
         <div class="plate__body">
-          ${frame}
+          ${frame}${float ? `
+          <p class="tale tale--float" data-fx="tale">${esc(p.s)}</p>` : ''}
           <figcaption class="note"><span class="note__t"><span class="note__n">图 ${pad(no)}</span>${esc(p.t)}</span><span class="note__d">${detail}</span></figcaption>
         </div>
-      </figure>`;
+      </figure>` };
 }
 
 function spread(v, s, nums) {
-  const P = (x, o = {}) => plate(v, x, nums[item(x).n], o);
+  const P = (x, o = {}) => plate(v, x, nums[item(x).n], { layout: s.layout, ...o });
   const ars = s.plates.map(x => item(x).ar || v.plates[item(x).n].ar);
+  const inner = ps => ps.map(q => q.html.replace('</figure>', q.tale ? `  ${q.tale}\n      </figure>` : '</figure>')).join('\n      ');
   switch (s.layout) {
     case 'screen': {
       const sum = ars.reduce((a, b) => a + ratio(b), 0);
       return `<div class="row row--${s.plates.length}" style="--sum:${r4(sum)}; --n:${s.plates.length}">
-      ${s.plates.map(x => P(x)).join('\n      ')}
+      ${inner(s.plates.map(x => P(x)))}
     </div>`;
     }
-    case 'emaki': return s.plates.map(x => P(x, { rest: true, ar: item(x).ar || '2.35/1' })).join('\n    ');
-    case 'scroll': return P(s.plates[0], { rest: true, ar: item(s.plates[0]).ar || '1/2' });
-    case 'pair': return `<div class="pair">${s.plates.map(x => P(x)).join('')}</div>`;
-    default: return P(s.plates[0], { rest: true });
+    case 'emaki': return s.plates.map(x => P(x, { ar: item(x).ar || '2.35/1' }).html).join('\n    ');
+    case 'pair': return `<div class="pair">${inner(s.plates.map(x => P(x)))}</div>`;
+    default: {
+      const q = s.layout === 'scroll' ? P(s.plates[0], { ar: item(s.plates[0]).ar || '1/2' }) : P(s.plates[0]);
+      return q.html + (q.tale ? `\n    ${q.tale.replace('class="tale"', 'class="tale tale--side"')}` : '');
+    }
   }
 }
 
@@ -128,8 +138,7 @@ function volumePage(v, i) {
   <link rel="stylesheet" href="../base.css">
   <link rel="stylesheet" href="../book.css">
 </head>
-<body class="book${v.theme === 'night' ? ' theme-night' : ''}" data-ambient="${v.ambient || ''}">
-  <canvas class="ambient" aria-hidden="true"></canvas>
+<body class="book${v.theme === 'night' ? ' theme-night' : ''}" data-decor="${(v.decor || []).join(' ')}">
   <a class="skip" href="#plates">跳到作品</a>
   <header class="bar" data-bar>
     <a class="bar__home" href="../index.html#works">${BOOK}</a>
@@ -173,7 +182,7 @@ function volumePage(v, i) {
   <script src="../text.js" defer></script>
   <script src="../home.js" defer></script>
   <script src="../book.js" defer></script>
-  <script src="../ambient.js" defer></script>
+  <script src="../decor.js" defer></script>
 </body>
 </html>
 `;

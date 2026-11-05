@@ -5,6 +5,7 @@
      data-fx="ink"     墨晕：每个字从模糊的墨点里慢慢洇开（页面打开时）
      data-fx="rise"    逐字浮现：滚到眼前时，一个字一个字浮上来
      data-fx="decode"  解码：字先是乱的，再一个个落定（由脚本触发，如目录展开）
+     data-fx="tale"    图的故事：只拆成一个个字，进度（--sp）由 flow.js 随滚动给出
    data-fx-delay="300" 推迟开始（毫秒）
 
    屏幕外一律是成品状态：长截图、打印、「减少动态效果」时文字直接完整显示。
@@ -23,7 +24,15 @@
     const text = el.textContent;
     el.setAttribute('aria-label', text.trim());
     el.textContent = '';
-    const chars = [...text].map((c, i) => {
+    // a closing mark stays with the character before it, an opening mark with the one after —
+    // so no line ever starts with ，or ends with 「
+    const units = [];
+    for (const c of text) {
+      if (units.length && /[，。、；：！？」』）》…—,.!?;:)]/.test(c)) units[units.length - 1] += c;
+      else if (units.length && /[「『（《(]$/.test(units[units.length - 1])) units[units.length - 1] += c;
+      else units.push(c);
+    }
+    const chars = units.map((c, i) => {
       const s = document.createElement('span');
       s.className = 'ch'; s.setAttribute('aria-hidden', 'true');
       s.textContent = c; s.style.setProperty('--i', i);
@@ -43,6 +52,8 @@
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) { play(e.target); io.unobserve(e.target); }
   }), { rootMargin: '0px 0px -12% 0px' });
+
+  for (const el of document.querySelectorAll('[data-fx="tale"]')) el.style.setProperty('--n', split(el).length);
 
   for (const el of document.querySelectorAll('[data-fx="ink"], [data-fx="rise"]')) {
     split(el);
@@ -71,7 +82,7 @@
         const settle = i + scramble;            // each character spins for a few beats, then lands
         if (/\s|[，。、；：！？·—（）《》「」]/.test(finals[i])) { c.textContent = finals[i]; c.classList.add('ok'); return; }
         if (k >= settle) { c.textContent = finals[i]; c.classList.add('ok'); }
-        else { done = false; c.classList.remove('ok'); c.textContent = k >= i ? rnd() : '　'; }
+        else { done = false; c.classList.remove('ok'); c.textContent = (k >= i ? rnd() : '　') + finals[i].slice(1); }
       });
       if (done) el.classList.remove('is-decoding'); else el._fx = requestAnimationFrame(step);
     };

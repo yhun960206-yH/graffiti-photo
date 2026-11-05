@@ -168,7 +168,6 @@
     .lb__close { right: var(--gutter); top: 18px; }
   }
 
-  .ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 }
 
 
@@ -192,14 +191,112 @@
   .is-decoding .ch:not(.ok) { opacity: .4; }
 }
 
+/* ───── layer 1 · the paper: little things from the photos, drawn and drifting (decor.js) ───── */
+@layer parts {
+  .decor { position: absolute; left: 0; top: 0; width: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+  .dc { position: absolute; display: block; will-change: translate; }
+  .dc__m { display: block; width: 100%; height: 100%; opacity: var(--a); transform-origin: 50% 50%; }
+  .dc svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .dc--sway { transform-origin: 50% 100%; }
+}
+@layer motion {
+  .dc__m { animation: none var(--d) var(--dl) infinite ease-in-out var(--dir) both; animation-play-state: paused; }
+  .dc.on .dc__m { animation-play-state: running; }
+  .dc--fall    { animation-name: dc-fall;    animation-timing-function: linear; }
+  .dc--drift   { animation-name: dc-drift;   animation-timing-function: linear; }
+  .dc--rise    { animation-name: dc-rise;    animation-timing-function: linear; }
+  .dc--tumble  { animation-name: dc-tumble; }
+  .dc--bob     { animation-name: dc-bob; }
+  .dc--sway    { animation-name: dc-sway; }
+  .dc--breathe { animation-name: dc-breathe; }
+  .dc--glide   { animation-name: dc-glide; }
+  /* petals and leaves: fall a little, swaying and turning over, then come again */
+  @keyframes dc-fall {
+    0%   { transform: translate(0, -70px) rotate(0) rotateY(0); opacity: 0; }
+    15%  { opacity: var(--a); }
+    40%  { transform: translate(var(--sw), -12px) rotate(calc(var(--rot) * .4)) rotateY(140deg); }
+    70%  { transform: translate(calc(var(--sw) * -.4), 46px) rotate(calc(var(--rot) * .7)) rotateY(250deg); }
+    85%  { opacity: var(--a); }
+    100% { transform: translate(calc(var(--sw) * .3), 110px) rotate(var(--rot)) rotateY(360deg); opacity: 0; }
+  }
+  /* blown sideways, like the wind of a passing train */
+  @keyframes dc-drift {
+    0%   { transform: translate(-80px, -20px) rotate(0); opacity: 0; }
+    15%  { opacity: var(--a); }
+    50%  { transform: translate(0, calc(var(--sw) * .5)) rotate(calc(var(--rot) * .5)); }
+    85%  { opacity: var(--a); }
+    100% { transform: translate(90px, 30px) rotate(var(--rot)); opacity: 0; }
+  }
+  /* steam and dust: up, widening, gone */
+  @keyframes dc-rise {
+    0%   { transform: translate(0, 40px) scaleX(.8); opacity: 0; }
+    30%  { opacity: var(--a); }
+    100% { transform: translate(calc(var(--sw) * .3), -90px) scaleX(1.25) skewX(10deg); opacity: 0; }
+  }
+  @keyframes dc-tumble { from { transform: translateY(8px) rotate(calc(var(--rot) * -.08)); } to { transform: translateY(-10px) rotate(calc(var(--rot) * .08)); } }
+  @keyframes dc-bob    { from { transform: translateY(-7px) rotate(-6deg); } to { transform: translateY(7px) rotate(6deg); } }
+  @keyframes dc-sway   { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+  @keyframes dc-breathe { from { transform: scale(.86); opacity: calc(var(--a) * .4); } to { transform: scale(1.08); opacity: var(--a); } }
+  @keyframes dc-glide  { from { transform: translateX(-26px) scale(.96); opacity: calc(var(--a) * .35); } to { transform: translateX(26px) scale(1.04); opacity: var(--a); } }
+}
+
+/* ───── layer 2 · the pictures: each grows toward its best place, from the edge it belongs to (flow.js) ───── */
+@layer parts {
+  .plate__frame { transform: scale(var(--zs, 1)); transform-origin: var(--zo, 50% 100%); }
+  .plate__frame img { transform: scale(var(--zi, 1)); }
+  .sp--l { --zo: 0% 100%; }
+  .sp--r { --zo: 100% 100%; }
+  .row .plate__frame, .sp--emaki .plate__frame { transform: none; }   /* panels that touch keep touching; only the picture inside breathes */
+}
+
+/* ───── layer 3 · the words: a caption that opens into the picture's story (flow.js + text.js) ─────
+   --sp 0 → 1 as the picture passes; each character arrives in turn, and leaves again if you scroll back */
+@layer parts {
+  .tale { font-family: var(--f-serif); font-weight: 300; font-size: 14px; line-height: 2.1; letter-spacing: .14em; color: var(--ink-soft); text-wrap: pretty; }
+  .tale--side { margin-top: 18px; max-width: 30em; }
+  .plate > .tale { margin-top: calc(var(--capspace, 76px) + 18px); }
+  .plate:has(> .tale) { padding-bottom: 36px; }
+  .sp--l > .tale--side { width: 86%; }
+  .sp--r > .tale--side { width: 86%; margin-left: auto; }
+  .sp--c > .tale--side { width: 76%; margin-inline: auto; }
+  .sp--scroll > .tale--side { width: 58%; margin-inline: auto; }
+  .row .plate .tale { font-size: 12.5px; }
+  /* on a wide picture the words float on it */
+  .tale--float {
+    position: absolute; top: 12px; right: var(--gutter); z-index: 2; max-width: 70%; margin: 0; padding: 0;
+    text-align: right; font-size: 13px; line-height: 1.9; color: #fff; text-shadow: 0 0 18px rgba(0, 0, 0, .55), 0 0 2px rgba(0, 0, 0, .3);
+    pointer-events: none;
+  }
+  @media (min-width: 1024px) {
+    .tale { font-size: 15px; }
+    /* beside the picture, set vertically in the empty columns, its foot level with the picture's foot */
+    .sp > .tale--side {
+      grid-row: 1; align-self: end; width: auto; max-width: none; margin: 0 0 var(--capspace, 76px);
+      writing-mode: vertical-rl; max-height: min(62vh, 26em); font-size: clamp(16px, 1.25vw, 19px); letter-spacing: .3em; line-height: 2.3; color: var(--ink);
+    }
+    .sp--l > .tale--side { grid-column: 10 / 12; justify-self: start; }
+    .sp--r > .tale--side { grid-column: 2 / 4; justify-self: end; }
+    .sp--c > .tale--side { grid-column: 11 / 13; justify-self: start; }
+    .sp--scroll > .tale--side { grid-column: 9 / 11; justify-self: center; }
+    .sp--l .plate, .sp--r .plate, .sp--c .plate, .sp--scroll .plate { grid-row: 1; }
+    .tale--float { top: 8%; right: 4%; max-width: none; max-height: 76%; writing-mode: vertical-rl; text-align: left; font-size: clamp(14px, 1.15vw, 18px); letter-spacing: .3em; line-height: 2.1; }
+  }
+}
+@layer motion {
+  .fx .tale .ch { --k: clamp(0, calc((var(--sp, 1) * (var(--n) + 12) - var(--i)) / 12), 1); opacity: var(--k); transform: translateY(calc((1 - var(--k)) * .7em)); }
+  .fx .tale--side .ch { transform: translate(calc((1 - var(--k)) * -.4em), calc((1 - var(--k)) * .7em)); }
+}
+
 @layer capture {
   @media (max-aspect-ratio: 1/3), print {
     .plate { --cp: 1 !important; }
     .note__t { color: var(--ink) !important; }
     [data-float] { transform: none !important; }
-    .ambient { display: none !important; }
     [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
+    .plate__frame, .plate__frame img { transform: none !important; }
+    .dc__m { animation: none !important; }
+    .dc { translate: none !important; }
     .bar { position: absolute !important; transform: none !important; }
   }
-  @media print { .bar, .lb { display: none !important; } }
+  @media print { .bar, .lb { display: none !important; } .decor { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
 }
