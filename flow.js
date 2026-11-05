@@ -5,7 +5,6 @@
              （白字，只有编号与标题）；图片继续往上走，说明落到图下，
              补出日期与参数。屏幕外的图一律是「落在图下」的成品状态，
              所以长截图、打印永远完整。
-   2. FLOAT  [data-float] 压在图上的标题随滚动略慢于图片，像浮在图上。
    3. ZOOM   图片离最佳位置越近越大：从它所在的一侧（偏左的从左下角、偏右的从右下角）长出来，
              里面的照片同时轻轻退远一点。屏幕外、长截图里都是原大。
    4. TALE   图的故事（.tale）随图片滑过一个字一个字出来；往回滑，又一个字一个字收回去。
@@ -30,79 +29,79 @@
     return (s.match(/[\d.]+/g) || [35, 35, 38]).slice(0, 3).map(Number);
   };
 
+  /* ── performance ────────────────────────────────────────────────
+     every position is measured once (and again only when the page changes size); while scrolling
+     the loop does arithmetic on those numbers and writes styles — it never asks the browser for a
+     layout, and it only touches what is near the screen. */
+  let Y = scrollY, VH = innerHeight;
+  const near = (top, h, before = 1.5, after = .6) => top < VH * before && top + h > -VH * after;
+
   /* ── 1. notes ─────────────────────────────────────────────────── */
-  const plates = $$('.plate').map(el => ({ el, body: el.querySelector('.plate__body'), t: el.querySelector('.note__t'), cp: -1, ink: parseColor(getComputedStyle(el).getPropertyValue('--ink')) }));
+  const plates = $$('.plate').map(el => ({
+    el, body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
+    frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
+    flat: !!el.closest('.row, .sp--emaki'),                        // panels that touch: only the picture inside breathes
+    top: 0, h: 0, cp: -1, zs: -1, live: false, ink: [35, 35, 38],
+  }));
   function notes() {
-    const vh = innerHeight;
     for (const p of plates) {
-      const r = p.body.getBoundingClientRect();
+      const top = p.top - Y;
       let cp = 1;
-      if (!still() && r.bottom > 0 && r.top < vh + 48) {
-        const readTop = r.height < vh * 0.9 ? (vh - r.height) / 2 : vh * 0.06;
-        cp = smooth(clamp((readTop - r.top) / (vh * 0.3)));      // on the photo until it has been seen, then it settles below
+      if (!still() && top + p.h > 0 && top < VH + 48) {
+        const readTop = p.h < VH * .9 ? (VH - p.h) / 2 : VH * .06;
+        cp = smooth(clamp((readTop - top) / (VH * .3)));            // on the photo until it has been seen, then it settles below
       }
-      if (Math.abs(cp - p.cp) < 0.002) continue;
+      cp = Math.round(cp * 40) / 40;
+      if (cp === p.cp) continue;
       p.cp = cp;
-      p.el.style.setProperty('--cp', cp.toFixed(3));
+      p.body.style.setProperty('--cp', cp.toFixed(3));
       const c = p.ink.map(v => Math.round(255 + (v - 255) * cp));
       p.t.style.color = `rgb(${c[0]},${c[1]},${c[2]})`;
     }
   }
 
-  /* ── 2. float ─────────────────────────────────────────────────── */
-  // the text lags a little behind its image as the image scrolls past — never more than `max` px
-  const floats = $$('[data-float]').map(el => ({ el, k: parseFloat(el.dataset.float) || .2, max: parseFloat(el.dataset.floatMax) || 36, host: el.closest('section, header, figure, a') || el.parentElement }));
-  function float() {
-    for (const f of floats) {
-      const r = f.host.getBoundingClientRect();
-      const vh = innerHeight;
-      const readTop = Math.min((vh - r.height) / 2, 0) ;
-      const off = still() || r.bottom < 0 || r.top > vh ? 0 : Math.min(f.max, Math.max(0, readTop - r.top) * f.k);
-      f.el.style.transform = off ? `translate3d(0, ${off.toFixed(1)}px, 0)` : '';
-    }
-  }
-
   /* ── 3. zoom ──────────────────────────────────────────────────── */
   function zoom() {
-    const vh = innerHeight;
     for (const p of plates) {
-      const r = p.body.getBoundingClientRect();
+      const top = p.top - Y;
+      const live = !still() && near(top, p.h, 1.5, .5);
       let zs = 1, zi = 1;
-      if (!still() && r.bottom > -vh * .5 && r.top < vh * 1.5) {
-        const d = (r.top + r.height / 2 - vh / 2) / vh;          // 0 = centred on screen
+      if (live) {
+        const d = (top + p.h / 2 - VH / 2) / VH;                    // 0 = centred on screen
         const e = smooth(clamp(1 - Math.abs(d) / .85));
         zs = .9 + .1 * e; zi = 1.14 - .14 * e;
       }
-      if (Math.abs(zs - (p.zs ?? -1)) < .0008) continue;
+      if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }   // a GPU layer only while it moves
+      if (Math.abs(zs - p.zs) < .0008) continue;
       p.zs = zs;
-      p.el.style.setProperty('--zs', zs.toFixed(4));
-      p.el.style.setProperty('--zi', zi.toFixed(4));
+      if (p.frame && !p.flat) p.frame.style.transform = zs === 1 ? '' : `scale(${zs.toFixed(4)})`;
+      if (p.img) p.img.style.transform = zi === 1 ? '' : `scale(${zi.toFixed(4)})`;
     }
   }
 
   /* ── 4. tales ─────────────────────────────────────────────────── */
   const tales = $$('.tale').map(el => {
     const host = el.closest('.plate') || el.previousElementSibling;
-    return { el, body: host && host.querySelector('.plate__body'), float: el.classList.contains('tale--float'), sp: -1 };
-  }).filter(t => t.body);
+    return { el, p: plates.find(p => p.el === host), float: el.classList.contains('tale--float'), sp: -1 };
+  }).filter(t => t.p);
   function tell() {
-    const vh = innerHeight;
     for (const t of tales) {
-      const r = t.body.getBoundingClientRect();
+      const top = t.p.top - Y, h = t.p.h;
       let sp = 1;
-      if (!still() && r.top < vh * 1.05 && r.bottom > 0) {
-        const readTop = r.height < vh * .9 ? (vh - r.height) / 2 : vh * .06;
-        sp = t.float ? smooth(clamp((readTop - r.top + vh * .32) / (vh * .45)))     // on the picture: as it arrives
-                     : smooth(clamp((readTop - r.top + vh * .12) / (vh * .42)));    // beside / below: once it has been seen
+      if (!still() && top < VH * 1.05 && top + h > 0) {
+        const readTop = h < VH * .9 ? (VH - h) / 2 : VH * .06;
+        sp = t.float ? smooth(clamp((readTop - top + VH * .32) / (VH * .45)))     // on the picture: as it arrives
+                     : smooth(clamp((readTop - top + VH * .12) / (VH * .42)));    // beside / below: once it has been seen
       }
-      if (Math.abs(sp - t.sp) < .002) continue;
+      sp = Math.round(sp * 24) / 24;                                   // a few steps; CSS transitions fill between them
+      if (sp === t.sp) continue;
       t.sp = sp;
       t.el.style.setProperty('--sp', sp.toFixed(3));
     }
   }
 
   /* ── 5. depth: the words are the front layer, so they move slowest ───────────────
-     speed f < 1: an element at doc-centre cy sits at  (cy − mid) × (f − 1)  from its place,
+     speed f < 1: an element whose centre is at page position c sits  (c − mid) × (f − 1)  from its place,
      mid being the page position at the middle of the screen — zero when it is centred. */
   const LAYERS = [
     ['.note', .9, 30],                                                  // a caption keeps close to its picture
@@ -113,45 +112,91 @@
   ];
   const words = [];
   for (const [sel, f, max] of LAYERS) for (const el of $$(sel)) {
-    if (el.matches('[data-float]') && sel !== '.cv__t') continue;
     if (words.some(w => w.el === el || w.el.contains(el))) continue;
-    if (el.matches('[data-float]')) el.removeAttribute('data-float');   // depth now does what float did
-    words.push({ el, f, max, off: 0 });
+    el.removeAttribute('data-float');
+    words.push({ el, f, max, off: 0, top: 0, h: 0 });
   }
   function depth() {
-    const vh = innerHeight, calm = still();
+    const calm = still();
     for (const w of words) {
-      const r = w.el.getBoundingClientRect();
-      const top = r.top - w.off;                                          // where it would be without us
+      const top = w.top - Y;
       let off = 0;
-      if (!calm && top < vh * 1.6 && top + r.height > -vh * .6) {
-        off = (top + r.height / 2 - vh / 2) * (w.f - 1);
-        off = Math.max(-w.max, Math.min(w.max, off));
-      }
-      if (Math.abs(off - w.off) < .3) continue;
+      if (!calm && near(top, w.h, 1.6, .6)) off = Math.max(-w.max, Math.min(w.max, (top + w.h / 2 - VH / 2) * (w.f - 1)));
+      off = Math.round(off * 2) / 2;
+      if (off === w.off) continue;
       w.off = off;
       w.el.style.translate = off ? `0 ${off.toFixed(1)}px` : '';
     }
   }
 
+  /* ── measuring (only when the page changes size) ──────────────── */
+  function measure() {
+    VH = innerHeight; Y = scrollY;
+    for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
+    for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; }
+    for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
+    tales.forEach(t => t.sp = -1);
+    plates.forEach(p => p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')));
+    window.__flow.measured = Date.now();
+  }
+
+  /* ── 6. pictures: full size only while the page is at rest ────────
+     scrolling comes first. While the reader scrolls nothing new is fetched or decoded; once the page
+     has been still for a moment, the pictures near the screen are fetched in full, decoded off to the
+     side, and swapped in one by one — and the swapping stops again the moment scrolling resumes. */
+  let lastScroll = 0, upgrading = false;
+  const scrolling = () => performance.now() - lastScroll < 220;
+  function upgrade() {
+    if (upgrading) return;
+    const next = plates.find(p => p.img && p.img.dataset.full && !p.full && near(p.top - scrollY, p.h, 1.8, .8));
+    if (!next) return;
+    upgrading = true;
+    const big = new Image(); big.src = next.img.dataset.full;
+    const swap = () => {
+      if (scrolling()) { setTimeout(swap, 240); return; }
+      next.img.src = big.src; next.full = true; upgrading = false;
+      setTimeout(() => { if (!scrolling()) upgrade(); }, 60);
+    };
+    (big.decode ? big.decode() : Promise.resolve()).then(swap, () => { next.full = true; upgrading = false; });
+  }
+  let restT = 0;
+  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(upgrade, 260); }, { passive: true });
+  addEventListener('load', () => setTimeout(upgrade, 300), { once: true });
+
   /* ── loop ─────────────────────────────────────────────────────── */
-  let ticking = false;
-  const frame = () => { ticking = false; notes(); float(); zoom(); tell(); depth(); };
-  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
-  addEventListener('resize', () => { plates.forEach(p => { p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')); p.cp = -1; p.zs = -1; }); tales.forEach(t => t.sp = -1); frame(); });
-  captureMQ.addEventListener('change', () => { plates.forEach(p => p.zs = -1); tales.forEach(t => t.sp = -1); frame(); });
+  let ticking = false, dirty = true;
+  const frame = () => {
+    ticking = false;
+    if (dirty) { dirty = false; measure(); }
+    Y = scrollY;
+    notes(); zoom(); tell(); depth();
+  };
+  const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+  const remeasure = () => { dirty = true; request(); };
+  window.__flow = { plates, remeasure, measured: 0 };
+  addEventListener('scroll', request, { passive: true });
+  addEventListener('resize', remeasure);
+  addEventListener('load', remeasure);
+  document.fonts && document.fonts.ready.then(remeasure);
+  new ResizeObserver(remeasure).observe(document.body);
+  captureMQ.addEventListener('change', remeasure);
   frame();
 
-  /* fetch every remaining image once the first screen is in, so a long screenshot has them all */
-  addEventListener('load', () => {
+  /* a long screenshot or a print needs every picture: fetch the rest then (only then — on a phone
+     fetching all 78 big pictures in the background would make scrolling stutter) */
+  const fetchAll = () => {
     const lazy = $$('img[loading="lazy"]');
     const next = () => {
       const img = lazy.shift(); if (!img) return;
+      if (img.dataset.full) { img.src = img.dataset.full; delete img.dataset.full; }
       img.loading = 'eager';
       if (img.complete) next(); else { img.addEventListener('load', next, { once: true }); img.addEventListener('error', next, { once: true }); }
     };
-    (window.requestIdleCallback || (f => setTimeout(f, 300)))(next);
-  });
-
-  window.__flow = { plates };
+    next();
+  };
+  const printMQ = matchMedia('print');
+  if (captureMQ.matches) addEventListener('load', fetchAll, { once: true });
+  captureMQ.addEventListener('change', e => e.matches && fetchAll());
+  printMQ.addEventListener('change', e => e.matches && fetchAll());
+  addEventListener('beforeprint', fetchAll);
 })();

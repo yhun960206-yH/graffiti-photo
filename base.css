@@ -75,7 +75,7 @@
     position: fixed; inset: 0 0 auto 0; z-index: 50; height: var(--bar);
     display: flex; align-items: center; gap: 28px; padding: 0 var(--gutter);
     font-size: 13px; letter-spacing: .24em;
-    background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--paper) 97%, transparent);
     transition: transform .6s var(--e-soft);
   }
   .bar.is-hidden { transform: translateY(-100%); }
@@ -194,14 +194,18 @@
 /* ───── layer 1 · the paper: little things from the photos, drawn and drifting (decor.js) ───── */
 @layer parts {
   .decor { position: absolute; left: 0; top: 0; width: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-  .dc { position: absolute; display: block; will-change: translate; transition: opacity .5s var(--e-soft); }
-  .dc.hush { opacity: .12; }
-  .dc__m { display: block; width: 100%; height: 100%; opacity: var(--a); transform-origin: 50% 50%; }
+  .decor__band { position: absolute; left: 0; top: 0; width: 100%; will-change: transform; }
+  .dc { position: absolute; display: block; transition: opacity .5s var(--e-soft); }
+  .dc__m { display: block; width: 100%; height: 100%; transform-origin: 50% 50%; }
   .dc svg { display: block; width: 100%; height: 100%; overflow: visible; }
   .dc--sway { transform-origin: 50% 100%; }
 }
 @layer motion {
-  .dc__m { animation: none var(--d) var(--dl) infinite ease-in-out var(--dir) both; animation-play-state: paused; }
+  /* fixed numbers only inside keyframes, so the GPU can run them without the page; each motif's own
+     turn (--r) and opacity sit on the still wrapper */
+  .dc { opacity: var(--a); rotate: var(--r, 0deg); }
+  .dc.hush { opacity: .12; }
+  .dc__m { opacity: 1; animation: none var(--d) var(--dl) infinite ease-in-out var(--dir) both; animation-play-state: paused; }
   .dc.on .dc__m { animation-play-state: running; }
   .dc--fall    { animation-name: dc-fall;    animation-timing-function: linear; }
   .dc--drift   { animation-name: dc-drift;   animation-timing-function: linear; }
@@ -211,43 +215,43 @@
   .dc--sway    { animation-name: dc-sway; }
   .dc--breathe { animation-name: dc-breathe; }
   .dc--glide   { animation-name: dc-glide; }
+  .dc--alt { animation-direction: reverse; }
   /* petals and leaves: fall a little, swaying and turning over, then come again */
   @keyframes dc-fall {
-    0%   { transform: translate(0, -70px) rotate(0) rotateY(0); opacity: 0; }
-    15%  { opacity: var(--a); }
-    40%  { transform: translate(var(--sw), -12px) rotate(calc(var(--rot) * .4)) rotateY(140deg); }
-    70%  { transform: translate(calc(var(--sw) * -.4), 46px) rotate(calc(var(--rot) * .7)) rotateY(250deg); }
-    85%  { opacity: var(--a); }
-    100% { transform: translate(calc(var(--sw) * .3), 110px) rotate(var(--rot)) rotateY(360deg); opacity: 0; }
+    0%   { transform: translate(0, -70px) rotate(0deg) rotateY(0deg); opacity: 0; }
+    15%  { opacity: 1; }
+    40%  { transform: translate(26px, -12px) rotate(80deg) rotateY(140deg); }
+    70%  { transform: translate(-12px, 46px) rotate(150deg) rotateY(250deg); }
+    85%  { opacity: 1; }
+    100% { transform: translate(8px, 110px) rotate(210deg) rotateY(360deg); opacity: 0; }
   }
   /* blown sideways, like the wind of a passing train */
   @keyframes dc-drift {
-    0%   { transform: translate(-80px, -20px) rotate(0); opacity: 0; }
-    15%  { opacity: var(--a); }
-    50%  { transform: translate(0, calc(var(--sw) * .5)) rotate(calc(var(--rot) * .5)); }
-    85%  { opacity: var(--a); }
-    100% { transform: translate(90px, 30px) rotate(var(--rot)); opacity: 0; }
+    0%   { transform: translate(-80px, -20px) rotate(0deg); opacity: 0; }
+    15%  { opacity: 1; }
+    50%  { transform: translate(0, 12px) rotate(110deg); }
+    85%  { opacity: 1; }
+    100% { transform: translate(90px, 30px) rotate(220deg); opacity: 0; }
   }
   /* steam and dust: up, widening, gone */
   @keyframes dc-rise {
     0%   { transform: translate(0, 40px) scaleX(.8); opacity: 0; }
-    30%  { opacity: var(--a); }
-    100% { transform: translate(calc(var(--sw) * .3), -90px) scaleX(1.25) skewX(10deg); opacity: 0; }
+    30%  { opacity: 1; }
+    100% { transform: translate(8px, -90px) scaleX(1.25) skewX(10deg); opacity: 0; }
   }
-  @keyframes dc-tumble { from { transform: translateY(8px) rotate(calc(var(--rot) * -.08)); } to { transform: translateY(-10px) rotate(calc(var(--rot) * .08)); } }
+  @keyframes dc-tumble { from { transform: translateY(8px) rotate(-14deg); } to { transform: translateY(-10px) rotate(14deg); } }
   @keyframes dc-bob    { from { transform: translateY(-7px) rotate(-6deg); } to { transform: translateY(7px) rotate(6deg); } }
   @keyframes dc-sway   { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
-  @keyframes dc-breathe { from { transform: scale(.86); opacity: calc(var(--a) * .4); } to { transform: scale(1.08); opacity: var(--a); } }
-  @keyframes dc-glide  { from { transform: translateX(-26px) scale(.96); opacity: calc(var(--a) * .35); } to { transform: translateX(26px) scale(1.04); opacity: var(--a); } }
+  @keyframes dc-breathe { from { transform: scale(.86); opacity: .4; } to { transform: scale(1.08); opacity: 1; } }
+  @keyframes dc-glide  { from { transform: translateX(-26px) scale(.96); opacity: .35; } to { transform: translateX(26px) scale(1.04); opacity: 1; } }
 }
 
 /* ───── layer 2 · the pictures: each grows toward its best place, from the edge it belongs to (flow.js) ───── */
 @layer parts {
-  .plate__frame { transform: scale(var(--zs, 1)); transform-origin: var(--zo, 50% 100%); }
-  .plate__frame img { transform: scale(var(--zi, 1)); }
+  .plate__frame { transform-origin: var(--zo, 50% 100%); }
+  .is-live .plate__frame, .is-live .plate__frame img { will-change: transform; }   /* a GPU layer only while near the screen */
   .sp--l { --zo: 0% 100%; }
   .sp--r { --zo: 100% 100%; }
-  .row .plate__frame, .sp--emaki .plate__frame { transform: none; }   /* panels that touch keep touching; only the picture inside breathes */
 }
 
 /* ───── layer 3 · the words: a caption that opens into the picture's story (flow.js + text.js) ─────

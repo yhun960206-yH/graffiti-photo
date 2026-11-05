@@ -4,7 +4,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const lb = $('.lb'); if (!lb) return;
   const lbImg = $('img', lb), lbT = $('.lb__t', lb), lbC = $('.lb__count', lb);
-  const items = $$('button.plate__frame').map(b => ({ src: $('img', b).getAttribute('src'), alt: $('img', b).alt, t: b.dataset.title, trigger: b }));
+  const items = $$('button.plate__frame').map(b => ({ src: $('img', b).dataset.full || $('img', b).getAttribute('src'), alt: $('img', b).alt, t: b.dataset.title, trigger: b }));
   let at = 0, opener = null;
   function render(i) {
     at = (i + items.length) % items.length;

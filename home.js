@@ -12,7 +12,9 @@
     if (Math.abs(dy) > 6) bar.classList.toggle('is-hidden', dy > 0 && y > innerHeight * .5);
     if (count) {
       let cur = null;
-      for (const m of marks) if (m.getBoundingClientRect().top < innerHeight * .55) cur = m;
+      // positions come from flow.js's measurements — no layout read while scrolling
+      const ps = window.__flow ? window.__flow.plates : [];
+      for (const p of ps) if (p.el.closest('.plates') && p.top - y < innerHeight * .55) cur = p.el;
       const text = `${cur ? cur.querySelector('.note__n').textContent : '图 01'} /${total}`;
       if (count.textContent !== text) count.textContent = text;
     }

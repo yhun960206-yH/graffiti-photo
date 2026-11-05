@@ -55,8 +55,10 @@ const FLOATS = new Set(['wide', 'cinema', 'emaki']);
 function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   const it = item(x), p = v.plates[it.n];
   const a = forceAr || it.ar || p.ar;
-  const src = `${prefix}images/series/${v.slug}/${pad(it.n)}.jpg`;
-  const img = `<img src="${src}" alt="${esc(p.t)}" loading="lazy" decoding="async">`;
+  const src = `${prefix}images/series/${v.slug}/${pad(it.n)}.jpg`, sm = `${prefix}images/series/${v.slug}/sm-${pad(it.n)}.jpg`;
+  // the small picture comes first; flow.js swaps in the full one only while the page is at rest,
+  // so scrolling never waits for a big picture to load or decode
+  const img = `<img src="${sm}" data-full="${src}" alt="${esc(p.t)}" loading="lazy" decoding="async">`;
   const frame = href
     ? `<a class="plate__frame" href="${href}">${img}</a>`
     : `<button class="plate__frame" type="button" data-title="图 ${pad(no)} · ${esc(p.t)}" aria-label="放大：${esc(p.t)}">${img}</button>`;

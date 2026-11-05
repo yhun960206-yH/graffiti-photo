@@ -119,7 +119,9 @@
   const WORDS = 'p, h1, h2, .plate, .note, .seal, .vols a, .foot, .dir';
   const TEXT = 'p, h1, h2, .note, .tale, .dir, .vols a';           // what a passing motif must not cover
 
-  let items = [], built = '', wordRects = [];
+  // a still turn for each motif: loose things lie any way up, upright things only lean a little
+  const turn = p => p.soft || p.m.move === 'glide' ? 0 : ['fall', 'drift', 'tumble'].includes(p.m.move) ? p.rot % 360 : p.sw * .25;
+  let items = [], bands = [], built = '', wordRects = [], moving = false;
   function build() {
     const was = layer.style.height;
     layer.style.height = '0px';                      // measure the page without this layer holding it open
@@ -139,7 +141,7 @@
 
     // the page is cut into bands; each band has its own fixed random numbers,
     // so when something above changes height only the bands it touches are re-laid
-    const BAND = 700, seed = seedOf(location.pathname + W), per = W * BAND / (W < 700 ? 44000 : 76000);
+    const BAND = 700, seed = seedOf(location.pathname + W), per = W * BAND / (W < 700 ? 56000 : 96000);
     const placed = [];
     for (let b0 = 0, band = 0; b0 < H; b0 += BAND, band++) {
       const rand = rng(seed + band * 7919);
@@ -163,38 +165,53 @@
         got++;
       }
     }
-    if (placed.length > 260) placed.length = 260;
-    layer.innerHTML = placed.map(p => `<i class="dc${p.soft ? ' dc--soft' : ''}" style="left:${p.x.toFixed(0)}px;top:${p.y.toFixed(0)}px;width:${p.s.toFixed(0)}px;height:${p.s.toFixed(0)}px"><i class="dc__m dc--${p.m.move}" style="--a:${(p.m.a * (.55 + p.z * .45)).toFixed(2)};--d:${p.d.toFixed(1)}s;--dl:-${(p.ph * p.d).toFixed(1)}s;--dir:${p.dir};--rot:${p.rot.toFixed(0)}deg;--sw:${p.sw.toFixed(0)}px"><svg><use href="#dc-${p.k}-${p.v}"/></svg></i></i>`).join('');
-    items = [...layer.children].map((el, i) => ({ el, z: placed[i].z, cy: placed[i].cy, x0: placed[i].x, y0: placed[i].y, s: placed[i].s, soft: placed[i].soft, on: false, hush: false }));
+    // depth bands: things of about the same depth share one band, and only the band moves while scrolling
+    // (4 moves per frame instead of one per motif). A motif's place inside its band already includes its
+    // share of the offset, so   band shift = −(screen middle) × k   puts it where it belongs.
+    moving = !still && !capture.matches;
+    const BANDS = 4, kOf = b => .2 + (1 - (.55 + (b + .5) / BANDS * .45)) * .66;   // far bands move fastest
+    bands = Array.from({ length: BANDS }, (_, b) => ({ k: kOf(b), el: document.createElement('div'), y: NaN }));
+    const html = bands.map(() => []);
+    items = [];
+    for (const p of placed) {
+      const b = Math.min(BANDS - 1, Math.floor((p.z - .55) / .45 * BANDS)), k = bands[b].k;
+      const top = p.y + (moving ? p.cy * k : 0);
+      html[b].push(`<i class="dc${p.soft ? ' dc--soft' : ''}" style="left:${p.x.toFixed(0)}px;top:${top.toFixed(0)}px;width:${p.s.toFixed(0)}px;height:${p.s.toFixed(0)}px;--a:${(p.m.a * (.55 + p.z * .45)).toFixed(2)};--r:${turn(p).toFixed(0)}deg"><i class="dc__m dc--${p.m.move}${p.sw < 0 && p.m.move === 'drift' ? ' dc--alt' : ''}" style="--d:${p.d.toFixed(1)}s;--dl:-${(p.ph * p.d).toFixed(1)}s;--dir:${p.dir}"><svg><use href="#dc-${p.k}-${p.v}"/></svg></i></i>`);
+      items.push({ b, k, x0: p.x, y0: p.y, cy: p.cy, s: p.s, soft: p.soft, hush: false });
+    }
+    layer.textContent = '';
+    bands.forEach((band, b) => {
+      band.el.className = 'decor__band'; band.el.innerHTML = html[b].join('');
+      layer.appendChild(band.el);
+      [...band.el.children].forEach((el, i) => { const it = items.filter(t => t.b === b)[i]; it.el = el; });
+    });
     if (!still) items.forEach(it => io.observe(it.el));
     parallax();
   }
 
   /* ── life ────────────────────────────────────────────────────── */
-  // only what is near the screen moves
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    const it = items.find(i => i.el === e.target); if (!it) return;
-    it.on = e.isIntersecting; e.target.classList.toggle('on', it.on);
-  }), { rootMargin: '60% 0px' });
+  // only what is near the screen is animated
+  const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('on', e.isIntersecting)), { rootMargin: '30% 0px' });
 
-  // depth: the paper is the back layer, so it moves fastest — and the farther a thing, the faster
-  //   speed f = 1.2 … 1.5;  offset = (centre − screen middle) × (f − 1)
+  // depth: the paper is the back layer, so it moves fastest — and the farther, the faster
+  //   speed 1.2 … 1.5 × the page;  a motif sits  (its centre − screen middle) × k  from its place
   const capture = matchMedia('(max-aspect-ratio: 1/3), print');
   function parallax() {
-    if (still || capture.matches) { items.forEach(it => it.el.style.translate = ''); return; }
-    const mid = scrollY + innerHeight / 2;
-    const near = innerHeight * 1.6;
+    if (!moving) { bands.forEach(b => b.el.style.transform = ''); return; }
+    const mid = scrollY + innerHeight / 2, vh = innerHeight;
+    for (const b of bands) {
+      const y = -mid * b.k;
+      if (Math.abs(y - b.y) < .3) continue;
+      b.y = y; b.el.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
+    }
+    // passing behind words, a motif steps aside: almost gone until it is clear again (arithmetic only)
     for (const it of items) {
+      if (it.soft) continue;
       const d = it.cy - mid;
-      if (Math.abs(d) > near) continue;
-      const off = d * (.2 + (1 - it.z) * .66);
-      it.el.style.translate = `0 ${off.toFixed(1)}px`;
-      // passing behind words, it steps aside: almost gone until it is clear again
-      if (!it.soft) {
-        const y0 = it.y0 + off, y1 = y0 + it.s, x0 = it.x0, x1 = x0 + it.s;
-        const hush = wordRects.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
-        if (hush !== it.hush) { it.hush = hush; it.el.classList.toggle('hush', hush); }
-      }
+      if (d > vh * 1.4 || d < -vh * 1.4) continue;
+      const y0 = it.y0 + d * it.k, y1 = y0 + it.s, x0 = it.x0, x1 = x0 + it.s;
+      const hush = wordRects.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
+      if (hush !== it.hush) { it.hush = hush; it.el.classList.toggle('hush', hush); }
     }
   }
   let tick = false;
@@ -203,6 +220,7 @@
   // rebuild when the page changes size (fonts, rotation, a long-screenshot window)
   let rt = 0;
   new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(build, 200); }).observe(document.body);
+  capture.addEventListener('change', () => { built = ''; build(); });
   build();
   addEventListener('load', build);
 })();
