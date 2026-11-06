@@ -23,6 +23,13 @@ mkdirSync(outDir, { recursive: true });
 // the words — titles, ledes, essays, each picture's title and story — come from copy/<slug>.md
 import { applyCopy, lint } from './copy.mjs';
 const COPY = applyCopy(volumes, join(root, 'copy'));
+// words typed into series-data.mjs the old way would be silently replaced by copy/*.md: say so
+{
+  const src = readFileSync(join(root, 'tools', 'series-data.mjs'), 'utf8').split('export const volumes')[1] || '';
+  const old = [[/\{\s*t:\s*'/, '图片标题 t'], [/,\s*s:\s*'/, '图片故事 s'], [/\blede:/, '简介 lede'], [/\bessay:/, '正文 essay'], [/slug:\s*'[\w-]+',\s*title:/, '卷名 title']]
+    .filter(([re]) => re.test(src)).map(([, k]) => k);
+  if (old.length && COPY[0]) COPY[0].warn.unshift(`tools/series-data.mjs 里有 ${old.join('、')}：这些不再使用，文字请写在 copy/<卷>.md`);
+}
 
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = n => String(n).padStart(2, '0');

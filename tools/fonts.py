@@ -28,13 +28,19 @@ text |= set(map(chr, range(0x20, 0x7f)))                      # ASCII
 text |= set('，。、；：？！…—–·「」『』（）《》〈〉“”‘’　→←↑↓×／％')
 text = ''.join(sorted(c for c in text if ord(c) >= 0x20))
 
-os.makedirs(os.path.join(ROOT, 'fonts'), exist_ok=True)
-# the list of what the fonts hold, so build-series.mjs can warn when the copy uses a character they don't have
-open(os.path.join(ROOT, 'fonts', 'chars.txt'), 'w', encoding='utf-8').write(text)
-
 FONTS = [('NotoSerifSC-VF.ttf', 'serif.woff2', (200, 400)),
          ('NotoSansSC-VF.ttf', 'sans.woff2', (300, 400))]
 os.makedirs(os.path.join(ROOT, 'fonts'), exist_ok=True)
+CHARS = os.path.join(ROOT, 'fonts', 'chars.txt')
+
+# nothing new: leave the fonts exactly as they are (no new files to publish, nothing for visitors to fetch again)
+have = open(CHARS, encoding='utf-8').read() if os.path.exists(CHARS) else ''
+if set(text) <= set(have) and all(os.path.exists(os.path.join(ROOT, 'fonts', o)) for _, o, _ in FONTS):
+    print(f'fonts        已包含全部 {len(set(text))} 字，不用重做')
+    sys.exit(0)
+
+# the list of what the fonts hold, so build-series.mjs can warn when the copy uses a character they don't have
+open(CHARS, 'w', encoding='utf-8').write(text)
 for src, out, (lo, hi) in FONTS:
     font = TTFont(os.path.join(SRC, src), lazy=False)
     opts = subset.Options()
@@ -49,5 +55,7 @@ for src, out, (lo, hi) in FONTS:
     font = instancer.instantiateVariableFont(font, {'wght': (lo, hi)})   # only the weights the site uses
     path = os.path.join(ROOT, 'fonts', out)
     font.flavor = 'woff2'
+    font.recalcTimestamp = False                        # same characters → the same file, byte for byte
+    font['head'].modified = font['head'].created
     font.save(path)
     print(f'{out:12s} {len(text)} 字  {os.path.getsize(path) / 1024:.0f} KB')

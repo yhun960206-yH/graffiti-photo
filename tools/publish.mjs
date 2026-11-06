@@ -18,7 +18,10 @@ const fontsSrc = join(root, '..', '_fonts-src');
 
 try {
   console.log('[1/4] 取回线上的改动');
-  run(GIT, ['pull', '--ff-only', '-q']);
+  // pages and fonts are rebuilt in step 2 anyway: drop the local copies (a proofing build leaves them changed),
+  // so they never block the pull; anything else you changed by hand is set aside and put back (--autostash)
+  run(GIT, ['checkout', '--', 'series', 'fonts'], true);
+  run(GIT, ['pull', '--ff-only', '--autostash', '-q']);
   console.log('[2/4] 生成网页');
   run(NODE, ['tools/build-series.mjs']);
   if (existsSync(join(fontsSrc, 'NotoSerifSC-VF.ttf'))) {
@@ -33,6 +36,6 @@ try {
   run(GIT, ['push', '-q']);
   console.log(`\n已发布「${msg}」：约一分钟后 https://yhun960206-yh.github.io/graffiti-photo/ 更新。`);
 } catch (e) {
-  console.log('\n出错了，上面是原因。没有推送任何东西。');
+  console.log(`\n出错了（${e.message.split('\n')[0]}），上面是 git / 生成器给出的原因。没有推送任何东西。`);
   process.exit(1);
 }
