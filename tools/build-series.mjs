@@ -270,7 +270,8 @@ const stampFonts = file => {
 };
 [join(root, 'base.css'), indexPath, join(root, '404.html'), ...volumes.map(v => join(outDir, `${v.slug}.html`))].forEach(stampFonts);
 const ASSETS = readdirSync(root).filter(f => /\.(css|js)$/.test(f));
-const hash = f => createHash('sha1').update(readFileSync(join(root, f))).digest('hex').slice(0, 8);
+// line endings ignored: Windows checkouts have CRLF, GitHub's runner LF — both must give the same stamp
+const hash = f => createHash('sha1').update(readFileSync(join(root, f), 'utf8').replace(/\r\n/g, '\n')).digest('hex').slice(0, 8);
 const ver = Object.fromEntries(ASSETS.map(f => [f, hash(f)]));
 const stamp = file => {
   const h = readFileSync(file, 'utf8').replace(/((?:href|src)=")((?:\.\.\/)?)([\w-]+\.(?:css|js))(?:\?v=\w+)?"/g,
