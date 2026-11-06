@@ -57,8 +57,10 @@
 **3. 发布**：双击 `publish.cmd`（或 `publish.cmd 这次改了什么`）：取回线上改动 → 生成 → 收进新出现的字 → 提交 → 推送。
 约一分钟后线上更新。
 
-在手机 Claude 里改文案也可以：改 `copy/*.md`，再让它运行 `node tools/build-series.mjs` 后推送。
-新出现的字要等电脑上跑一次 `publish.cmd`（它会收进字体）；在那之前这几个字用系统字体显示。
+**自动生成**：每次推送到 GitHub，`.github/workflows/build.yml` 会自动 生成网页 → 收进新出现的字 → 存回仓库 → 发布。
+所以在手机上（GitHub 网页、手机 Claude）**只改 `copy/*.md` 推送就行**，约一两分钟后上线，不用再运行任何命令。
+进度在仓库的 Actions 页面：https://github.com/yhun960206-yH/graffiti-photo/actions
+（它存回仓库的提交叫「自动生成：网页与字体」；下次电脑上 `publish.cmd` 会自动取回。）
 
 ## 加一卷
 把照片放进 `images/series/<目录>/01.jpg …`（长边约 2400px，另做 900px 的 `sm-01.jpg …`），
@@ -120,7 +122,7 @@
 
 ## 线上地址与更新
 - 网站：https://yhun960206-yh.github.io/graffiti-photo/
-- 仓库：https://github.com/yhun960206-yH/graffiti-photo（公开，GitHub Pages 从 main 分支根目录发布）
+- 仓库：https://github.com/yhun960206-yH/graffiti-photo（公开；GitHub Pages 由 Actions 的「生成并发布」流程发布）
 - 改完内容后，运行 `publish.cmd`（见上面「写文案 · 校对 · 发布」）。便携版 Git 在 `~/tools/mingit`。
   推送后约 1 分钟，线上自动更新。生成器会给 css/js 和字体链接加上 `?v=版本号`，浏览器不会混用新页面和旧样式。
 
