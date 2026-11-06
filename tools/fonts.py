@@ -18,14 +18,19 @@ SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, '..', '_fonts-src
 
 # every character the site can show: the pages, the content, and the scripts (the decode effect's random strokes)
 text = set()
-for pat in ['*.html', 'series/*.html', '*.js', 'tools/series-data.mjs']:
+for pat in ['*.html', 'series/*.html', '*.js', 'tools/series-data.mjs', 'copy/*.md']:
     for f in glob.glob(os.path.join(ROOT, pat)):
+        if os.path.basename(f) == 'proof.html': continue          # the proofing page is not part of the site
         s = open(f, encoding='utf-8').read()
         s = re.sub(r'<script type="application/ld\+json">.*?</script>', '', s, flags=re.S)
         text |= set(s)
 text |= set(map(chr, range(0x20, 0x7f)))                      # ASCII
 text |= set('，。、；：？！…—–·「」『』（）《》〈〉“”‘’　→←↑↓×／％')
 text = ''.join(sorted(c for c in text if ord(c) >= 0x20))
+
+os.makedirs(os.path.join(ROOT, 'fonts'), exist_ok=True)
+# the list of what the fonts hold, so build-series.mjs can warn when the copy uses a character they don't have
+open(os.path.join(ROOT, 'fonts', 'chars.txt'), 'w', encoding='utf-8').write(text)
 
 FONTS = [('NotoSerifSC-VF.ttf', 'serif.woff2', (200, 400)),
          ('NotoSansSC-VF.ttf', 'sans.woff2', (300, 400))]

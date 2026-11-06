@@ -26,16 +26,44 @@
 | `home.js` | 顶栏（首页与每一卷共用） |
 | `book.js` | 点开看大图 |
 | `decor.js` | 背景层：从照片里提取的小东西画成插画，飘在留白处（每卷的 `decor` 决定用哪几种） |
-| `tools/series-data.mjs` | **所有作品内容都在这里** |
-| `tools/build-series.mjs` | 生成器 |
+| `copy/<卷>.md` | **文字都在这里**：卷名、简介、正文、每张图的标题和故事 |
+| `tools/series-data.mjs` | 其余的作品数据：日期、参数、裁切、版式、插画 |
+| `tools/build-series.mjs` | 生成器（也生成校对页 `proof.html`，只在本机，不发布） |
+| `tools/copy.mjs` | 读写文案、检查长度 |
+| `publish.cmd` | 一键发布 |
 
-## 改内容 / 加一卷
-改 `tools/series-data.mjs`，然后运行：
+## 写文案 · 校对 · 发布
+**1. 写**：打开 `copy/<卷>.md`（`lane` 巷子里 · `yearend` 新一与毛利兰 · `bear` 小熊帽 · `train` 冬日的列车 · `summer` 五月的树荫 · `cafe` 咖啡凉了）。
 ```
-node tools/build-series.mjs
+卷名：巷子里
+简介【待审】：二月的一个下午，在巷子里走了三个小时。
+正文【待审】：
+第一段……
+
+第二段……
+
+## 01 古着店【待审】
+![](../images/series/lane/sm-01.jpg)
+古着店门口挂满了粉色的花……        ← 故事，可以不写；不写就只显示标题
 ```
-新的一卷：把照片放进 `images/series/<目录>/01.jpg …`（长边约 2400px，另做 900px 的 `sm-01.jpg …`），
-在 `volumes` 里照着现有两卷加一项，并从 `upcoming` 删掉对应的「整理中」。
+- `## 01` 的 01 是照片文件的编号（`01.jpg`），不是网页上的「图 01」——校对页上两个都有。
+- 【待审】= 还是代拟稿。写好或确认过的，把【待审】删掉；网站上不显示它，只在校对页上提醒你。
+- 在 GitHub 网页上打开这些 .md，每段文字上面都有那张图的缩略图，手机上也能直接看着图审。
+
+**2. 校对**：运行 `node tools/build-series.mjs`，用浏览器打开 `proof.html`：
+每张图（按网页上的顺序）配着标题、故事、字数，标出待审的、可能放不下的
+（一排小图里的标题手机上约 6 字；浮在宽幅图上的故事建议 30 字内），以及字体里还没有的字。
+
+**3. 发布**：双击 `publish.cmd`（或 `publish.cmd 这次改了什么`）：取回线上改动 → 生成 → 收进新出现的字 → 提交 → 推送。
+约一分钟后线上更新。
+
+在手机 Claude 里改文案也可以：改 `copy/*.md`，再让它运行 `node tools/build-series.mjs` 后推送。
+新出现的字要等电脑上跑一次 `publish.cmd`（它会收进字体）；在那之前这几个字用系统字体显示。
+
+## 加一卷
+把照片放进 `images/series/<目录>/01.jpg …`（长边约 2400px，另做 900px 的 `sm-01.jpg …`），
+在 `tools/series-data.mjs` 的 `volumes` 里照着现有的加一项，从 `upcoming` 删掉对应的「整理中」；
+再新建 `copy/<目录>.md` 写文字（照着现有的写），运行 `python tools/light.py` 和 `publish.cmd`。
 
 ## 三层
 层次全靠滚动时的速度差：**图片与页面同速**（基准）；**背景插画更快**（在最后，越远越快，滚 100px 约走 120–150px）；
@@ -93,14 +121,8 @@ node tools/build-series.mjs
 ## 线上地址与更新
 - 网站：https://yhun960206-yh.github.io/graffiti-photo/
 - 仓库：https://github.com/yhun960206-yH/graffiti-photo（公开，GitHub Pages 从 main 分支根目录发布）
-- 改完内容后，在网站文件夹里运行（便携版 Git 在 `~/tools/mingit`）：
-  ```
-  node tools/build-series.mjs
-  git add -A
-  git commit -m "更新作品"
-  git push
-  ```
-  推送后约 1 分钟，线上自动更新。生成器会给 css/js 链接加上 `?v=版本号`，浏览器不会混用新页面和旧样式。
+- 改完内容后，运行 `publish.cmd`（见上面「写文案 · 校对 · 发布」）。便携版 Git 在 `~/tools/mingit`。
+  推送后约 1 分钟，线上自动更新。生成器会给 css/js 和字体链接加上 `?v=版本号`，浏览器不会混用新页面和旧样式。
 
 ## 本地预览
 ```
