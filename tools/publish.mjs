@@ -30,7 +30,7 @@ try {
     run(NODE, ['tools/build-series.mjs'], true);
   } else console.log('[3/4] 跳过字体（没有 ../_fonts-src）');
   console.log('[4/4] 发布');
-  run(GIT, ['add', '-A']);
+  run(GIT, ['-c', 'core.safecrlf=false', 'add', '-A']);            // no line-ending chatter
   if (!run(GIT, ['status', '--porcelain'], true).trim()) { console.log('\n没有要发布的改动。'); process.exit(0); }
   run(GIT, ['commit', '-q', '-m', msg]);
   run(GIT, ['push', '-q']);
