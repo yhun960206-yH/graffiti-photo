@@ -1,5 +1,5 @@
 /* ==========================================================
-   涂鸦写真帖 —— 共用基础
+   涂鸦 —— 共用基础
    日式的感觉只靠版面，不靠文字：
      · 間：大片留白，图片不居中、左右错落
      · 竖排：卷名竖排压在图上
@@ -103,7 +103,7 @@
   .cv__img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to left, rgba(10, 10, 12, .38), rgba(10, 10, 12, 0) 38%); }
   .cv__t {
     position: absolute; top: 7%; right: 6%; z-index: 1;
-    writing-mode: vertical-rl; font-family: var(--f-serif); font-weight: 200; font-size: min(var(--t-display), 12cqh); line-height: 1.1; letter-spacing: .32em;
+    writing-mode: vertical-rl; white-space: nowrap; font-family: var(--f-serif); font-weight: 200; font-size: min(var(--t-display), 12cqh); line-height: 1.1; letter-spacing: .32em;
     color: var(--on-image); text-shadow: 0 0 24px rgba(0, 0, 0, .18); will-change: transform;
   }
   .cv__side { display: flex; align-items: flex-start; gap: 22px; padding: 26px var(--gutter) 0; }

@@ -1,5 +1,5 @@
 /* ==========================================================
-   涂鸦写真帖 · 首页
+   涂鸦 · 首页
    封面（目录压在图上，点开一卷就在它下面展开）→ 关于 → 结尾
    ========================================================== */
 @layer page {
@@ -30,7 +30,7 @@
   .hx__meta { font-size: 11px; letter-spacing: .2em; opacity: .7; }
   .hx__t {
     grid-row: 2; justify-self: end; align-self: start; margin: 4px 0 32px;
-    writing-mode: vertical-rl; font-family: var(--f-serif); font-weight: 200; font-size: min(11vw, 6.4svh); line-height: 1.1; letter-spacing: .32em;
+    writing-mode: vertical-rl; white-space: nowrap; font-family: var(--f-serif); font-weight: 200; font-size: min(11vw, 6.4svh); line-height: 1.1; letter-spacing: .32em;
     text-shadow: 0 0 24px rgba(0, 0, 0, .2); pointer-events: none;
   }
 

@@ -28,7 +28,7 @@
 // ============================================================
 
 export const AUTHOR = '涂鸦';
-export const BOOK = '涂鸦写真帖';
+export const BOOK = '涂鸦';
 
 export const upcoming = [];
 
