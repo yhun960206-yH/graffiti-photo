@@ -73,8 +73,8 @@ function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   const it = item(x), p = v.plates[it.n];
   const a = forceAr || it.ar || p.ar;
   const src = `${prefix}images/series/${v.slug}/${pad(it.n)}.jpg`, sm = `${prefix}images/series/${v.slug}/sm-${pad(it.n)}.jpg`;
-  const altText = p.t || `图 ${pad(no)}`;
-  const titleText = p.t ? `图 ${pad(no)} · ${p.t}` : `图 ${pad(no)}`;
+  const altText = p.t || `${v.title} ${pad(no)}`;
+  const titleText = p.t || '';
   // the small picture comes first; flow.js swaps in the full one only while the page is at rest,
   // so scrolling never waits for a big picture to load or decode
   const img = `<img src="${sm}" data-full="${src}" alt="${esc(altText)}" loading="lazy" decoding="async">`;
@@ -84,16 +84,16 @@ function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
           ` : '';
   const frame = href
     ? `<a class="plate__frame" href="${href}">${img}</a>`
-    : `<button class="plate__frame" type="button" data-title="${esc(titleText)}" aria-label="放大：${esc(altText)}">${img}</button>`;
+    : `<button class="plate__frame" type="button" ${titleText ? ` data-title="${esc(titleText)}"` : ''} aria-label="放大">${img}</button>`;
   const timePart = p.d ? (p.d === v.date ? '' : p.d.startsWith(v.date + ' · ') ? p.d.slice(v.date.length + 3) : p.d) : '';
   const detail = [timePart, p.x].filter(Boolean).map(esc).join('　');
   const float = p.s && FLOATS.has(layout);
   const tale = p.s && !float ? `<p class="tale" data-fx="tale">${esc(p.s)}</p>` : '';
-  return { tale, html: `<figure class="plate${p.s ? ' has-tale' : ''}"${lit ? ` data-light="${lit}"` : ''} style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
+  return { tale, html: `<figure class="plate${p.s ? ' has-tale' : ''}" data-no="${pad(no)}"${lit ? ` data-light="${lit}"` : ''} style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
         <div class="plate__body">
           ${glow}${frame}${float ? `
           <p class="tale tale--float" data-fx="tale">${esc(p.s)}</p>` : ''}
-          <figcaption class="note"><span class="note__t"><span class="note__n">图 ${pad(no)}</span>${esc(p.t)}</span><span class="note__d">${detail}</span></figcaption>
+          <figcaption class="note">${p.t ? `<span class="note__t">${esc(p.t)}</span>` : ''}<span class="note__d">${detail}</span></figcaption>
         </div>
       </figure>` };
 }
@@ -173,7 +173,7 @@ function volumePage(v, i) {
   <a class="skip" href="#plates">跳到作品</a>
   <header class="bar" data-bar>
     <a class="bar__home" href="../index.html#works">${BOOK}</a>
-    <span class="bar__n" data-count>图 01 / ${pad(count(v))}</span>
+    <span class="bar__n" data-count>01 / ${pad(count(v))}</span>
   </header>
 
   <main>${cover({ img: `images/series/${v.slug}/${pad(v.cover)}.jpg`, smImg: `images/series/${v.slug}/sm-${pad(v.cover)}.jpg`, prefix: '../', pos: v.coverPos, alt: v.plates[v.cover].t || v.title, title: v.title, side })}
@@ -232,7 +232,7 @@ function entry(v, i) {
   const f = v.feature, fp = v.plates[f.plate], href = `series/${v.slug}.html`;
   const nums = numbers(v);
   const order = Object.keys(nums).map(Number).sort((a, b) => nums[a] - nums[b]).slice(0, THUMBS);
-  const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t || `图 ${pad(nums[n])}`)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
+  const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t || `${v.title} ${pad(nums[n])}`)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
   const ledeLine = v.lede ? `\n              <p class="dir__lede">${esc(v.lede)}</p>` : '';
   return `
         <li class="dir__i" style="--k:${i}">

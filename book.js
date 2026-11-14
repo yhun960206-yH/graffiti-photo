@@ -11,7 +11,7 @@
     const it = items[at];
     lbImg.classList.add('is-swap');
     setTimeout(() => {
-      lbImg.src = it.src; lbImg.alt = it.alt; lbT.textContent = it.t;
+      lbImg.src = it.src; lbImg.alt = it.alt; lbT.textContent = it.t || ''; lbT.hidden = !it.t;
       lbC.textContent = `${at + 1} / ${items.length}`;
       const done = () => lbImg.classList.remove('is-swap');
       if (lbImg.complete) requestAnimationFrame(done); else lbImg.onload = done;
