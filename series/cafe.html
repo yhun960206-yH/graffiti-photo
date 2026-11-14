@@ -14,9 +14,9 @@
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="preload" as="font" type="font/woff2" href="../fonts/serif.woff2?v=32e94b1d" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="../fonts/sans.woff2?v=1ec2ef67" crossorigin>
-  <link rel="preload" as="image" href="../images/series/cafe/01.jpg">
-  <link rel="stylesheet" href="../base.css?v=ad46d725">
-  <link rel="stylesheet" href="../book.css?v=5c687c18">
+  <link rel="preload" as="image" href="../images/series/cafe/01.jpg" imagesrcset="../images/series/cafe/sm-01.jpg 900w, ../images/series/cafe/01.jpg 2400w" imagesizes="(max-width: 768px) 100vw, 75vw">
+  <link rel="stylesheet" href="../base.css?v=433ccf2d">
+  <link rel="stylesheet" href="../book.css?v=4b5675f3">
 </head>
 <body class="book theme-night" style="background-color:#2b2221" data-decor="steam monstera lamp">
   <a class="skip" href="#plates">跳到作品</a>
@@ -28,17 +28,18 @@
   <main>
     <section class="cv">
       <div class="cv__img">
-        <img src="../images/series/cafe/01.jpg" alt="咖啡凉了" style="object-position:55% 35%" fetchpriority="high">
+        <img src="../images/series/cafe/01.jpg" srcset="../images/series/cafe/sm-01.jpg 900w, ../images/series/cafe/01.jpg 2400w" sizes="(max-width: 768px) 100vw, 75vw" alt="咖啡凉了" style="object-position:55% 35%" fetchpriority="high" decoding="async">
         <h1 class="cv__t" data-float=".12" data-fx="ink">咖啡凉了</h1>
       </div>
       <div class="cv__side">
         <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
-        <p class="cv__meta t-note">第六卷<br>2024.03.11<br>6 张</p>
+        <div class="cv__meta"><p class="cv__date">2024.03.11</p><p class="t-note">第六卷 · 6 张</p></div>
       </div>
     </section>
 
     <section class="vi">
-      <p class="vi__meta t-note">2024.03.11<br>Nikon Z 8 · 50mm f/1.8<br>6 张</p>
+      <p class="vi__date">2024.03.11</p>
+      <p class="vi__meta t-note">Nikon Z 8 · 50mm f/1.8 · 6 张</p>
     </section>
 
     <div class="plates" id="plates">
@@ -48,14 +49,14 @@
         <div class="plate__body">
           <img class="glow" src="../images/series/cafe/glow-02.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
           <button class="plate__frame" type="button" data-title="图 02" aria-label="放大：图 02"><img src="../images/series/cafe/sm-02.jpg" data-full="../images/series/cafe/02.jpg" alt="图 02" loading="lazy" decoding="async"></button>
-          <figcaption class="note"><span class="note__t"><span class="note__n">图 02</span></span><span class="note__d">2024.03.11 · 16:04　f/2 · 1/1000 · ISO 2000</span></figcaption>
+          <figcaption class="note"><span class="note__t"><span class="note__n">图 02</span></span><span class="note__d">16:04　f/2 · 1/1000 · ISO 2000</span></figcaption>
         </div>
       </figure>
       <figure class="plate" data-light="#312216" style="--ar:3/2; --r:1.5; --pos:50% 50%">
         <div class="plate__body">
           <img class="glow" src="../images/series/cafe/glow-03.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
           <button class="plate__frame" type="button" data-title="图 03" aria-label="放大：图 03"><img src="../images/series/cafe/sm-03.jpg" data-full="../images/series/cafe/03.jpg" alt="图 03" loading="lazy" decoding="async"></button>
-          <figcaption class="note"><span class="note__t"><span class="note__n">图 03</span></span><span class="note__d">2024.03.11 · 16:05　f/2 · 1/1000 · ISO 1800</span></figcaption>
+          <figcaption class="note"><span class="note__t"><span class="note__n">图 03</span></span><span class="note__d">16:05　f/2 · 1/1000 · ISO 1800</span></figcaption>
         </div>
       </figure>
     </div>
@@ -65,7 +66,7 @@
         <div class="plate__body">
           <img class="glow" src="../images/series/cafe/glow-04.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
           <button class="plate__frame" type="button" data-title="图 04" aria-label="放大：图 04"><img src="../images/series/cafe/sm-04.jpg" data-full="../images/series/cafe/04.jpg" alt="图 04" loading="lazy" decoding="async"></button>
-          <figcaption class="note"><span class="note__t"><span class="note__n">图 04</span></span><span class="note__d">2024.03.11 · 16:45　f/2 · 1/60 · ISO 360</span></figcaption>
+          <figcaption class="note"><span class="note__t"><span class="note__n">图 04</span></span><span class="note__d">16:45　f/2 · 1/60 · ISO 360</span></figcaption>
         </div>
       </figure>
     </section>
@@ -74,7 +75,7 @@
         <div class="plate__body">
           <img class="glow" src="../images/series/cafe/glow-05.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
           <button class="plate__frame" type="button" data-title="图 05" aria-label="放大：图 05"><img src="../images/series/cafe/sm-05.jpg" data-full="../images/series/cafe/05.jpg" alt="图 05" loading="lazy" decoding="async"></button>
-          <figcaption class="note"><span class="note__t"><span class="note__n">图 05</span></span><span class="note__d">2024.03.11 · 17:39　f/2.8 · 1/60 · ISO 72</span></figcaption>
+          <figcaption class="note"><span class="note__t"><span class="note__n">图 05</span></span><span class="note__d">17:39　f/2.8 · 1/60 · ISO 72</span></figcaption>
         </div>
       </figure>
     </section>
@@ -83,7 +84,7 @@
         <div class="plate__body">
           <img class="glow" src="../images/series/cafe/glow-06.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
           <button class="plate__frame" type="button" data-title="图 06" aria-label="放大：图 06"><img src="../images/series/cafe/sm-06.jpg" data-full="../images/series/cafe/06.jpg" alt="图 06" loading="lazy" decoding="async"></button>
-          <figcaption class="note"><span class="note__t"><span class="note__n">图 06</span></span><span class="note__d">2024.03.11 · 18:15　f/1.8 · 1/60 · ISO 560</span></figcaption>
+          <figcaption class="note"><span class="note__t"><span class="note__n">图 06</span></span><span class="note__d">18:15　f/1.8 · 1/60 · ISO 560</span></figcaption>
         </div>
       </figure>
     </section>
@@ -112,10 +113,10 @@
     </div>
   </dialog>
 
-  <script src="../flow.js?v=c439f21a" defer></script>
+  <script src="../flow.js?v=074bbfb2" defer></script>
   <script src="../text.js?v=155ce369" defer></script>
   <script src="../home.js?v=490b6b1a" defer></script>
   <script src="../book.js?v=fd8fad7e" defer></script>
-  <script src="../decor.js?v=4b838394" defer></script>
+  <script src="../decor.js?v=99cd2139" defer></script>
 </body>
 </html>

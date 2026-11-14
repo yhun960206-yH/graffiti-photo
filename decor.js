@@ -253,8 +253,10 @@
 
   // rebuild when the page changes size (fonts, rotation, a long-screenshot window)
   let rt = 0;
-  new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(build, 200); }).observe(document.body);
+  const scheduleBuild = (delay = 180) => { clearTimeout(rt); rt = setTimeout(build, delay); };
+  new ResizeObserver(() => scheduleBuild(220)).observe(document.body);
   capture.addEventListener('change', () => { built = ''; build(); });
-  build();
-  addEventListener('load', build);
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(() => build(), { timeout: 300 });
+  else scheduleBuild(120);
+  addEventListener('load', () => scheduleBuild(200), { once: true });
 })();

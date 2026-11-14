@@ -85,7 +85,8 @@ function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   const frame = href
     ? `<a class="plate__frame" href="${href}">${img}</a>`
     : `<button class="plate__frame" type="button" data-title="${esc(titleText)}" aria-label="放大：${esc(altText)}">${img}</button>`;
-  const detail = [p.d, p.x].filter(Boolean).map(esc).join('　');
+  const timePart = p.d ? (p.d === v.date ? '' : p.d.startsWith(v.date + ' · ') ? p.d.slice(v.date.length + 3) : p.d) : '';
+  const detail = [timePart, p.x].filter(Boolean).map(esc).join('　');
   const float = p.s && FLOATS.has(layout);
   const tale = p.s && !float ? `<p class="tale" data-fx="tale">${esc(p.s)}</p>` : '';
   return { tale, html: `<figure class="plate${p.s ? ' has-tale' : ''}"${lit ? ` data-light="${lit}"` : ''} style="--ar:${a}; --r:${r4(ratio(a))}; --pos:${it.pos || p.pos || '50% 50%'}">
@@ -118,11 +119,12 @@ function spread(v, s, nums) {
 }
 
 /* the cover: a picture with the title set vertically on it, a margin with the seal */
-function cover({ img, pos, alt, title, side, prefix = '' }) {
+function cover({ img, smImg, pos, alt, title, side, prefix = '' }) {
+  const srcset = smImg ? ` srcset="${prefix}${smImg} 900w, ${prefix}${img} 2400w" sizes="(max-width: 768px) 100vw, 75vw"` : '';
   return `
     <section class="cv">
       <div class="cv__img">
-        <img src="${prefix}${img}" alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high">
+        <img src="${prefix}${img}"${srcset} alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
         <h1 class="cv__t" data-float=".12" data-fx="ink">${esc(title)}</h1>
       </div>
       <div class="cv__side">
@@ -141,7 +143,7 @@ function volumePage(v, i) {
     ${spread(v, s, nums)}
     </section>`).join('');
   const ledeHtml = v.lede ? `<p class="cv__lede" data-fx="rise" data-fx-delay="700">${esc(v.lede)}</p>\n        ` : '';
-  const side = `${ledeHtml}<p class="cv__meta t-note">第${CN[v.no]}卷<br>${esc(v.date)}<br>${count(v)} 张</p>`;
+  const side = `${ledeHtml}<div class="cv__meta"><p class="cv__date">${esc(v.date)}</p><p class="t-note">第${CN[v.no]}卷 · ${count(v)} 张</p></div>`;
   const desc = v.lede ? `${v.lede}　${AUTHOR}的摄影作品。` : `${v.title} · ${v.date} · ${count(v)} 张 · ${AUTHOR}的摄影作品。`;
   const ogDesc = v.lede || `${v.date} · ${count(v)} 张`;
   const essayHtml = (v.essay && v.essay.length)
@@ -163,7 +165,7 @@ function volumePage(v, i) {
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="preload" as="font" type="font/woff2" href="../fonts/serif.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="../fonts/sans.woff2" crossorigin>
-  <link rel="preload" as="image" href="../images/series/${v.slug}/${pad(v.cover)}.jpg">
+  <link rel="preload" as="image" href="../images/series/${v.slug}/${pad(v.cover)}.jpg" imagesrcset="../images/series/${v.slug}/sm-${pad(v.cover)}.jpg 900w, ../images/series/${v.slug}/${pad(v.cover)}.jpg 2400w" imagesizes="(max-width: 768px) 100vw, 75vw">
   <link rel="stylesheet" href="../base.css">
   <link rel="stylesheet" href="../book.css">
 </head>
@@ -174,10 +176,11 @@ function volumePage(v, i) {
     <span class="bar__n" data-count>图 01 / ${pad(count(v))}</span>
   </header>
 
-  <main>${cover({ img: `images/series/${v.slug}/${pad(v.cover)}.jpg`, prefix: '../', pos: v.coverPos, alt: v.plates[v.cover].t || v.title, title: v.title, side })}
+  <main>${cover({ img: `images/series/${v.slug}/${pad(v.cover)}.jpg`, smImg: `images/series/${v.slug}/sm-${pad(v.cover)}.jpg`, prefix: '../', pos: v.coverPos, alt: v.plates[v.cover].t || v.title, title: v.title, side })}
 
     <section class="vi">${essayHtml}
-      <p class="vi__meta t-note">${[v.date, v.gear, `${count(v)} 张`].filter(Boolean).map(esc).join('<br>')}</p>
+      <p class="vi__date">${esc(v.date)}</p>
+      <p class="vi__meta t-note">${[v.gear, `${count(v)} 张`].filter(Boolean).map(esc).join(' · ')}</p>
     </section>
 
     <div class="plates" id="plates">${body}

@@ -107,7 +107,7 @@
   const LAYERS = [
     ['.note', .9, 30],                                                  // a caption keeps close to its picture
     ['.tale', .84, 64],
-    ['.vi__text p, .vi__meta, .vend > *, .about > *, .close > *, .cv__lede, .cv__meta, .cv__no', .86, 70],
+    ['.vi__text p, .vi__date, .vi__meta, .vend > *, .about > *, .close > *, .cv__lede, .cv__meta, .cv__no', .86, 70],
     ['.hx__top, .hx__t, .hx__dir', .88, 48],
     ['.cv__t', .78, 90],                                                // the title, frontmost
   ];
@@ -178,9 +178,11 @@
   }
 
   /* ── measuring (only when the page changes size) ──────────────── */
+  let lastH = 0;
   function measure() {
     if (innerWidth !== VW || !VH) { VW = innerWidth; VH = innerHeight; }
     Y = scrollY;
+    lastH = document.documentElement.scrollHeight;
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; }
     // the corner follows the picture: about 1.8% of its shorter side (a small panel ~2px, a big print ~10px)
@@ -198,24 +200,34 @@
      scrolling comes first. While the reader scrolls nothing new is fetched or decoded; once the page
      has been still for a moment, the pictures near the screen are fetched in full, decoded off to the
      side, and swapped in one by one — and the swapping stops again the moment scrolling resumes. */
-  let lastScroll = 0, upgrading = false;
-  const scrolling = () => performance.now() - lastScroll < 220;
+  let lastScroll = performance.now(), upgrading = false;
+  const scrolling = () => performance.now() - lastScroll < 380;
   function upgrade() {
-    if (upgrading) return;
-    const next = plates.find(p => p.img && p.img.dataset.full && !p.full && near(p.top - scrollY, p.h, 1.8, .8));
+    if (upgrading || VW < 768) return;
+    const next = plates.find(p => p.img && p.img.dataset.full && !p.full && near(p.top - scrollY, p.h, 1.4, .5));
     if (!next) return;
     upgrading = true;
-    const big = new Image(); big.src = next.img.dataset.full;
+    const big = new Image(); big.decoding = 'async'; big.src = next.img.dataset.full;
     const swap = () => {
-      if (scrolling()) { setTimeout(swap, 240); return; }
+      if (scrolling()) { setTimeout(swap, 400); return; }
       next.img.src = big.src; next.full = true; upgrading = false;
-      setTimeout(() => { if (!scrolling()) upgrade(); }, 60);
+      setTimeout(() => { if (!scrolling()) upgrade(); }, 180);
     };
     (big.decode ? big.decode() : Promise.resolve()).then(swap, () => { next.full = true; upgrading = false; });
   }
+  function warmDecode() {
+    let n = 0;
+    for (const p of plates) {
+      if (p.img && p.img.decode && near(p.top - scrollY, p.h, 2.2, .4)) {
+        p.img.loading = 'eager';
+        p.img.decode().catch(() => {});
+        if (++n >= 4) break;
+      }
+    }
+  }
   let restT = 0;
-  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { tint(); upgrade(); }, 260); }, { passive: true });
-  addEventListener('load', () => setTimeout(upgrade, 300), { once: true });
+  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { tint(); upgrade(); }, 420); }, { passive: true });
+  addEventListener('load', () => { setTimeout(warmDecode, 40); setTimeout(upgrade, 1200); }, { once: true });
 
   /* ── loop ─────────────────────────────────────────────────────── */
   let ticking = false, dirty = true;
@@ -226,14 +238,18 @@
     notes(); zoom(); tell(); depth(); tint();
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
-  const remeasure = () => { dirty = true; request(); };
+  const remeasure = () => {
+    if (innerWidth === VW && Math.abs(document.documentElement.scrollHeight - lastH) < 4) return;
+    dirty = true; request();
+  };
   window.__flow = { plates, remeasure, measured: 0, get vh() { return VH; } };
   addEventListener('scroll', request, { passive: true });
-  addEventListener('resize', () => { if (innerWidth !== VW) remeasure(); });
+  addEventListener('resize', () => { if (innerWidth !== VW) { dirty = true; request(); } });
   addEventListener('load', remeasure);
   document.fonts && document.fonts.ready.then(remeasure);
-  new ResizeObserver(remeasure).observe(document.body);
-  captureMQ.addEventListener('change', remeasure);
+  let roT = 0;
+  new ResizeObserver(() => { clearTimeout(roT); roT = setTimeout(remeasure, 150); }).observe(document.body);
+  captureMQ.addEventListener('change', () => { dirty = true; request(); });
   frame();
 
   /* a long screenshot or a print needs every picture: fetch the rest then (only then — on a phone
