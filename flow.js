@@ -25,17 +25,14 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const smooth = t => t * t * (3 - 2 * t);
-  const parseColor = s => {
-    s = (s || '').trim();
-    if (s.startsWith('#')) { const h = s.length === 4 ? s.slice(1).split('').map(c => c + c).join('') : s.slice(1); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); }
-    return (s.match(/[\d.]+/g) || [35, 35, 38]).slice(0, 3).map(Number);
-  };
 
   /* ── performance ────────────────────────────────────────────────
      every position is measured once (and again only when the page changes size); while scrolling
      the loop does arithmetic on those numbers and writes styles — it never asks the browser for a
-     layout, and it only touches what is near the screen. */
-  let Y = scrollY, VH = innerHeight;
+     layout, and it only touches what is near the screen.
+     VH is locked to the stable viewport height (updated only when viewport width changes),
+     so mobile address-bar collapse/expand while scrolling never causes layout or scale jumps. */
+  let Y = scrollY, VH = innerHeight, VW = innerWidth;
   const near = (top, h, before = 1.5, after = .6) => top < VH * before && top + h > -VH * after;
   // where a picture's top sits when it is best seen: the picture and the caption under it centred together
   // (a picture too tall for that sits just under the top bar). Everything about it is finished by then.
@@ -47,7 +44,7 @@
     el, body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
     flat: !!el.closest('.row, .sp--emaki'),                        // panels that touch: only the picture inside breathes
-    top: 0, h: 0, cp: -1, zs: -1, live: false, ink: [35, 35, 38],
+    top: 0, h: 0, cp: -1, zs: -1, live: false,
   }));
   function notes() {
     for (const p of plates) {
@@ -61,8 +58,6 @@
       if (cp === p.cp) continue;
       p.cp = cp;
       p.body.style.setProperty('--cp', cp.toFixed(3));
-      const c = p.ink.map(v => Math.round(255 + (v - 255) * cp));
-      p.t.style.color = `rgb(${c[0]},${c[1]},${c[2]})`;
     }
   }
 
@@ -78,10 +73,10 @@
         zs = .9 + .1 * e; zi = 1.14 - .14 * e;
       }
       if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }   // a GPU layer only while it moves
-      if (Math.abs(zs - p.zs) < .0008) continue;
+      if (Math.abs(zs - p.zs) < .001) continue;
       p.zs = zs;
-      if (p.frame && !p.flat) p.frame.style.transform = zs === 1 ? '' : `scale(${zs.toFixed(4)})`;
-      if (p.img) p.img.style.transform = zi === 1 ? '' : `scale(${zi.toFixed(4)})`;
+      if (p.frame && !p.flat) p.frame.style.transform = zs === 1 ? '' : `scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1)`;
+      if (p.img) p.img.style.transform = zi === 1 ? '' : `scale3d(${zi.toFixed(4)}, ${zi.toFixed(4)}, 1)`;
     }
   }
 
@@ -164,7 +159,7 @@
     document.body.style.backgroundRepeat = 'no-repeat';
     barTint = '';
   }
-  let barTint = '';
+  let barTint = '', metaHex = '';
   function tint() {
     if (!stops.length || !bar) return;
     const y = Y + 30;
@@ -176,12 +171,16 @@
     if (key === barTint) return;
     barTint = key;
     bar.style.backgroundColor = `rgba(${key},.97)`;
-    if (meta) meta.content = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+    if (meta && !scrolling()) {
+      const hex = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+      if (hex !== metaHex) { metaHex = hex; meta.content = hex; }
+    }
   }
 
   /* ── measuring (only when the page changes size) ──────────────── */
   function measure() {
-    VH = innerHeight; Y = scrollY;
+    if (innerWidth !== VW || !VH) { VW = innerWidth; VH = innerHeight; }
+    Y = scrollY;
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; }
     // the corner follows the picture: about 1.8% of its shorter side (a small panel ~2px, a big print ~10px)
@@ -191,7 +190,6 @@
     }
     for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
     tales.forEach(t => t.sp = -1);
-    plates.forEach(p => p.ink = parseColor(getComputedStyle(p.el).getPropertyValue('--ink')));
     paint();
     window.__flow.measured = Date.now();
   }
@@ -216,7 +214,7 @@
     (big.decode ? big.decode() : Promise.resolve()).then(swap, () => { next.full = true; upgrading = false; });
   }
   let restT = 0;
-  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(upgrade, 260); }, { passive: true });
+  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { tint(); upgrade(); }, 260); }, { passive: true });
   addEventListener('load', () => setTimeout(upgrade, 300), { once: true });
 
   /* ── loop ─────────────────────────────────────────────────────── */
@@ -229,9 +227,9 @@
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
   const remeasure = () => { dirty = true; request(); };
-  window.__flow = { plates, remeasure, measured: 0 };
+  window.__flow = { plates, remeasure, measured: 0, get vh() { return VH; } };
   addEventListener('scroll', request, { passive: true });
-  addEventListener('resize', remeasure);
+  addEventListener('resize', () => { if (innerWidth !== VW) remeasure(); });
   addEventListener('load', remeasure);
   document.fonts && document.fonts.ready.then(remeasure);
   new ResizeObserver(remeasure).observe(document.body);

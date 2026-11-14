@@ -125,6 +125,7 @@
     return [-76, -38, 0, 38, 76].map(r => `<path d="M50 54 C 41 38, 43 17, 50 6 C 57 17, 59 38, 50 54 Z" transform="rotate(${r} 50 54)" fill="${fill}" stroke="${line}" stroke-width="1.6"/>`).join('')
       + `<path d="M50 54 Q 52 76 46 96" fill="none" stroke="#7a6a48" stroke-width="2.5" stroke-linecap="round"/>`;
   }
+
   // how each kind moves: keyframes in base.css; [duration range s, direction]
   const MOVE = { fall: [11, 18, 'normal'], drift: [13, 20, 'normal'], rise: [7, 12, 'normal'], tumble: [9, 16, 'alternate'], bob: [4, 7, 'alternate'], sway: [5, 8, 'alternate'], breathe: [6, 11, 'alternate'], glide: [14, 22, 'alternate'] };
 
@@ -152,8 +153,9 @@
 
   // a still turn for each motif: loose things lie any way up, upright things only lean a little
   const turn = p => p.soft || p.m.move === 'glide' ? 0 : ['fall', 'drift', 'tumble'].includes(p.m.move) ? p.rot % 360 : p.sw * .25;
-  let items = [], bands = [], built = '', wordRects = [], moving = false;
+  let items = [], bands = [], built = '', wordRects = [], moving = false, stableVH = innerHeight, stableVW = innerWidth;
   function build() {
+    if (innerWidth !== stableVW || !stableVH) { stableVW = innerWidth; stableVH = innerHeight; }
     const was = layer.style.height;
     layer.style.height = '0px';                      // measure the page without this layer holding it open
     const W = document.documentElement.clientWidth, H = document.documentElement.scrollHeight;
@@ -229,7 +231,8 @@
   const capture = matchMedia('(max-aspect-ratio: 1/3), print');
   function parallax() {
     if (!moving) { bands.forEach(b => b.el.style.transform = ''); return; }
-    const mid = scrollY + innerHeight / 2, vh = innerHeight;
+    const vh = (window.__flow && window.__flow.vh) || stableVH;
+    const mid = scrollY + vh / 2;
     for (const b of bands) {
       const y = -mid * b.k;
       if (Math.abs(y - b.y) < .3) continue;
