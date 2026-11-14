@@ -30,9 +30,7 @@
 export const AUTHOR = '涂鸦';
 export const BOOK = '涂鸦写真帖';
 
-export const upcoming = [
-  { title: '街', kind: '人文 · 扫街', note: '整理中' },
-];
+export const upcoming = [];
 
 const NZ_TAM = 'Nikon Z 8 · Tamron 28–75mm F2.8';
 const NZ_50 = 'Nikon Z 8 · 50mm f/1.8';
