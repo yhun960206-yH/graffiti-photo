@@ -1,20 +1,5 @@
 // 文案：copy/<卷>.md 是每一卷的卷名、简介、正文、每张图的标题和故事。
 // build-series.mjs 读它，盖在 series-data.mjs 上（那里只留日期、参数、裁切、版式这些）。
-//
-// 文件的样子（照着改就行）：
-//
-//   卷名：巷子里
-//   简介【待审】：二月的一个下午，在巷子里走了三个小时。
-//   正文【待审】：
-//   第一段……
-//
-//   第二段……
-//
-//   ## 01 古着店【待审】
-//   ![](../images/series/lane/sm-01.jpg)
-//   故事，可以不写；不写就只有标题。
-//
-// 【待审】= 还是代拟稿。你写好或确认过，把【待审】删掉。网站上不显示它，只在校对页上提醒你。
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -89,8 +74,8 @@ export function applyCopy(volumes, dir) {
     if (!existsSync(file)) { report.push({ v, missing: true, drafts: new Set(), warn: [`copy/${v.slug}.md 不存在，用的是 series-data.mjs 里的文字`] }); continue; }
     const c = parse(readFileSync(file, 'utf8'), `copy/${v.slug}.md`);
     if (c.title) v.title = c.title;
-    if (c.lede !== undefined) v.lede = c.lede;
-    if (c.essay) v.essay = c.essay;
+    v.lede = c.lede || '';
+    v.essay = c.essay || [];
     for (const [n, p] of Object.entries(c.plates)) {
       if (!v.plates[n]) { c.warn.push(`图 ${pad(n)}：文案里有，但 series-data.mjs 里没有这张图`); continue; }
       v.plates[n].t = p.t;
@@ -102,21 +87,16 @@ export function applyCopy(volumes, dir) {
   return report;
 }
 
-/* ── length checks, from what the layout can hold ──
-   the caption is one line at 13px with wide spacing: in a row of three small pictures on a phone a picture is
-   only about 100px wide, so about 6 characters fit. A story on a wide / cinema / emaki picture floats on the
-   picture itself; beside a picture on a computer it runs in vertical columns. */
+/* ── length checks, from what the layout can hold ── */
 const len = s => [...(s || '')].filter(c => !/\s/.test(c)).length;     // what takes room: not the spaces
 export function lint(v, layoutOf) {
   const out = {};
   const add = (n, msg) => (out[n] = out[n] || []).push(msg);
   if (!v.title) add('title', '没有卷名');
   if (len(v.title) > 8) add('title', `卷名 ${len(v.title)} 字，封面上竖排会很挤（建议 8 字以内）`);
-  if (!v.lede) add('lede', '没有简介');
-  else if (len(v.lede) > 40) add('lede', `简介 ${len(v.lede)} 字，偏长（建议 40 字以内）`);
+  if (v.lede && len(v.lede) > 40) add('lede', `简介 ${len(v.lede)} 字，偏长（建议 40 字以内）`);
   for (const [n, p] of Object.entries(v.plates)) {
     const where = layoutOf(Number(n));
-    if (!p.t) add(n, '没有标题');
     const tl = len(p.t);
     if (where === 'screen' && tl > 6) add(n, `标题 ${tl} 字：这张在一排小图里，手机上大约只放得下 6 个字`);
     else if (tl > 10) add(n, `标题 ${tl} 字，偏长（建议 10 字以内）`);
@@ -126,7 +106,7 @@ export function lint(v, layoutOf) {
       else if (sl > 60) add(n, `故事 ${sl} 字，偏长（建议 60 字以内）`);
     }
     // 'i:' = just so you know, not a problem
-    if (!where) add(n, Number(n) === v.cover ? 'i:这张只用作封面，标题用作封面图的说明（读屏、放大时）' : '这张图没有排进版式，网页上看不到');
+    if (!where) add(n, Number(n) === v.cover ? 'i:这张只用作封面' : '这张图没有排进版式，网页上看不到');
   }
   return out;
 }

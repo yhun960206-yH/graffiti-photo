@@ -29,7 +29,7 @@
     if (!open) return;
     loadStrip(panel);
     const lede = panel.querySelector('.dir__lede');
-    if (window.__fx && !reduce) window.__fx.decode(lede);
+    if (lede && window.__fx && !reduce) window.__fx.decode(lede);
     // keep the opened panel on screen, without jumping
     setTimeout(() => {
       const r = panel.getBoundingClientRect();

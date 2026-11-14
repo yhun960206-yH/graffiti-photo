@@ -73,16 +73,18 @@ function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   const it = item(x), p = v.plates[it.n];
   const a = forceAr || it.ar || p.ar;
   const src = `${prefix}images/series/${v.slug}/${pad(it.n)}.jpg`, sm = `${prefix}images/series/${v.slug}/sm-${pad(it.n)}.jpg`;
+  const altText = p.t || `图 ${pad(no)}`;
+  const titleText = p.t ? `图 ${pad(no)} · ${p.t}` : `图 ${pad(no)}`;
   // the small picture comes first; flow.js swaps in the full one only while the page is at rest,
   // so scrolling never waits for a big picture to load or decode
-  const img = `<img src="${sm}" data-full="${src}" alt="${esc(p.t)}" loading="lazy" decoding="async">`;
+  const img = `<img src="${sm}" data-full="${src}" alt="${esc(altText)}" loading="lazy" decoding="async">`;
   const lit = lightOf(v.slug, it.n);
   // the light through the picture, spilling onto the paper around it
   const glow = lit ? `<img class="glow" src="${prefix}images/series/${v.slug}/glow-${pad(it.n)}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
           ` : '';
   const frame = href
     ? `<a class="plate__frame" href="${href}">${img}</a>`
-    : `<button class="plate__frame" type="button" data-title="图 ${pad(no)} · ${esc(p.t)}" aria-label="放大：${esc(p.t)}">${img}</button>`;
+    : `<button class="plate__frame" type="button" data-title="${esc(titleText)}" aria-label="放大：${esc(altText)}">${img}</button>`;
   const detail = [p.d, p.x].filter(Boolean).map(esc).join('　');
   const float = p.s && FLOATS.has(layout);
   const tale = p.s && !float ? `<p class="tale" data-fx="tale">${esc(p.s)}</p>` : '';
@@ -138,8 +140,13 @@ function volumePage(v, i) {
     <section class="sp sp--${s.layout}${s.align ? ' sp--' + s.align : ''}">
     ${spread(v, s, nums)}
     </section>`).join('');
-  const side = `<p class="cv__lede" data-fx="rise" data-fx-delay="700">${esc(v.lede)}</p>
-        <p class="cv__meta t-note">第${CN[v.no]}卷<br>${esc(v.date)}<br>${count(v)} 张</p>`;
+  const ledeHtml = v.lede ? `<p class="cv__lede" data-fx="rise" data-fx-delay="700">${esc(v.lede)}</p>\n        ` : '';
+  const side = `${ledeHtml}<p class="cv__meta t-note">第${CN[v.no]}卷<br>${esc(v.date)}<br>${count(v)} 张</p>`;
+  const desc = v.lede ? `${v.lede}　${AUTHOR}的摄影作品。` : `${v.title} · ${v.date} · ${count(v)} 张 · ${AUTHOR}的摄影作品。`;
+  const ogDesc = v.lede || `${v.date} · ${count(v)} 张`;
+  const essayHtml = (v.essay && v.essay.length)
+    ? `\n      <div class="vi__text">${v.essay.map((p, k) => `<p${k ? '' : ' data-fx="rise"'}>${esc(p)}</p>`).join('')}</div>`
+    : '';
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -147,10 +154,10 @@ function volumePage(v, i) {
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <!-- 由 tools/build-series.mjs 生成：请改 tools/series-data.mjs 后重新运行，不要直接改这个文件 -->
   <title>${esc(v.title)} · ${BOOK}</title>
-  <meta name="description" content="${esc(v.lede)}　${AUTHOR}的摄影作品。">
+  <meta name="description" content="${esc(desc)}">
   <meta name="theme-color" content="${lightOf(v.slug, v.cover) || (darkOf(v) ? '#17171a' : '#f2efe7')}">
   <meta property="og:title" content="${esc(v.title)} · ${BOOK}">
-  <meta property="og:description" content="${esc(v.lede)}">
+  <meta property="og:description" content="${esc(ogDesc)}">
   <meta property="og:image" content="${SITE}images/series/${v.slug}/${pad(v.cover)}.jpg">
   <meta property="og:url" content="${SITE}series/${v.slug}.html">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
@@ -167,10 +174,9 @@ function volumePage(v, i) {
     <span class="bar__n" data-count>图 01 / ${pad(count(v))}</span>
   </header>
 
-  <main>${cover({ img: `images/series/${v.slug}/${pad(v.cover)}.jpg`, prefix: '../', pos: v.coverPos, alt: v.plates[v.cover].t, title: v.title, side })}
+  <main>${cover({ img: `images/series/${v.slug}/${pad(v.cover)}.jpg`, prefix: '../', pos: v.coverPos, alt: v.plates[v.cover].t || v.title, title: v.title, side })}
 
-    <section class="vi">
-      <div class="vi__text">${v.essay.map((p, k) => `<p${k ? '' : ' data-fx="rise"'}>${esc(p)}</p>`).join('')}</div>
+    <section class="vi">${essayHtml}
       <p class="vi__meta t-note">${[v.date, v.gear, `${count(v)} 张`].filter(Boolean).map(esc).join('<br>')}</p>
     </section>
 
@@ -223,15 +229,15 @@ function entry(v, i) {
   const f = v.feature, fp = v.plates[f.plate], href = `series/${v.slug}.html`;
   const nums = numbers(v);
   const order = Object.keys(nums).map(Number).sort((a, b) => nums[a] - nums[b]).slice(0, THUMBS);
-  const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
+  const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t || `图 ${pad(nums[n])}`)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
+  const ledeLine = v.lede ? `\n              <p class="dir__lede">${esc(v.lede)}</p>` : '';
   return `
         <li class="dir__i" style="--k:${i}">
           <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${lightOf(v.slug, f.plate)}" data-bg="images/series/${v.slug}/${pad(f.plate)}.jpg" data-pos="${f.pos || fp.pos || '50% 50%'}">
             <span class="dir__no">${CN[v.no]}</span><span class="dir__t">${esc(v.title)}</span><span class="dir__m">${esc(v.date.slice(0, 7))}</span>
           </button>
           <div class="dir__p" id="dir-${v.slug}" role="region" aria-label="${esc(v.title)}">
-            <div class="dir__in">
-              <p class="dir__lede">${esc(v.lede)}</p>
+            <div class="dir__in">${ledeLine}
               <p class="dir__meta">${esc(v.kind)} · ${count(v)} 张</p>
               <div class="dir__strip">${strip}</div>
               <a class="dir__go" href="${href}">翻开这一卷</a>
@@ -315,8 +321,8 @@ const proofVol = (v, rep) => {
       <li class="${rep.drafts.has(n) ? 'is-dr' : ''}">
         <img src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="" loading="lazy">
         <p class="meta"><span>## ${pad(n)}</span><span>${nums[n] ? `网页上 图 ${pad(nums[n])}` : '不在网页上'}${where[n] ? ` · ${LAYOUT[where[n]]}` : ''}</span>${tag(n)}</p>
-        <p class="t">${esc(p.t) || '<i>（没有标题）</i>'}<span class="n">${shown(p.t).length} 字</span></p>
-        ${p.s ? `<p class="s">${esc(p.s)}<span class="n">${shown(p.s).length} 字</span></p>` : '<p class="s none">没有故事（只显示标题）</p>'}
+        <p class="t">${esc(p.t) || '<i>（无标题）</i>'}<span class="n">${shown(p.t).length} 字</span></p>
+        ${p.s ? `<p class="s">${esc(p.s)}<span class="n">${shown(p.s).length} 字</span></p>` : '<p class="s none">无文字</p>'}
         ${warn(n)}
       </li>`;
     }).join('')}
