@@ -185,17 +185,14 @@
   function depth() {
     if (!cvEl) return;
     if (still()) {
-      if (cvProg !== 0) { cvProg = 0; cvEl.style.setProperty('--cv-alpha', '1'); cvEl.style.setProperty('--cv-blur', '0px'); }
+      if (cvProg !== 0) { cvProg = 0; cvEl.style.setProperty('--cv-p', '0'); }
       return;
     }
     const span = cvSpan || Math.max(280, VH * .68);
     const t = clamp(Y / span, 0, 1);
-    if (Math.abs(t - cvProg) < .001) return;
+    if (t === cvProg) return;
     cvProg = t;
-    const alpha = Math.max(.08, 1 - t * .88);
-    const blur = t * 18;
-    cvEl.style.setProperty('--cv-alpha', alpha.toFixed(4));
-    cvEl.style.setProperty('--cv-blur', blur.toFixed(2) + 'px');
+    cvEl.style.setProperty('--cv-p', t.toFixed(4));
   }
 
   /* ── 6. light: the paper, lit by whatever picture is above it ──── */

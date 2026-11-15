@@ -126,7 +126,8 @@ function cover({ img, smImg, pos, alt, title, side, prefix = '' }) {
   return `
     <section class="cv">
       <div class="cv__img">
-        <img src="${prefix}${img}"${srcset} alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
+        <img class="cv__base" src="${prefix}${img}"${srcset} alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
+        <img class="cv__blur" src="${prefix}${smImg || img}" alt="" aria-hidden="true" style="object-position:${pos || '50% 50%'}" decoding="async">
       </div>
       <h1 class="cv__t" data-float=".12" data-fx="ink">${esc(title)}</h1>
       <div class="cv__side">
