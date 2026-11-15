@@ -191,6 +191,7 @@
       if (cvProg !== 0) {
         cvProg = 0;
         cvImg.style.opacity = '1';
+        cvImg.style.setProperty('--cv-blur', '0');
         if (cvBase) cvBase.style.opacity = '1';
         if (cvBlur) cvBlur.style.opacity = '0';
         if (cvTitle) cvTitle.style.opacity = '1';
@@ -204,6 +205,7 @@
     const blurIn = clamp(t * 1.45, 0, 1);
     const imgOp = clamp(1 - t * .92, .06, 1);
     cvImg.style.opacity = imgOp.toFixed(3);
+    cvImg.style.setProperty('--cv-blur', blurIn.toFixed(3));
     if (cvBase) cvBase.style.opacity = (1 - blurIn * .92).toFixed(3);
     if (cvBlur) cvBlur.style.opacity = blurIn.toFixed(3);
     if (cvTitle) cvTitle.style.opacity = clamp(1 - t * 1.05, .04, 1).toFixed(3);

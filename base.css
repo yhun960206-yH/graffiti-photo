@@ -99,9 +99,22 @@
   /* ───── cover: the picture carries a floating vertical title; the margin carries the seal ───── */
   .cv { display: grid; grid-template-columns: 1fr; padding-top: var(--bar); position: relative; }
   .cv__img {
+    --cv-blur: 0;
     grid-column: 1; grid-row: 1; position: relative; height: min(calc(100svh - var(--bar) - 148px), 118vw);
     overflow: hidden; background: transparent; container-type: size; border-radius: var(--r-img);
     transform: translateZ(0); will-change: opacity;
+    -webkit-mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .72)) 0%,
+      #000 calc(var(--cv-blur) * 18%),
+      #000 calc(100% - var(--cv-blur) * 48%),
+      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .68)) calc(100% - var(--cv-blur) * 20%),
+      rgba(0, 0, 0, calc(1 - var(--cv-blur))) 100%);
+    mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .72)) 0%,
+      #000 calc(var(--cv-blur) * 18%),
+      #000 calc(100% - var(--cv-blur) * 48%),
+      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .68)) calc(100% - var(--cv-blur) * 20%),
+      rgba(0, 0, 0, calc(1 - var(--cv-blur))) 100%);
   }
   .cv__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .cv__base { will-change: opacity; }
@@ -145,7 +158,7 @@
   .plate__body { position: relative; }
   /* the light through the picture on the paper around it (tools/light.py): a tiny blurred map, stretched */
   main { overflow-x: clip; }                                          /* the glows spread past the screen's sides: cut them there */
-  .glow { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; max-width: none; z-index: -1; pointer-events: none; user-select: none; opacity: var(--glow-a, 1); }
+  .glow { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; max-width: none; z-index: -1; pointer-events: none; user-select: none; opacity: var(--glow-a, 1); -webkit-mask-image: radial-gradient(closest-side, #000 38%, rgba(0, 0, 0, .55) 68%, transparent 100%); mask-image: radial-gradient(closest-side, #000 38%, rgba(0, 0, 0, .55) 68%, transparent 100%); }
   .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); border-radius: var(--rs, var(--r-img)); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
   .plate__body::before {

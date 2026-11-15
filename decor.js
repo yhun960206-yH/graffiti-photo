@@ -239,7 +239,7 @@
     items = [];
     for (const p of placed) {
       const b = Math.min(BANDS - 1, Math.floor((p.z - .55) / .45 * BANDS)), k = bands[b].k;
-      const top = p.y + (moving ? p.cy * k : 0);
+      const top = p.y - (moving ? p.cy * (1 + k) : 0);
       html[b].push(`<i class="dc${p.soft ? ' dc--soft' : ''}" style="left:${p.x.toFixed(0)}px;top:${top.toFixed(0)}px;width:${p.s.toFixed(0)}px;height:${p.s.toFixed(0)}px;--a:${(p.m.a * (.55 + p.z * .45)).toFixed(2)};--r:${turn(p).toFixed(0)}deg"><i class="dc__m dc--${p.m.move}${p.sw < 0 && p.m.move === 'drift' ? ' dc--alt' : ''}" style="--d:${p.d.toFixed(1)}s;--dl:-${(p.ph * p.d).toFixed(1)}s;--dir:${p.dir}"><svg><use href="#dc-${p.k}-${p.v}"/></svg></i></i>`);
       items.push({ b, k, x0: p.x, y0: p.y, cy: p.cy, s: p.s, soft: p.soft, hush: false });
     }
@@ -265,7 +265,7 @@
     const vh = (window.__flow && window.__flow.vh) || stableVH;
     const mid = scrollY + vh / 2;
     for (const b of bands) {
-      const y = -mid * b.k;
+      const y = mid * (1 + b.k);
       if (Math.abs(y - b.y) < .3) continue;
       b.y = y; b.el.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
     }
@@ -274,7 +274,7 @@
       if (it.soft) continue;
       const d = it.cy - mid;
       if (d > vh * 1.4 || d < -vh * 1.4) continue;
-      const y0 = it.y0 + d * it.k, y1 = y0 + it.s, x0 = it.x0, x1 = x0 + it.s;
+      const y0 = it.y0 - d * (1 + it.k), y1 = y0 + it.s, x0 = it.x0, x1 = x0 + it.s;
       const hush = wordRects.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
       if (hush !== it.hush) { it.hush = hush; it.el.classList.toggle('hush', hush); }
     }

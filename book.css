@@ -49,6 +49,7 @@
   /* ───── end colophon card (.plate--end): stacks like the final photo card while keeping jump links clickable ───── */
   .plates .plate--end {
     width: min(100%, 560px);
+    top: calc(var(--bar) + 5vh);
     margin-bottom: calc(16px + var(--safe-b));
   }
   .vend-card {
