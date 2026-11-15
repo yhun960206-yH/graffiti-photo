@@ -40,27 +40,3 @@
 
 ## 11
 ![](../images/series/mingxi/sm-11.jpg)
-
-## 12
-![](../images/series/mingxi/sm-12.jpg)
-
-## 13
-![](../images/series/mingxi/sm-13.jpg)
-
-## 14
-![](../images/series/mingxi/sm-14.jpg)
-
-## 15
-![](../images/series/mingxi/sm-15.jpg)
-
-## 16
-![](../images/series/mingxi/sm-16.jpg)
-
-## 17
-![](../images/series/mingxi/sm-17.jpg)
-
-## 18
-![](../images/series/mingxi/sm-18.jpg)
-
-## 19
-![](../images/series/mingxi/sm-19.jpg)
