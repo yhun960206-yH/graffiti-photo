@@ -13,26 +13,33 @@
   .vi__text + .vi__date { margin-top: 28px; }
   .vi__meta { margin-top: 6px; }
 
-  /* ───── the sequence (phone first: clean centred viewing, generous image size, sticky stacking on series groups) ───── */
-  .plates { padding-bottom: var(--sec); }
-  .sp { padding: var(--sec) var(--gutter) 0; }
+  /* ───── the sequence (all subpage photos stack with subtle paper tilt as you scroll up) ───── */
+  .plates { position: relative; padding-bottom: var(--sec); }
+  .sp {
+    position: sticky; top: calc(var(--bar) + 8vh);
+    margin-top: var(--sec);
+    padding: 0 var(--gutter);
+  }
+  .sp:has(.row), .sp:has(.pair), .sp--emaki { position: relative; top: auto; }
+  .sp .plate__frame { box-shadow: 0 -16px 40px -10px rgba(0, 0, 0, .38), 0 12px 28px -8px rgba(0, 0, 0, .28); }
   .sp--l .plate, .sp--r .plate, .sp--c .plate { width: 100%; margin-inline: auto; }
   .sp--scroll .plate { width: 82%; margin-inline: auto; }
   .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }
   .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
   .sp--emaki .plate + .plate { margin-top: 12px; }
   .sp--emaki .plate {
-    position: sticky; top: calc(var(--bar) + 12vh);
+    position: sticky; top: calc(var(--bar) + 11vh);
     padding-bottom: 58px;
   }
-  .sp--emaki .plate + .plate .plate__frame { box-shadow: 0 -14px 34px rgba(0, 0, 0, .34); }
-  .pair { display: grid; gap: 28px; }
-  .pair .plate:first-child { position: sticky; top: calc(var(--bar) + 10vh); z-index: 1; }
-  .pair .plate:last-child { position: relative; z-index: 2; width: 92%; margin-inline: auto; }
-  .pair .plate:last-child .plate__frame { box-shadow: 0 -14px 34px rgba(0, 0, 0, .32); }
+  .pair { display: grid; gap: 36px; }
+  .pair > .plate { position: sticky; top: calc(var(--bar) + 8vh); }
+  .pair .plate:first-child { z-index: 1; }
+  .pair .plate:last-child { z-index: 2; width: 92%; margin-inline: auto; }
   @media (max-width: 699px) {
-    .row > .plate { position: sticky; top: calc(var(--bar) + 10vh); }
-    .row > .plate + .plate .plate__frame { box-shadow: 0 -14px 34px rgba(0, 0, 0, .32); }
+    .row > .plate { position: sticky; top: calc(var(--bar) + 8vh); }
+  }
+  @media (min-width: 700px) {
+    .sp:has(.row) { position: sticky; top: calc(var(--bar) + 8vh); }
   }
 
   /* ───── end ───── */
@@ -65,9 +72,9 @@
     .sp--emaki { row-gap: 0; }
     .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: 0; }
     .pair { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); align-items: start; gap: 0; }
+    .sp:has(.pair) { position: sticky; top: calc(var(--bar) + 8vh); }
     .pair .plate:first-child { position: static; grid-column: 1 / 8; width: min(100%, calc(74vh * var(--r))); }
     .pair .plate:last-child { position: static; grid-column: 9 / 13; width: 100%; margin: 14vw 0 0; }
-    .pair .plate:last-child .plate__frame { box-shadow: none; }
 
     .vols { grid-template-columns: 1fr 1fr; }
     .vols a { padding: 48px var(--gutter); border-bottom: 0; }

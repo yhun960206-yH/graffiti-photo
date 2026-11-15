@@ -40,17 +40,18 @@
   const readAt = h => h + CAP < VH * .9 ? Math.max(VH * .1, (VH - h - CAP) * (VW < 768 ? .42 : .48)) : VH * .07;
 
   /* ── 1. notes ─────────────────────────────────────────────────── */
-  const plates = $$('.plate').map(el => ({
-    el, body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
+  const TILT_ANGLES = [-2.1, 1.85, -1.5, 2.25, -1.8, 1.6];
+  const plates = $$('.plate').map((el, idx) => ({
+    el, idx, sp: el.closest('.sp'),
+    body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
     flat: !!el.closest('.row, .sp--emaki'),                        // panels that touch: only the picture inside breathes
-    stackNext: null,
-    top: 0, h: 0, cp: -1, zs: -1, dim: 0, live: false,
+    tiltMax: TILT_ANGLES[idx % TILT_ANGLES.length],
+    top: 0, h: 0, cp: -1, zs: -1, tilt: 0, ty: 0, dim: 0, live: false,
   }));
-  for (const grp of $$('.sp--emaki, .pair, .row')) {
-    const items = $$('.plate', grp).map(el => plates.find(p => p.el === el)).filter(Boolean);
-    for (let i = 0; i < items.length - 1; i++) items[i].stackNext = items[i + 1];
-  }
+  // give each spread & plate an incrementing z-index so every new photo cleanly stacks above the previous one
+  $$('.sp').forEach((sp, i) => { sp.style.zIndex = String(i + 2); });
+  plates.forEach((p, i) => { p.el.style.zIndex = String(i + 2); });
   function notes() {
     for (const p of plates) {
       const top = p.top - Y;
@@ -66,37 +67,62 @@
     }
   }
 
-  /* ── 3. zoom ──────────────────────────────────────────────────── */
+  /* ── 3. zoom & sticky card stacking (with subtle paper tilt) ─── */
+  function nextOver(i) {
+    const p = plates[i];
+    const inRowDesk = p.el.closest('.row') && VW >= 700;
+    const inPairDesk = p.el.closest('.pair') && VW >= 1024;
+    for (let j = i + 1; j < plates.length; j++) {
+      const q = plates[j];
+      if ((inRowDesk || inPairDesk) && q.sp === p.sp) continue;     // side-by-side siblings move together on desktop
+      return q;
+    }
+    return null;
+  }
   function zoom() {
-    for (const p of plates) {
+    for (let i = 0; i < plates.length; i++) {
+      const p = plates[i];
       const top = p.top - Y;
-      const live = !still() && near(top, p.h, 1.5, .5);
-      let zs = 1, zi = 1;
+      const live = !still() && near(top, p.h, 1.6, 1.2);
+      let zs = 1, zi = 1, tilt = 0, ty = 0, dim = 0;
       if (live) {
-        const eye = VW < 768 ? VH * .45 : VH * .5;
+        const eye = VW < 768 ? VH * .44 : VH * .48;
         const d = (top + p.h / 2 - eye) / VH;                       // 0 = at optimal viewing level
         const e = smooth(clamp(1 - Math.abs(d) / .85));
-        zs = .92 + .08 * e; zi = 1.12 - .12 * e;
-      }
-      let dim = 0;
-      const nxt = p.stackNext;
-      const canStack = nxt && (!p.el.closest('.row') || VW < 700) && (!p.el.closest('.pair') || VW < 1024);
-      if (!still() && canStack) {
-        const stickyTop = 52 + VH * .11;
-        const nTop = nxt.top - Y;
-        const overlap = clamp((stickyTop + p.h - nTop) / Math.max(120, p.h * .85));
-        if (overlap > 0) {
-          const se = smooth(overlap);
-          zs *= (1 - .055 * se);
-          dim = Math.round(se * .32 * 40) / 40;
+        zs = .93 + .07 * e; zi = 1.1 - .1 * e;
+        // subtle organic paper angle as a card rises from the bottom toward the reading level, straightening at the centre
+        if (d > 0) {
+          const enter = smooth(clamp(d / .75));
+          tilt = -p.tiltMax * .42 * enter;
         }
       }
+      const nxt = nextOver(i);
+      if (!still() && nxt) {
+        const stickyTop = 52 + VH * .09;
+        const nTop = nxt.top - Y;
+        // starts receding & tilting gently as the next photo rises up to cover it
+        const startAt = stickyTop + Math.max(p.h * .92, VH * .38);
+        const span = Math.max(160, p.h * .88);
+        const overlap = clamp((startAt - nTop) / span);
+        if (overlap > 0) {
+          const se = smooth(overlap);
+          zs *= (1 - .065 * se);
+          tilt = p.tiltMax * se;
+          ty = -12 * se;
+          dim = Math.round(se * .36 * 40) / 40;
+        }
+      }
+      tilt = Math.round(tilt * 20) / 20;
+      ty = Math.round(ty * 2) / 2;
       if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }
       if (dim !== p.dim && p.frame) { p.dim = dim; p.frame.style.setProperty('--dim', dim ? dim.toFixed(3) : '0'); }
-      if (Math.abs(zs - p.zs) < .001) continue;
-      p.zs = zs;
-      const allowFrameScale = !p.flat || p.dim > 0 || VW < 700;
-      if (p.frame && allowFrameScale) p.frame.style.transform = zs === 1 ? '' : `scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1)`;
+      if (Math.abs(zs - p.zs) < .001 && Math.abs(tilt - p.tilt) < .04 && Math.abs(ty - p.ty) < .4) continue;
+      p.zs = zs; p.tilt = tilt; p.ty = ty;
+      if (p.frame) {
+        p.frame.style.transform = (zs === 1 && tilt === 0 && ty === 0)
+          ? ''
+          : `translate3d(0, ${ty.toFixed(1)}px, 0) scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1) rotate3d(0, 0, 1, ${tilt.toFixed(2)}deg)`;
+      }
       if (p.img) p.img.style.transform = zi === 1 ? '' : `scale3d(${zi.toFixed(4)}, ${zi.toFixed(4)}, 1)`;
     }
   }
@@ -203,9 +229,10 @@
   function measure() {
     if (innerWidth !== VW || !VH) { VW = innerWidth; VH = innerHeight; }
     Y = scrollY;
+    root.classList.add('is-measuring');
     lastH = document.documentElement.scrollHeight;
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
-    for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; }
+    for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99; }
     // the corner follows the picture: about 1.8% of its shorter side (a small panel ~2px, a big print ~10px)
     for (const p of plates) if (p.frame) {
       const s = Math.min(p.frame.offsetWidth, p.frame.offsetHeight);
@@ -213,6 +240,7 @@
     }
     for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
     tales.forEach(t => t.sp = -1);
+    root.classList.remove('is-measuring');
     paint();
     window.__flow.measured = Date.now();
   }

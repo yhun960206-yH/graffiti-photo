@@ -166,10 +166,12 @@
     io.disconnect();
     layer.style.height = H + 'px';
     const Y = scrollY;
+    document.documentElement.classList.add('is-measuring');
     const rect = (el, pad) => { const r = el.getBoundingClientRect(); return r.width ? [r.left - pad, r.top + Y - pad, r.right + pad, r.bottom + Y + pad] : null; };
     const blocks = [...document.querySelectorAll(BLOCK)].map(el => rect(el, 6)).filter(Boolean);
     const words = [...document.querySelectorAll(WORDS)].map(el => rect(el, 14)).filter(Boolean);
     wordRects = [...document.querySelectorAll(TEXT)].map(el => rect(el, 26)).filter(Boolean);
+    document.documentElement.classList.remove('is-measuring');
     const hit = (list, x0, y0, x1, y1) => list.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
 
     // the page is cut into bands; each band has its own fixed random numbers,
