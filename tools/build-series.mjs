@@ -144,12 +144,12 @@ function volumePage(v, i) {
     <section class="sp sp--${s.layout}${s.align ? ' sp--' + s.align : ''}">
     ${spread(v, s, nums)}
     </section>`).join('');
-  const ledeHtml = v.lede ? `<p class="cv__lede" data-fx="rise" data-fx-delay="700">${esc(v.lede)}</p>\n        ` : '';
+  const ledeHtml = v.lede ? `<p class="cv__lede">${esc(v.lede)}</p>\n        ` : '';
   const side = `${ledeHtml}<div class="cv__meta"><p class="cv__date">${esc(v.date)}</p><p class="t-note">第${CN[v.no]}卷 · ${count(v)} 张</p></div>`;
   const desc = v.lede ? `${v.lede}　${AUTHOR}的摄影作品。` : `${v.title} · ${v.date} · ${count(v)} 张 · ${AUTHOR}的摄影作品。`;
   const ogDesc = v.lede || `${v.date} · ${count(v)} 张`;
   const essayHtml = (v.essay && v.essay.length)
-    ? `\n      <div class="vi__text">${v.essay.map((p, k) => `<p${k ? '' : ' data-fx="rise"'}>${esc(p)}</p>`).join('')}</div>`
+    ? `\n      <div class="vi__text">${v.essay.map(p => `<p>${esc(p)}</p>`).join('')}</div>`
     : '';
   return `<!DOCTYPE html>
 <html lang="zh-CN">
