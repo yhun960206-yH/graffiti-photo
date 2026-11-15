@@ -99,29 +99,18 @@
   /* ───── cover: the picture carries a floating vertical title; the margin carries the seal ───── */
   .cv { display: grid; grid-template-columns: 1fr; padding-top: var(--bar); position: relative; }
   .cv__img {
-    --cv-blur: 0;
     grid-column: 1; grid-row: 1; position: relative; height: min(calc(100svh - var(--bar) - 148px), 118vw);
-    overflow: hidden; background: transparent; container-type: size; border-radius: var(--r-img);
+    overflow: visible; background: transparent; container-type: size; border-radius: var(--r-img);
     transform: translateZ(0); will-change: opacity;
-    -webkit-mask-image: linear-gradient(to bottom,
-      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .72)) 0%,
-      #000 calc(var(--cv-blur) * 18%),
-      #000 calc(100% - var(--cv-blur) * 48%),
-      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .68)) calc(100% - var(--cv-blur) * 20%),
-      rgba(0, 0, 0, calc(1 - var(--cv-blur))) 100%);
-    mask-image: linear-gradient(to bottom,
-      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .72)) 0%,
-      #000 calc(var(--cv-blur) * 18%),
-      #000 calc(100% - var(--cv-blur) * 48%),
-      rgba(0, 0, 0, calc(1 - var(--cv-blur) * .68)) calc(100% - var(--cv-blur) * 20%),
-      rgba(0, 0, 0, calc(1 - var(--cv-blur))) 100%);
   }
-  .cv__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cv__img img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: var(--r-img); }
   .cv__base { will-change: opacity; }
   .cv__blur {
-    position: absolute; inset: 0; pointer-events: none;
-    transform: scale(1.06) translateZ(0);
+    position: absolute; inset: -8% -4% -18% -4%; width: 108%; height: 126%; max-width: none; pointer-events: none;
+    transform: translateZ(0);
     opacity: 0; will-change: opacity;
+    -webkit-mask-image: radial-gradient(ellipse 92% 82% at 50% 42%, #000 32%, rgba(0, 0, 0, .55) 64%, rgba(0, 0, 0, .15) 84%, transparent 100%);
+    mask-image: radial-gradient(ellipse 92% 82% at 50% 42%, #000 32%, rgba(0, 0, 0, .55) 64%, rgba(0, 0, 0, .15) 84%, transparent 100%);
   }
   .cv__img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to left, rgba(10, 10, 12, .42), rgba(10, 10, 12, 0) 40%); }
   .cv__t {
@@ -235,10 +224,10 @@
     content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .07;
     background: url("images/grain.webp") repeat 0 0 / 96px 96px;
   }
-  .decor { position: absolute; left: 0; top: 0; width: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-  .decor__band { position: absolute; left: 0; top: 0; width: 100%; will-change: transform; }
-  .dc { position: absolute; display: block; transition: opacity .5s var(--e-soft); }
-  .dc__m { display: block; width: 100%; height: 100%; transform-origin: 50% 50%; }
+  .decor { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: -1; overflow: hidden; pointer-events: none; contain: layout style paint; }
+  .decor__band { position: absolute; left: 0; top: 0; width: 100%; height: 0; will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translate3d(0, 0, 0); }
+  .dc { position: absolute; display: block; transition: opacity .5s var(--e-soft); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .dc__m { display: block; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform, opacity; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .dc svg { display: block; width: 100%; height: 100%; overflow: visible; }
   .dc--sway { transform-origin: 50% 100%; }
 }
@@ -260,12 +249,12 @@
   .dc--alt { animation-direction: reverse; }
   /* petals and leaves: fall a little, swaying and turning over, then come again */
   @keyframes dc-fall {
-    0%   { transform: translate(0, -70px) rotate(0deg) rotateY(0deg); opacity: 0; }
+    0%   { transform: translate3d(0, -70px, 0) rotate(0deg) scaleX(1); opacity: 0; }
     15%  { opacity: 1; }
-    40%  { transform: translate(26px, -12px) rotate(80deg) rotateY(140deg); }
-    70%  { transform: translate(-12px, 46px) rotate(150deg) rotateY(250deg); }
+    40%  { transform: translate3d(26px, -12px, 0) rotate(80deg) scaleX(-.45); }
+    70%  { transform: translate3d(-12px, 46px, 0) rotate(150deg) scaleX(-.75); }
     85%  { opacity: 1; }
-    100% { transform: translate(8px, 110px) rotate(210deg) rotateY(360deg); opacity: 0; }
+    100% { transform: translate3d(8px, 110px, 0) rotate(210deg) scaleX(1); opacity: 0; }
   }
   /* blown sideways, like the wind of a passing train */
   @keyframes dc-drift {
@@ -347,6 +336,7 @@
 
 @layer capture {
   @media (max-aspect-ratio: 1/3), print {
+    .decor { position: absolute; inset: auto; left: 0; top: 0; }
     .plate { --cp: 1 !important; }
     .note__t { color: var(--ink) !important; }
     [data-float] { transform: none !important; }

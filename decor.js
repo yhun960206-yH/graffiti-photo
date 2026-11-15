@@ -190,8 +190,9 @@
     const key = `${W}x${Math.round(H / 40)}`;
     if (key === built) return;
     built = key;
-    io.disconnect();
-    layer.style.height = H + 'px';
+    const vh = (flow && flow.vh) || stableVH;
+    moving = !still && !capture.matches;
+    layer.style.height = (moving ? vh : H) + 'px';
     const Y = scrollY;
     const rect = (el, pad) => { const r = el.getBoundingClientRect(); return r.width ? [r.left - pad, r.top + Y - pad, r.right + pad, r.bottom + Y + pad] : null; };
     // read plate rects from flow.js cached flow coordinates so we NEVER toggle .is-measuring or force a sticky layout thrash!
@@ -232,16 +233,15 @@
     // depth bands: things of about the same depth share one band, and only the band moves while scrolling
     // (4 moves per frame instead of one per motif). A motif's place inside its band already includes its
     // share of the offset, so   band shift = −(screen middle) × k   puts it where it belongs.
-    moving = !still && !capture.matches;
-    const BANDS = 4, kOf = b => .2 + (1 - (.55 + (b + .5) / BANDS * .45)) * .66;   // far bands move fastest
+    const BANDS = 4, kOf = b => .2 + (1 - (.55 + (b + .5) / BANDS * .45)) * .52;
     bands = Array.from({ length: BANDS }, (_, b) => ({ k: kOf(b), el: document.createElement('div'), y: NaN }));
     const html = bands.map(() => []);
     items = [];
     for (const p of placed) {
       const b = Math.min(BANDS - 1, Math.floor((p.z - .55) / .45 * BANDS)), k = bands[b].k;
-      const top = p.y - (moving ? p.cy * (1 + k) : 0);
-      html[b].push(`<i class="dc${p.soft ? ' dc--soft' : ''}" style="left:${p.x.toFixed(0)}px;top:${top.toFixed(0)}px;width:${p.s.toFixed(0)}px;height:${p.s.toFixed(0)}px;--a:${(p.m.a * (.55 + p.z * .45)).toFixed(2)};--r:${turn(p).toFixed(0)}deg"><i class="dc__m dc--${p.m.move}${p.sw < 0 && p.m.move === 'drift' ? ' dc--alt' : ''}" style="--d:${p.d.toFixed(1)}s;--dl:-${(p.ph * p.d).toFixed(1)}s;--dir:${p.dir}"><svg><use href="#dc-${p.k}-${p.v}"/></svg></i></i>`);
-      items.push({ b, k, x0: p.x, y0: p.y, cy: p.cy, s: p.s, soft: p.soft, hush: false });
+      const top = moving ? (p.y - p.cy * (1 + k) + vh * .5 * (1 + k)) : p.y;
+      html[b].push('<i class="dc' + (p.soft ? ' dc--soft' : '') + '" style="left:' + p.x.toFixed(0) + 'px;top:' + top.toFixed(0) + 'px;width:' + p.s.toFixed(0) + 'px;height:' + p.s.toFixed(0) + 'px;--a:' + (p.m.a * (.55 + p.z * .45)).toFixed(2) + ';--r:' + turn(p).toFixed(0) + 'deg"><i class="dc__m dc--' + p.m.move + (p.sw < 0 && p.m.move === 'drift' ? ' dc--alt' : '') + '" style="--d:' + p.d.toFixed(1) + 's;--dl:-' + (p.ph * p.d).toFixed(1) + 's;--dir:' + p.dir + '"><svg><use href="#dc-' + p.k + '-' + p.v + '"/></svg></i></i>');
+      items.push({ b, k, x0: p.x, y0: p.y, cy: p.cy, s: p.s, soft: p.soft, on: false });
     }
     layer.textContent = '';
     bands.forEach((band, b) => {
@@ -249,38 +249,40 @@
       layer.appendChild(band.el);
       [...band.el.children].forEach((el, i) => { const it = items.filter(t => t.b === b)[i]; it.el = el; });
     });
-    if (!still) items.forEach(it => io.observe(it.el));
-    parallax();
+    parallax(scrollY, (window.__flow && window.__flow.vh) || stableVH, true);
   }
 
   /* ── life ────────────────────────────────────────────────────── */
-  // only what is near the screen is animated
-  const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('on', e.isIntersecting)), { rootMargin: '30% 0px' });
-
-  // depth: the paper is the back layer, so it moves fastest — and the farther, the faster
-  //   speed 1.2 … 1.5 × the page;  a motif sits  (its centre − screen middle) × k  from its place
   const capture = matchMedia('(max-aspect-ratio: 1/3), print');
-  function parallax() {
-    if (!moving) { bands.forEach(b => b.el.style.transform = ''); return; }
-    const vh = (window.__flow && window.__flow.vh) || stableVH;
-    const mid = scrollY + vh / 2;
-    for (const b of bands) {
-      const y = mid * (1 + b.k);
-      if (Math.abs(y - b.y) < .3) continue;
-      b.y = y; b.el.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
-    }
-    // passing behind words, a motif steps aside: almost gone until it is clear again (arithmetic only)
+  function updateActive(mid, vh) {
+    if (still) return;
+    const span = vh * 1.45;
     for (const it of items) {
-      if (it.soft) continue;
-      const d = it.cy - mid;
-      if (d > vh * 1.4 || d < -vh * 1.4) continue;
-      const y0 = it.y0 - d * (1 + it.k), y1 = y0 + it.s, x0 = it.x0, x1 = x0 + it.s;
-      const hush = wordRects.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
-      if (hush !== it.hush) { it.hush = hush; it.el.classList.toggle('hush', hush); }
+      const on = Math.abs(it.cy - mid) < span;
+      if (on !== it.on) { it.on = on; it.el.classList.toggle('on', on); }
     }
   }
-  let tick = false;
-  addEventListener('scroll', () => { lastScrollAt = performance.now(); if (!tick) { tick = true; requestAnimationFrame(() => { tick = false; parallax(); }); } }, { passive: true });
+  function parallax(yPos = scrollY, vh = (window.__flow && window.__flow.vh) || stableVH, forceActive = false) {
+    if (!moving) { bands.forEach(b => b.el.style.transform = ''); return; }
+    const mid = yPos + vh * .5;
+    for (const b of bands) {
+      const y = yPos * b.k;
+      if (y === b.y) continue;
+      b.y = y; b.el.style.transform = 'translate3d(0, ' + y.toFixed(2) + 'px, 0)';
+    }
+    if (forceActive) updateActive(mid, vh);
+  }
+  window.__decorParallax = parallax;
+  let idleT = 0, tick = false;
+  addEventListener('scroll', () => {
+    lastScrollAt = performance.now();
+    clearTimeout(idleT);
+    idleT = setTimeout(() => updateActive(scrollY + ((window.__flow && window.__flow.vh) || stableVH) * .5, (window.__flow && window.__flow.vh) || stableVH), 180);
+    if (!window.__flow && !tick) {
+      tick = true;
+      requestAnimationFrame(() => { tick = false; parallax(); });
+    }
+  }, { passive: true });
 
   // rebuild when the page changes size (fonts, rotation, a long-screenshot window)
   let rt = 0;
