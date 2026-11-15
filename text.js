@@ -43,10 +43,20 @@
     return chars;
   }
 
+  const activeFx = new Set();
   const play = el => {
     const d = parseFloat(el.dataset.fxDelay) || 0;
-    setTimeout(() => el.classList.add('is-in'), d);
+    activeFx.add(el);
+    setTimeout(() => {
+      el.classList.add('is-in');
+      setTimeout(() => { el.classList.add('is-done'); activeFx.delete(el); }, 1200);
+    }, d);
   };
+  // if the reader starts scrolling immediately upon entering the page, finish cover/intro blur transitions right away so the first scroll gets 100% of GPU budget
+  addEventListener('scroll', () => {
+    for (const el of activeFx) { el.classList.add('is-in', 'is-done'); }
+    activeFx.clear();
+  }, { passive: true, once: true });
 
   // ink: right away; rise: when it comes into view
   const io = new IntersectionObserver(es => es.forEach(e => {

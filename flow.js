@@ -44,9 +44,9 @@
   const plates = $$('.plate').map((el, idx) => ({
     el, idx, sp: el.closest('.sp'),
     body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
-    frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
+    frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'), glow: el.querySelector('.glow'),
     tiltMax: TILT_ANGLES[idx % TILT_ANGLES.length],
-    top: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, cardA: 1, buried: false, live: false,
+    top: 0, left: 0, right: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, cardA: 1, covered: false, buried: false, live: false, decoded: false,
   }));
   // give every plate an incrementing z-index so every subsequent photo cleanly stacks above the previous one
   plates.forEach((p, i) => { p.el.style.zIndex = String(i + 2); });
@@ -122,6 +122,11 @@
         ty = -10 * se - 6 * extra;
         dim = Math.round(clamp(se * .34 + extra * .18, 0, .58) * 40) / 40;
         noteA = Math.round(clamp(1 - overlap * 2.2, 0, 1) * 20) / 20;
+      }
+      const covered = overlap > .45;
+      if (covered !== p.covered && p.frame) {
+        p.covered = covered;
+        p.frame.style.pointerEvents = covered ? 'none' : '';
       }
       const cardA = Math.round((1 - fadeOut) * 20) / 20;
       if (cardA !== p.cardA) {
@@ -255,22 +260,24 @@
     if (innerWidth !== VW || !VH) { VW = innerWidth; VH = innerHeight; }
     Y = scrollY;
     root.classList.add('is-measuring');
-    lastH = document.documentElement.scrollHeight;
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
+    // 1. Read all layout geometry in a single clean pass (zero interleaved style writes = zero layout thrashing)
+    const targetCenter = VW < 768 ? VH * .45 : VH * .49;
+    const rsList = [];
     for (const p of plates) {
       const r = p.body.getBoundingClientRect();
-      p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99;
-      // centre each photo (whether horizontal or vertical) on the same optical pile axis so all cards overlap in one stack
-      const targetCenter = VW < 768 ? VH * .45 : VH * .49;
+      p.top = r.top + Y; p.left = r.left; p.right = r.right; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99;
       p.stickY = Math.round(clamp(targetCenter - p.h / 2, 58, VH * .32));
-      p.el.style.setProperty('--stack-top', p.stickY + 'px');
-    }
-    // the corner follows the picture: about 1.8% of its shorter side (a small panel ~2px, a big print ~10px)
-    for (const p of plates) if (p.frame) {
-      const s = Math.min(p.frame.offsetWidth, p.frame.offsetHeight);
-      if (s) p.frame.style.setProperty('--rs', Math.round(Math.min(10, Math.max(2, s * .018))) + 'px');
+      rsList.push(Math.min(r.width, r.height));
     }
     for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
+    lastH = document.documentElement.scrollHeight;
+    // 2. Write all CSS variables in one batch after reads complete
+    for (let i = 0; i < plates.length; i++) {
+      const p = plates[i], s = rsList[i];
+      p.el.style.setProperty('--stack-top', p.stickY + 'px');
+      if (p.frame && s) p.frame.style.setProperty('--rs', Math.round(Math.min(10, Math.max(2, s * .018))) + 'px');
+    }
     tales.forEach(t => t.sp = -1);
     root.classList.remove('is-measuring');
     paint();
@@ -296,19 +303,26 @@
     };
     (big.decode ? big.decode() : Promise.resolve()).then(swap, () => { next.full = true; upgrading = false; });
   }
-  function warmDecode() {
+  function warmDecode(limit = 6) {
     let n = 0;
     for (const p of plates) {
-      if (p.img && p.img.decode && near(p.top - scrollY, p.h, 2.2, .4)) {
+      if (!p.decoded && p.img && near(p.top - scrollY, p.h, 3.2, .5)) {
+        p.decoded = true;
         p.img.loading = 'eager';
-        p.img.decode().catch(() => {});
-        if (++n >= 4) break;
+        if (p.img.decode) p.img.decode().catch(() => {});
+        if (p.glow) {
+          p.glow.loading = 'eager';
+          if (p.glow.decode) p.glow.decode().catch(() => {});
+        }
+        if (++n >= limit) break;
       }
     }
   }
   let restT = 0;
-  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { tint(); upgrade(); }, 420); }, { passive: true });
-  addEventListener('load', () => { setTimeout(warmDecode, 40); setTimeout(upgrade, 1200); }, { once: true });
+  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { warmDecode(4); tint(); upgrade(); }, 260); }, { passive: true });
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => warmDecode(6), { once: true });
+  else warmDecode(6);
+  addEventListener('load', () => { warmDecode(8); setTimeout(upgrade, 1200); }, { once: true });
 
   /* ── loop ─────────────────────────────────────────────────────── */
   let ticking = false, dirty = true;
@@ -319,11 +333,13 @@
     notes(); zoom(); tell(); depth(); tint();
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+  let deferRemeasure = 0;
   const remeasure = () => {
+    if (scrolling()) { clearTimeout(deferRemeasure); deferRemeasure = setTimeout(remeasure, 320); return; }
     if (innerWidth === VW && Math.abs(document.documentElement.scrollHeight - lastH) < 4) return;
     dirty = true; request();
   };
-  window.__flow = { plates, remeasure, measured: 0, get vh() { return VH; } };
+  window.__flow = { plates, remeasure, measured: 0, get vh() { return VH; }, get h() { return lastH; } };
   addEventListener('scroll', request, { passive: true });
   addEventListener('resize', () => { if (innerWidth !== VW) { dirty = true; request(); } });
   addEventListener('load', remeasure);

@@ -77,10 +77,12 @@ function plate(v, x, no, { prefix = '../', href, ar: forceAr, layout } = {}) {
   const titleText = p.t || '';
   // the small picture comes first; flow.js swaps in the full one only while the page is at rest,
   // so scrolling never waits for a big picture to load or decode
-  const img = `<img src="${sm}" data-full="${src}" alt="${esc(altText)}" loading="lazy" decoding="async">`;
+  const eager = !href && no <= 5;
+  const loadAttr = eager ? 'loading="eager"' : 'loading="lazy"';
+  const img = `<img src="${sm}" data-full="${src}" alt="${esc(altText)}" ${loadAttr} decoding="async">`;
   const lit = lightOf(v.slug, it.n);
   // the light through the picture, spilling onto the paper around it
-  const glow = lit ? `<img class="glow" src="${prefix}images/series/${v.slug}/glow-${pad(it.n)}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+  const glow = lit ? `<img class="glow" src="${prefix}images/series/${v.slug}/glow-${pad(it.n)}.webp" alt="" aria-hidden="true" ${loadAttr} decoding="async">
           ` : '';
   const frame = href
     ? `<a class="plate__frame" href="${href}">${img}</a>`
@@ -208,8 +210,8 @@ function volumePage(v, i) {
     </div>
   </dialog>
 
-  <script src="../flow.js" defer></script>
   <script src="../text.js" defer></script>
+  <script src="../flow.js" defer></script>
   <script src="../home.js" defer></script>
   <script src="../book.js" defer></script>
   <script src="../decor.js" defer></script>

@@ -154,24 +154,27 @@
   // a still turn for each motif: loose things lie any way up, upright things only lean a little
   const turn = p => p.soft || p.m.move === 'glide' ? 0 : ['fall', 'drift', 'tumble'].includes(p.m.move) ? p.rot % 360 : p.sw * .25;
   let items = [], bands = [], built = '', wordRects = [], moving = false, stableVH = innerHeight, stableVW = innerWidth;
+  let lastScrollAt = -1e9;
   function build() {
+    if (performance.now() - lastScrollAt < 360) { scheduleBuild(240); return; }
     if (innerWidth !== stableVW || !stableVH) { stableVW = innerWidth; stableVH = innerHeight; }
-    const was = layer.style.height;
-    layer.style.height = '0px';                      // measure the page without this layer holding it open
-    const W = document.documentElement.clientWidth, H = document.documentElement.scrollHeight;
-    layer.style.height = was;
+    const flow = window.__flow;
+    const W = document.documentElement.clientWidth;
+    const H = (flow && flow.h) || document.documentElement.scrollHeight;
     const key = `${W}x${Math.round(H / 40)}`;
     if (key === built) return;
     built = key;
     io.disconnect();
     layer.style.height = H + 'px';
     const Y = scrollY;
-    document.documentElement.classList.add('is-measuring');
     const rect = (el, pad) => { const r = el.getBoundingClientRect(); return r.width ? [r.left - pad, r.top + Y - pad, r.right + pad, r.bottom + Y + pad] : null; };
-    const blocks = [...document.querySelectorAll(BLOCK)].map(el => rect(el, 6)).filter(Boolean);
-    const words = [...document.querySelectorAll(WORDS)].map(el => rect(el, 14)).filter(Boolean);
-    wordRects = [...document.querySelectorAll(TEXT)].map(el => rect(el, 26)).filter(Boolean);
-    document.documentElement.classList.remove('is-measuring');
+    // read plate rects from flow.js cached flow coordinates so we NEVER toggle .is-measuring or force a sticky layout thrash!
+    const plateRects = (flow && flow.plates && flow.plates.length && flow.measured)
+      ? flow.plates.map(p => [p.left - 6, p.top - 6, p.right + 6, p.top + p.h + 54])
+      : [...document.querySelectorAll('.plate__frame')].map(el => rect(el, 6)).filter(Boolean);
+    const blocks = [...plateRects, ...[...document.querySelectorAll('.cv__img, .hx, .bar')].map(el => rect(el, 6)).filter(Boolean)];
+    const words = [...plateRects, ...[...document.querySelectorAll('.vi, .vend, .vols, .foot, .dir, .cv__side')].map(el => rect(el, 14)).filter(Boolean)];
+    wordRects = [...document.querySelectorAll('.vi p, .vend p, .vols a, .dir')].map(el => rect(el, 22)).filter(Boolean);
     const hit = (list, x0, y0, x1, y1) => list.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
 
     // the page is cut into bands; each band has its own fixed random numbers,
@@ -251,14 +254,13 @@
     }
   }
   let tick = false;
-  addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(() => { tick = false; parallax(); }); } }, { passive: true });
+  addEventListener('scroll', () => { lastScrollAt = performance.now(); if (!tick) { tick = true; requestAnimationFrame(() => { tick = false; parallax(); }); } }, { passive: true });
 
   // rebuild when the page changes size (fonts, rotation, a long-screenshot window)
   let rt = 0;
   const scheduleBuild = (delay = 180) => { clearTimeout(rt); rt = setTimeout(build, delay); };
   new ResizeObserver(() => scheduleBuild(220)).observe(document.body);
   capture.addEventListener('change', () => { built = ''; build(); });
-  if (typeof requestIdleCallback === 'function') requestIdleCallback(() => build(), { timeout: 300 });
-  else scheduleBuild(120);
-  addEventListener('load', () => scheduleBuild(200), { once: true });
+  build();
+  addEventListener('load', () => scheduleBuild(320), { once: true });
 })();

@@ -180,16 +180,17 @@
 @layer motion {
   .fx [data-fx] .ch { display: inline-block; }
   .fx [data-fx="ink"] .ch {
-    opacity: 0; filter: blur(14px); transform: scale(1.35);
-    transition: opacity 1.4s var(--e-soft), filter 1.8s var(--e-soft), transform 2s var(--e-soft);
-    transition-delay: calc(200ms + var(--i) * 150ms);
+    opacity: 0; filter: blur(4px); transform: scale(1.18);
+    transition: opacity .85s var(--e-soft), filter .9s var(--e-soft), transform 1.05s var(--e-soft);
+    transition-delay: calc(80ms + var(--i) * 90ms);
   }
   .fx [data-fx="rise"] .ch {
-    opacity: 0; transform: translateY(.55em);
-    transition: opacity .9s var(--e-soft), transform 1.1s var(--e-soft);
-    transition-delay: calc(var(--i) * 42ms);
+    opacity: 0; transform: translateY(.45em);
+    transition: opacity .7s var(--e-soft), transform .85s var(--e-soft);
+    transition-delay: calc(var(--i) * 32ms);
   }
   .fx [data-fx].is-in .ch { opacity: 1; filter: none; transform: none; }
+  .fx [data-fx].is-done .ch { transition: none !important; filter: none !important; transform: none !important; }
   .is-decoding .ch:not(.ok) { opacity: .4; }
 }
 
@@ -264,10 +265,10 @@
     content: ""; position: absolute; inset: 0; pointer-events: none;
     background: #0a0a0c; opacity: var(--dim, 0);
   }
-  .is-live .plate__frame, .is-live .plate__frame img, .is-live .note { will-change: transform; }   /* a GPU layer only while near the screen */
-  @media (min-width: 1024px) {
-    .sp--l { --zo: 0% 100%; }
-    .sp--r { --zo: 100% 100%; }
+  .is-live .plate__frame, .is-live .plate__frame img, .is-live .note {
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 }
 

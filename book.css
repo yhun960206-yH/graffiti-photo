@@ -30,7 +30,10 @@
     width: min(100%, calc(66svh * var(--r, 1.5)));
   }
   .plates .plate__frame {
-    box-shadow: 0 -14px 36px -8px rgba(0, 0, 0, .42), 0 14px 32px -8px rgba(0, 0, 0, .32), 0 0 0 1px rgba(255, 255, 255, .06);
+    box-shadow: 0 -10px 26px -6px rgba(0, 0, 0, .4), 0 10px 24px -6px rgba(0, 0, 0, .3), 0 0 0 1px rgba(255, 255, 255, .06);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* ───── side tales sit cleanly below their card in the flow ───── */
