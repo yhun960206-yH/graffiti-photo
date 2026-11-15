@@ -186,21 +186,29 @@ function volumePage(v, i) {
     </section>
 
     <div class="plates" id="plates">${body}
+      <figure class="plate plate--end"${lightOf(v.slug, v.cover) ? ` data-light="${lightOf(v.slug, v.cover)}"` : ''}>
+        <div class="plate__body">
+          ${lightOf(v.slug, v.cover) ? `<img class="glow" src="../images/series/${v.slug}/glow-${pad(v.cover)}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">\n          ` : ''}<div class="plate__frame vend-card">
+            <img class="vend-card__bg" src="../images/series/${v.slug}/sm-${pad(v.cover)}.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" style="object-position:${v.coverPos || '50% 50%'}">
+            <div class="vend-card__in">
+              <div class="vend">
+                ${SEAL}
+                <p class="vend__t">${esc(v.title)}</p>
+                <p class="t-note">${[`第${CN[v.no]}卷`, v.date, `${count(v)} 张`, `摄影 ${AUTHOR}`].map(esc).join(' · ')}</p>
+                <p class="t-note">© ${new Date().getFullYear()} ${AUTHOR}　图片未经许可请勿转载</p>
+              </div>
+              <nav class="vols" aria-label="其他作品">
+                <a href="${prev.slug}.html"><span class="t-note">上一卷</span><span class="vols__t">${esc(prev.title)}</span></a>
+                <a href="${next.slug}.html"><span class="t-note">下一卷</span><span class="vols__t">${esc(next.title)}</span></a>
+              </nav>
+              <footer class="foot"><a href="../index.html">← ${BOOK}</a><a href="../index.html#works">全部作品</a></footer>
+            </div>
+          </div>
+          <figcaption class="note"><span class="note__t">卷尾 · ${esc(v.title)}</span><span class="note__d">第${CN[v.no]}卷 · 终</span></figcaption>
+        </div>
+      </figure>
     </div>
-
-    <section class="vend">
-      ${SEAL}
-      <p class="vend__t" data-fx="rise">${esc(v.title)}</p>
-      <p class="t-note">${[`第${CN[v.no]}卷`, v.date, `${count(v)} 张`, `摄影 ${AUTHOR}`].map(esc).join(' · ')}</p>
-      <p class="t-note">© ${new Date().getFullYear()} ${AUTHOR}　图片未经许可请勿转载</p>
-    </section>
-    <nav class="vols" aria-label="其他作品">
-      <a href="${prev.slug}.html"><span class="t-note">上一卷</span><span class="vols__t">${esc(prev.title)}</span></a>
-      <a href="${next.slug}.html"><span class="t-note">下一卷</span><span class="vols__t">${esc(next.title)}</span></a>
-    </nav>
   </main>
-
-  <footer class="foot"><a href="../index.html">← ${BOOK}</a><a href="../index.html#works">全部作品</a></footer>
 
   <dialog class="lb" aria-label="大图">
     <figure class="lb__fig"><img alt=""><figcaption><span class="lb__count"></span><span class="lb__t"></span></figcaption></figure>

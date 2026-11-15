@@ -45,7 +45,7 @@
     el, idx, sp: el.closest('.sp'),
     body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'), glow: el.querySelector('.glow'),
-    tiltMax: TILT_ANGLES[idx % TILT_ANGLES.length],
+    isEnd: el.classList.contains('plate--end'), tiltMax: el.classList.contains('plate--end') ? 0 : TILT_ANGLES[idx % TILT_ANGLES.length],
     top: 0, left: 0, right: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, cardA: 1, covered: false, buried: false, live: false, decoded: false,
   }));
   // give every plate an incrementing z-index so every subsequent photo cleanly stacks above the previous one
@@ -261,7 +261,12 @@
     // 2. Write all CSS variables in one batch after reads complete
     if (platesBox && plates.length > 1) {
       const last = plates[plates.length - 1];
-      const needEnd = Math.max(36, Math.round(maxH - last.h + VH * .22));
+      let maxBottom = 0;
+      for (const p of plates) {
+        const b = p.stickY + p.h + 64;
+        if (b > maxBottom) maxBottom = b;
+      }
+      const needEnd = Math.max(48, Math.round(maxBottom - (last.stickY + last.h) + 32), Math.round(VH - (last.stickY + last.h) - 88));
       platesBox.style.setProperty('--stack-end', needEnd + 'px');
     }
     for (let i = 0; i < plates.length; i++) {

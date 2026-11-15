@@ -14,7 +14,7 @@
       let cur = null;
       // positions come from flow.js's measurements — no layout read while scrolling
       const ps = window.__flow ? window.__flow.plates : [];
-      for (const p of ps) if (p.el.closest('.plates') && p.top - y < vh * .55) cur = p.el;
+      for (const p of ps) if (p.el.dataset.no && p.el.closest('.plates') && p.top - y < vh * .55) cur = p.el;
       const text = `${cur ? (cur.dataset.no || '01') : '01'} /${total}`;
       if (count.textContent !== text) count.textContent = text;
     }
