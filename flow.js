@@ -179,23 +179,23 @@
   /* ── 5. cover fade & depth: fade cover smoothly as the reader scrolls up into the stack ── */
   const words = [];
   const cvEl = document.querySelector('.cv');
+  const cvImg = document.querySelector('.cv__img');
   const platesBox = document.getElementById('plates');
-  let cvH = 0, cvFade = -1;
+  let cvSpan = 0, cvProg = -1;
   function depth() {
     if (!cvEl) return;
     if (still()) {
-      if (cvFade !== 1) { cvFade = 1; cvEl.style.setProperty('--cv-fade', '1'); cvEl.style.setProperty('--cv-shift', '0px'); cvEl.style.setProperty('--cv-scale', '1'); }
+      if (cvProg !== 0) { cvProg = 0; cvEl.style.setProperty('--cv-alpha', '1'); cvEl.style.setProperty('--cv-blur', '0px'); }
       return;
     }
-    const span = Math.max(260, (cvH || VH * .78) * .88);
+    const span = cvSpan || Math.max(280, VH * .68);
     const t = clamp(Y / span, 0, 1);
-    const f = Math.round((1 - smooth(t)) * 200) / 200;
-    if (f === cvFade) return;
-    cvFade = f;
-    const e = 1 - f;
-    cvEl.style.setProperty('--cv-fade', f.toFixed(3));
-    cvEl.style.setProperty('--cv-shift', (-e * 28).toFixed(1) + 'px');
-    cvEl.style.setProperty('--cv-scale', (1 - e * .045).toFixed(4));
+    if (Math.abs(t - cvProg) < .001) return;
+    cvProg = t;
+    const alpha = Math.max(.08, 1 - t * .88);
+    const blur = t * 18;
+    cvEl.style.setProperty('--cv-alpha', alpha.toFixed(4));
+    cvEl.style.setProperty('--cv-blur', blur.toFixed(2) + 'px');
   }
 
   /* ── 6. light: the paper, lit by whatever picture is above it ──── */
@@ -247,8 +247,9 @@
     root.classList.add('is-measuring');
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     // 1. Read all layout geometry in a single clean pass (zero interleaved style writes = zero layout thrashing)
-    if (cvEl) cvH = cvEl.getBoundingClientRect().height;
-    cvFade = -1;
+    if (cvImg) cvSpan = Math.max(260, cvImg.getBoundingClientRect().height * .92);
+    else if (cvEl) cvSpan = Math.max(260, cvEl.getBoundingClientRect().height * .82);
+    cvProg = -1;
     const targetCenter = VW < 768 ? VH * .45 : VH * .49;
     const rsList = [];
     let maxH = 0;
