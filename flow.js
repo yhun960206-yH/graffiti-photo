@@ -133,9 +133,7 @@
         p.cardA = cardA;
         p.el.style.opacity = cardA < 1 ? cardA.toFixed(2) : '';
       }
-      tilt = Math.round(tilt * 20) / 20;
-      tx = Math.round(tx * 2) / 2;
-      ty = Math.round(ty * 2) / 2;
+      // keep continuous subpixel precision (no step rounding) for 120Hz smooth transforms
       if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }
       if (dim !== p.dim && p.frame) {
         p.dim = dim;
@@ -146,12 +144,12 @@
         p.noteA = noteA;
         p.body.style.setProperty('--note-a', String(noteA));
       }
-      if (Math.abs(zs - p.zs) < .001 && Math.abs(tilt - p.tilt) < .04 && Math.abs(tx - p.tx) < .4 && Math.abs(ty - p.ty) < .4) continue;
+      if (Math.abs(zs - p.zs) < .0004 && Math.abs(tilt - p.tilt) < .015 && Math.abs(tx - p.tx) < .1 && Math.abs(ty - p.ty) < .1) continue;
       p.zs = zs; p.tilt = tilt; p.tx = tx; p.ty = ty;
       if (p.frame) {
         p.frame.style.transform = (zs === 1 && tilt === 0 && tx === 0 && ty === 0)
           ? ''
-          : `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1) rotate3d(0, 0, 1, ${tilt.toFixed(2)}deg)`;
+          : `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1) rotate3d(0, 0, 1, ${tilt.toFixed(3)}deg)`;
       }
       if (p.img) p.img.style.transform = zi === 1 ? '' : `scale3d(${zi.toFixed(4)}, ${zi.toFixed(4)}, 1)`;
     }
@@ -178,40 +176,9 @@
     }
   }
 
-  /* ── 5. depth: the words are the front layer, so they move slowest ───────────────
-     speed f < 1: an element whose centre is at page position c sits  (c − mid) × (f − 1)  from its place,
-     mid being the page position at the middle of the screen — zero when it is centred. */
-  const LAYERS = [
-    ['.note', .9, 30],                                                  // a caption keeps close to its picture
-    ['.tale', .84, 64],
-    ['.vi__text p, .vi__date, .vi__meta, .vend > *, .about > *, .close > *, .cv__lede, .cv__meta, .cv__no', .86, 70],
-    ['.hx__top, .hx__t, .hx__dir', .88, 48],
-    ['.cv__t', .78, 90],                                                // the title, frontmost
-  ];
+  /* ── 5. depth: native compositor scroll for text (zero main-thread translate jitter) ── */
   const words = [];
-  for (const [sel, f, max] of LAYERS) for (const el of $$(sel)) {
-    if (words.some(w => w.el === el || w.el.contains(el))) continue;
-    el.removeAttribute('data-float');
-    words.push({ el, f, max, off: 0, top: 0, h: 0 });
-  }
-  // a caption or story drifts only while it is still arriving: once settled it sits exactly in place
-  for (const w of words) {
-    const p = plates.find(p => p.note === w.el), t = tales.find(t => t.el === w.el);
-    if (p) w.k = () => 1 - Math.max(0, p.cp);
-    else if (t) w.k = () => 1 - Math.max(0, t.sp);
-  }
-  function depth() {
-    const calm = still();
-    for (const w of words) {
-      const top = w.top - Y;
-      let off = 0;
-      if (!calm && near(top, w.h, 1.6, .6)) off = Math.max(-w.max, Math.min(w.max, (top + w.h / 2 - VH / 2) * (w.f - 1))) * (w.k ? w.k() : 1);
-      off = Math.round(off * 2) / 2;
-      if (off === w.off) continue;
-      w.off = off;
-      w.el.style.translate = off ? `0 ${off.toFixed(1)}px` : '';
-    }
-  }
+  function depth() {}
 
   /* ── 6. light: the paper, lit by whatever picture is above it ──── */
   const bar = document.querySelector('.bar'), meta = document.querySelector('meta[name="theme-color"]');

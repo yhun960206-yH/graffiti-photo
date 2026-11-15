@@ -181,7 +181,7 @@ function volumePage(v, i) {
   <main>${cover({ img: `images/series/${v.slug}/${pad(v.cover)}.jpg`, smImg: `images/series/${v.slug}/sm-${pad(v.cover)}.jpg`, prefix: '../', pos: v.coverPos, alt: v.plates[v.cover].t || v.title, title: v.title, side })}
 
     <section class="vi">${essayHtml}
-      <p class="vi__meta t-note">${[v.gear, `拍摄于 ${v.date}`, `共 ${count(v)} 张`].filter(Boolean).map(esc).join(' · ')}</p>
+      <p class="vi__meta t-note">${esc(v.gear)}</p>
     </section>
 
     <div class="plates" id="plates">${body}
