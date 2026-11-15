@@ -16,7 +16,7 @@
   /* ───── unified sticky stack: every photo (landscape & portrait) stays & stacks in one pile ───── */
   .plates {
     position: relative;
-    padding: 0 var(--gutter) calc(var(--sec) * 1.2);
+    padding: 0 var(--gutter) var(--stack-end, clamp(28px, 6vh, 64px));
   }
   /* dissolve section/group wrappers so every .plate shares .plates as its sticky container and NEVER scrolls off early */
   .sp, .row, .pair { display: contents !important; }

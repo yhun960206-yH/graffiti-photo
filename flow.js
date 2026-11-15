@@ -176,9 +176,27 @@
     }
   }
 
-  /* ── 5. depth: native compositor scroll for text (zero main-thread translate jitter) ── */
+  /* ── 5. cover fade & depth: fade cover smoothly as the reader scrolls up into the stack ── */
   const words = [];
-  function depth() {}
+  const cvEl = document.querySelector('.cv');
+  const platesBox = document.getElementById('plates');
+  let cvH = 0, cvFade = -1;
+  function depth() {
+    if (!cvEl) return;
+    if (still()) {
+      if (cvFade !== 1) { cvFade = 1; cvEl.style.setProperty('--cv-fade', '1'); cvEl.style.setProperty('--cv-shift', '0px'); cvEl.style.setProperty('--cv-scale', '1'); }
+      return;
+    }
+    const span = Math.max(260, (cvH || VH * .78) * .88);
+    const t = clamp(Y / span, 0, 1);
+    const f = Math.round((1 - smooth(t)) * 200) / 200;
+    if (f === cvFade) return;
+    cvFade = f;
+    const e = 1 - f;
+    cvEl.style.setProperty('--cv-fade', f.toFixed(3));
+    cvEl.style.setProperty('--cv-shift', (-e * 28).toFixed(1) + 'px');
+    cvEl.style.setProperty('--cv-scale', (1 - e * .045).toFixed(4));
+  }
 
   /* ── 6. light: the paper, lit by whatever picture is above it ──── */
   const bar = document.querySelector('.bar'), meta = document.querySelector('meta[name="theme-color"]');
@@ -229,22 +247,31 @@
     root.classList.add('is-measuring');
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     // 1. Read all layout geometry in a single clean pass (zero interleaved style writes = zero layout thrashing)
+    if (cvEl) cvH = cvEl.getBoundingClientRect().height;
+    cvFade = -1;
     const targetCenter = VW < 768 ? VH * .45 : VH * .49;
     const rsList = [];
+    let maxH = 0;
     for (const p of plates) {
       const r = p.body.getBoundingClientRect();
       p.top = r.top + Y; p.left = r.left; p.right = r.right; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99;
       p.stickY = Math.round(clamp(targetCenter - p.h / 2, 58, VH * .32));
+      if (p.h > maxH) maxH = p.h;
       rsList.push(Math.min(r.width, r.height));
     }
     for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
-    lastH = document.documentElement.scrollHeight;
     // 2. Write all CSS variables in one batch after reads complete
+    if (platesBox && plates.length > 1) {
+      const last = plates[plates.length - 1];
+      const needEnd = Math.max(36, Math.round(maxH - last.h + VH * .22));
+      platesBox.style.setProperty('--stack-end', needEnd + 'px');
+    }
     for (let i = 0; i < plates.length; i++) {
       const p = plates[i], s = rsList[i];
       p.el.style.setProperty('--stack-top', p.stickY + 'px');
       if (p.frame && s) p.frame.style.setProperty('--rs', Math.round(Math.min(10, Math.max(2, s * .018))) + 'px');
     }
+    lastH = document.documentElement.scrollHeight;
     tales.forEach(t => t.sp = -1);
     root.classList.remove('is-measuring');
     paint();

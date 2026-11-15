@@ -97,7 +97,7 @@
   }
 
   /* ───── cover: the picture carries a floating vertical title; the margin carries the seal ───── */
-  .cv { display: grid; grid-template-columns: 1fr; padding-top: var(--bar); position: relative; }
+  .cv { display: grid; grid-template-columns: 1fr; padding-top: var(--bar); position: relative; opacity: var(--cv-fade, 1); transform: translate3d(0, var(--cv-shift, 0px), 0) scale(var(--cv-scale, 1)); transform-origin: 50% 25%; }
   .cv__img { grid-column: 1; grid-row: 1; position: relative; height: min(calc(100svh - var(--bar) - 148px), 118vw); overflow: hidden; background: var(--paper-2); container-type: size; border-radius: var(--r-img); }
   .cv__img img { width: 100%; height: 100%; object-fit: cover; }
   .cv__img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to left, rgba(10, 10, 12, .42), rgba(10, 10, 12, 0) 40%); }
@@ -328,6 +328,7 @@
     [data-float] { transform: none !important; }
     [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
     .sp, .row, .pair { display: block !important; position: relative !important; top: auto !important; }
+    .cv { opacity: 1 !important; transform: none !important; }
     .plate { position: relative !important; top: auto !important; visibility: visible !important; }
     .plate__frame, .plate__frame img { transform: none !important; box-shadow: none !important; }
     .plate__frame::after { opacity: 0 !important; }

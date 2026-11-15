@@ -54,8 +54,8 @@ export const volumes = [
     },
     spreads: [
       { layout: 'single', align: 'l', plates: [1] },
-      { layout: 'screen', plates: [2, 3] },
-      { layout: 'single', align: 'r', plates: [4] },
+      { layout: 'single', align: 'r', plates: [3] },
+      { layout: 'single', align: 'c', plates: [4] },
       { layout: 'pair', plates: [5, 6] },
       { layout: 'screen', plates: [7, 8] },
     ],
