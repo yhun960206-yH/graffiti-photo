@@ -239,15 +239,35 @@ volumes.forEach((v, i) => {
    each volume is one line; opening it shows its words, a strip of pictures, and the way in.
    the cover picture behind turns into that volume's picture. */
 const THUMBS = 6;
+const ratioOf = ar => { const [w, h] = String(ar || '1/1').split('/').map(Number); return (w && h) ? w / h : 1; };
+function pickPlate(v, wantLand) {
+  const f = v.feature || { plate: v.cover };
+  const check = wantLand ? (r => r > 1.05) : (r => r < 0.95);
+  if (!wantLand && f.plateM && v.plates[f.plateM]) {
+    return { n: f.plateM, pos: f.posM || v.plates[f.plateM].pos || '50% 35%' };
+  }
+  if (f.plate && v.plates[f.plate] && check(ratioOf(v.plates[f.plate].ar))) {
+    return { n: f.plate, pos: f.pos || v.plates[f.plate].pos || '50% 38%' };
+  }
+  if (v.cover && v.plates[v.cover] && check(ratioOf(v.plates[v.cover].ar))) {
+    return { n: v.cover, pos: v.coverPos || v.plates[v.cover].pos || '50% 35%' };
+  }
+  const nums = numbers(v);
+  const ordered = Object.keys(v.plates).map(Number).sort((a, b) => (nums[a] ?? 999) - (nums[b] ?? 999) || a - b);
+  let hit = ordered.find(n => check(ratioOf(v.plates[n].ar)));
+  if (!hit && !wantLand) hit = ordered.find(n => ratioOf(v.plates[n].ar) <= 1.05);
+  const chosen = hit || f.plate || v.cover || ordered[0];
+  return { n: chosen, pos: (chosen === f.plate && f.pos) || (chosen === v.cover && v.coverPos) || v.plates[chosen].pos || '50% 38%' };
+}
 function entry(v, i) {
-  const f = v.feature, fp = v.plates[f.plate], href = `series/${v.slug}.html`;
+  const desk = pickPlate(v, true), mob = pickPlate(v, false), href = `series/${v.slug}.html`;
   const nums = numbers(v);
   const order = Object.keys(nums).map(Number).sort((a, b) => nums[a] - nums[b]).slice(0, THUMBS);
   const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t || `${v.title} ${pad(nums[n])}`)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
   const ledeLine = v.lede ? `\n              <p class="dir__lede">${esc(v.lede)}</p>` : '';
   return `
         <li class="dir__i" style="--k:${i}">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${lightOf(v.slug, f.plate)}" data-bg="images/series/${v.slug}/${pad(f.plate)}.jpg" data-pos="${f.pos || fp.pos || '50% 50%'}">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${lightOf(v.slug, desk.n)}" data-light-m="${lightOf(v.slug, mob.n)}" data-bg="images/series/${v.slug}/${pad(desk.n)}.jpg" data-pos="${desk.pos}" data-bg-m="images/series/${v.slug}/${pad(mob.n)}.jpg" data-pos-m="${mob.pos}">
             <span class="dir__no">${CN[v.no]}</span><span class="dir__t">${esc(v.title)}</span><span class="dir__m">${esc(v.date.slice(0, 7))}</span>
           </button>
           <div class="dir__p" id="dir-${v.slug}" role="region" aria-label="${esc(v.title)}">

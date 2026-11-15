@@ -1,4 +1,5 @@
-/* 首页目录：点开一卷，它的内容在这一行下面展开，背后的封面换成这一卷的照片。再点一下收起。 */
+/* 首页目录：点开一卷，它的内容在这一行下面展开，背后的封面换成这一卷的照片。再点一下收起。
+   电脑/平板宽屏优先展示横图，手机竖屏点击时优先展示竖图。 */
 (() => {
   const dir = document.querySelector('.dir');
   const bg = document.querySelector('.hx__bg');
@@ -8,14 +9,26 @@
   const base = bg.querySelector('img');
   const heads = [...dir.querySelectorAll('button.dir__h')];
   const layers = new Map();
+  const mqMobile = matchMedia('(max-width: 767px), (max-aspect-ratio: 4/5)');
 
   const loadStrip = panel => panel.querySelectorAll('img[data-src]').forEach(img => { img.src = img.dataset.src; img.removeAttribute('data-src'); });
+
+  function pickForViewport(btn) {
+    const isMob = mqMobile.matches;
+    return {
+      src: (isMob && btn.dataset.bgM) ? btn.dataset.bgM : btn.dataset.bg,
+      pos: (isMob && btn.dataset.posM) ? btn.dataset.posM : btn.dataset.pos,
+      light: (isMob && btn.dataset.lightM) ? btn.dataset.lightM : btn.dataset.light
+    };
+  }
 
   function showBg(src, pos) {
     let img = src ? layers.get(src) : base;
     if (!img) {
       img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = src; img.style.objectPosition = pos;
       bg.appendChild(img); layers.set(src, img);
+    } else if (pos) {
+      img.style.objectPosition = pos;
     }
     const on = () => { for (const el of bg.querySelectorAll('img')) el.classList.toggle('is-on', el === img); };
     if (img.complete) requestAnimationFrame(on); else img.addEventListener('load', on, { once: true });
@@ -37,6 +50,14 @@
     }, 480);
   }
 
+  function syncOpenBg() {
+    const active = heads.find(b => b.getAttribute('aria-expanded') === 'true');
+    if (!active) return;
+    const picked = pickForViewport(active);
+    showBg(picked.src, picked.pos);
+    document.body.style.backgroundColor = picked.light || '';
+  }
+
   heads.forEach(btn => {
     set(btn, false);
     btn.addEventListener('click', () => {
@@ -44,10 +65,18 @@
       heads.forEach(b => b !== btn && b.getAttribute('aria-expanded') === 'true' && set(b, false));
       set(btn, opening);
       dir.classList.toggle('has-open', opening);
-      showBg(opening ? btn.dataset.bg : null, btn.dataset.pos);
-      document.body.style.backgroundColor = opening && btn.dataset.light ? btn.dataset.light : '';   // the page below takes that volume's light
+      if (opening) {
+        const picked = pickForViewport(btn);
+        showBg(picked.src, picked.pos);
+        document.body.style.backgroundColor = picked.light || '';
+      } else {
+        showBg(null);
+        document.body.style.backgroundColor = '';
+      }
     });
   });
+
+  mqMobile.addEventListener('change', syncOpenBg);
 
   // a pointer resting on a line starts fetching its pictures (only that volume's — nothing loads in the background)
   heads.forEach(b => ['pointerenter', 'focus'].forEach(t => b.addEventListener(t, () => loadStrip(document.getElementById(b.getAttribute('aria-controls'))), { once: true })));
