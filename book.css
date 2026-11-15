@@ -19,7 +19,7 @@
     padding: 0 var(--gutter) calc(var(--sec) * 1.2);
   }
   /* dissolve section/group wrappers so every .plate shares .plates as its sticky container and NEVER scrolls off early */
-  .sp, .row, .pair { display: contents; }
+  .sp, .row, .pair { display: contents !important; }
 
   .plates .plate {
     position: sticky;
@@ -30,7 +30,7 @@
     width: min(100%, calc(66svh * var(--r, 1.5)));
   }
   .plates .plate__frame {
-    box-shadow: 0 -14px 36px -8px rgba(0, 0, 0, .42), 0 14px 32px -8px rgba(0, 0, 0, .32), 0 0 0 1px rgba(255, 255, 255, .05);
+    box-shadow: 0 -14px 36px -8px rgba(0, 0, 0, .42), 0 14px 32px -8px rgba(0, 0, 0, .32), 0 0 0 1px rgba(255, 255, 255, .06);
   }
 
   /* ───── side tales sit cleanly below their card in the flow ───── */

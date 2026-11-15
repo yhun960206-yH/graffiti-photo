@@ -40,13 +40,13 @@
   const readAt = h => h + CAP < VH * .9 ? Math.max(VH * .1, (VH - h - CAP) * (VW < 768 ? .42 : .48)) : VH * .07;
 
   /* ── 1. notes ─────────────────────────────────────────────────── */
-  const TILT_ANGLES = [-2.4, 2.1, -1.7, 2.5, -2.0, 1.85, -2.2, 1.65];
+  const TILT_ANGLES = [-2.6, 2.2, -1.8, 2.8, -2.3, 1.9, -2.5, 2.1];
   const plates = $$('.plate').map((el, idx) => ({
     el, idx, sp: el.closest('.sp'),
     body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
     tiltMax: TILT_ANGLES[idx % TILT_ANGLES.length],
-    top: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, buried: false, live: false,
+    top: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, cardA: 1, buried: false, live: false,
   }));
   // give every plate an incrementing z-index so every subsequent photo cleanly stacks above the previous one
   plates.forEach((p, i) => { p.el.style.zIndex = String(i + 2); });
@@ -71,12 +71,20 @@
       const p = plates[i];
       const top = p.top - Y;
       const nxt = plates[i + 1] || null;
-      const buryRef = plates[i + 4] || null;
-      // release GPU layers for cards already buried 4+ layers deep so 25-photo pages never bloat memory
-      const buried = !still() && !!buryRef && (buryRef.top - Y <= buryRef.stickY + 12);
+      const nxt2 = plates[i + 2] || null;
+      const nxt3 = plates[i + 3] || null;
+      // release GPU layers for cards already buried 3+ layers deep so 25-photo pages never bloat memory or poke out behind landscape/portrait swaps
+      let fadeOut = 0;
+      if (!still() && nxt3) {
+        const n3Top = nxt3.top - Y;
+        const start3 = Math.max(nxt2.stickY + nxt2.h * .75, VH * .72);
+        fadeOut = smooth(clamp((start3 - n3Top) / Math.max(120, start3 - nxt3.stickY)));
+      }
+      const buried = !still() && fadeOut >= .99;
       if (buried !== p.buried) {
         p.buried = buried;
         p.el.style.visibility = buried ? 'hidden' : '';
+        p.el.style.pointerEvents = buried ? 'none' : '';
       }
       if (buried) continue;
 
@@ -95,24 +103,30 @@
         zs = .93 + .07 * e; zi = 1.08 - .08 * e;
         if (d > 0) {
           const enter = smooth(clamp(d / .7));
-          tilt = -p.tiltMax * .45 * enter;
+          tilt = -p.tiltMax * .45 * enter + p.tiltMax * .28 * (1 - enter);
+        } else {
+          tilt = p.tiltMax * .28;
         }
       }
       if (overlap > 0) {
         const se = smooth(overlap);
-        // depth of the pile: also step back slightly more as i+2 and i+3 arrive on top
+        // depth of the pile: also step back slightly more as i+2 arrives on top
         let extra = 0;
-        const nxt2 = plates[i + 2];
         if (nxt2) {
-          const o2 = clamp(((nxt.stickY + nxt.h * .7) - (nxt2.top - Y)) / Math.max(140, nxt.h));
+          const o2 = clamp(((nxt.stickY + nxt.h * .75) - (nxt2.top - Y)) / Math.max(140, nxt.h));
           extra = smooth(o2);
         }
-        zs *= (1 - .06 * se - .03 * extra);
-        tilt = p.tiltMax * (.22 + .78 * se) + (p.tiltMax > 0 ? .5 : -.5) * extra;
-        tx = (p.tiltMax > 0 ? 1 : -1) * (3.5 * se + 2 * extra);
+        zs *= (1 - .065 * se - .04 * extra);
+        tilt = p.tiltMax * (.28 + .85 * se + .35 * extra);
+        tx = (p.tiltMax > 0 ? 1 : -1) * (4 * se + 2.5 * extra);
         ty = -10 * se - 6 * extra;
-        dim = Math.round(clamp(se * .34 + extra * .16, 0, .55) * 40) / 40;
+        dim = Math.round(clamp(se * .34 + extra * .18, 0, .58) * 40) / 40;
         noteA = Math.round(clamp(1 - overlap * 2.2, 0, 1) * 20) / 20;
+      }
+      const cardA = Math.round((1 - fadeOut) * 20) / 20;
+      if (cardA !== p.cardA) {
+        p.cardA = cardA;
+        p.el.style.opacity = cardA < 1 ? cardA.toFixed(2) : '';
       }
       tilt = Math.round(tilt * 20) / 20;
       tx = Math.round(tx * 2) / 2;
@@ -121,7 +135,7 @@
       if (dim !== p.dim && p.frame) {
         p.dim = dim;
         p.frame.style.setProperty('--dim', dim ? dim.toFixed(3) : '0');
-        p.body.style.setProperty('--glow-a', (1 - dim * 1.8).toFixed(2));
+        p.body.style.setProperty('--glow-a', Math.max(0, 1 - dim * 1.8).toFixed(2));
       }
       if (noteA !== p.noteA) {
         p.noteA = noteA;
