@@ -37,6 +37,26 @@ const NZ_50 = 'Nikon Z 8 · 50mm f/1.8';
 
 export const volumes = [
   {
+    slug: 'aman', kind: '人像 · 汉服', year: '2026', date: '2026.03.10',
+    theme: 'night',
+    decor: ['hairpin'],
+    gear: NZ_TAM,
+    cover: 1, coverPos: '50% 32%',
+    feature: { plate: 1, ar: '2/3', pos: '50% 32%' },
+    plates: {
+      1: { d: '2026.03.10', ar: '2/3' },
+      2: { d: '2026.03.10', ar: '2/3' },
+      3: { d: '2026.03.10', ar: '2/3' },
+      4: { d: '2026.03.10', ar: '2/3' },
+      5: { d: '2026.03.10', ar: '2/3' },
+    },
+    spreads: [
+      { layout: 'single', align: 'l', plates: [2] },
+      { layout: 'pair', plates: [3, 4] },
+      { layout: 'single', align: 'c', plates: [5] },
+    ],
+  },
+  {
     slug: 'polaroid', kind: '人像 · 拍立得', year: '2026', date: '2026.03.06',
     decor: ['instax', 'film', 'spark'],
     gear: 'Instant Film', theme: 'night',
@@ -138,28 +158,6 @@ export const volumes = [
       { layout: 'single', align: 'r', plates: [42] },
       { layout: 'screen', plates: [43, 44, 45] },
       { layout: 'single', align: 'c', plates: [46] },
-    ],
-  },
-  {
-    slug: 'xiaoyu', kind: '人像 · JK', year: '2026', date: '2026.02.12',
-    decor: ['polkabow'],
-    gear: NZ_TAM,
-    cover: 1, coverPos: '50% 38%',
-    feature: { plate: 2, ar: '3/2', pos: '50% 38%' },
-    plates: {
-      1: { d: '2026.02.12 · 14:22', ar: '3/2' },
-      2: { d: '2026.02.12 · 15:16', ar: '3/2' },
-      3: { d: '2026.02.12 · 15:17', ar: '2/3' },
-      4: { d: '2026.02.12 · 15:18', ar: '2/3' },
-      5: { d: '2026.02.12 · 15:21', ar: '2/3' },
-      6: { d: '2026.02.12 · 15:37', ar: '3/2' },
-      7: { d: '2026.02.12 · 16:31', ar: '2/3' },
-    },
-    spreads: [
-      { layout: 'single', align: 'l', plates: [2] },
-      { layout: 'screen', plates: [3, 4, 5] },
-      { layout: 'single', align: 'r', plates: [6] },
-      { layout: 'single', align: 'c', plates: [7] },
     ],
   },
   {
@@ -320,6 +318,28 @@ export const volumes = [
       { layout: 'screen', plates: [1, 2] },
       { layout: 'scroll', plates: [{ n: 4, pos: '50% 30%' }] },
       { layout: 'single', align: 'r', plates: [5] },
+    ],
+  },
+  {
+    slug: 'xiaoyu', kind: '人像 · JK', year: '2025', date: '2025.01.10',
+    decor: ['polkabow'],
+    gear: NZ_TAM,
+    cover: 1, coverPos: '50% 38%',
+    feature: { plate: 2, ar: '3/2', pos: '50% 38%' },
+    plates: {
+      1: { d: '2025.01.10 · 14:22', ar: '3/2' },
+      2: { d: '2025.01.10 · 15:16', ar: '3/2' },
+      3: { d: '2025.01.10 · 15:17', ar: '2/3' },
+      4: { d: '2025.01.10 · 15:18', ar: '2/3' },
+      5: { d: '2025.01.10 · 15:21', ar: '2/3' },
+      6: { d: '2025.01.10 · 15:37', ar: '3/2' },
+      7: { d: '2025.01.10 · 16:31', ar: '2/3' },
+    },
+    spreads: [
+      { layout: 'single', align: 'l', plates: [2] },
+      { layout: 'screen', plates: [3, 4, 5] },
+      { layout: 'single', align: 'r', plates: [6] },
+      { layout: 'single', align: 'c', plates: [7] },
     ],
   },
   {

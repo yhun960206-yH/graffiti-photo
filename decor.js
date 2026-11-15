@@ -19,6 +19,11 @@
      soft: a glow — may sit behind text, only its centre has to be on paper */
   const INK = '#2b2a27';
   const M = {
+    // 阿瞒·汉服：金步摇发簪
+    hairpin: { move: 'sway', size: [34, 54], w: 4, a: .92, svg: [
+      "<g transform=\"rotate(-28 50 50)\"><path d=\"M50 20 L50 92\" stroke=\"#d4af37\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M50 24 C 36 16, 26 24, 38 32 C 44 36, 56 36, 62 32 C 74 24, 64 16, 50 24 Z\" fill=\"#f3d266\" stroke=\"#b8860b\" stroke-width=\"2\"/><circle cx=\"50\" cy=\"22\" r=\"4.5\" fill=\"#c93b2b\" stroke=\"#f7e39c\" stroke-width=\"1.4\"/><circle cx=\"38\" cy=\"18\" r=\"2.5\" fill=\"#f7e39c\"/><circle cx=\"62\" cy=\"18\" r=\"2.5\" fill=\"#f7e39c\"/><circle cx=\"50\" cy=\"11\" r=\"2.8\" fill=\"#f7e39c\"/><line x1=\"36\" y1=\"31\" x2=\"36\" y2=\"52\" stroke=\"#e6c35c\" stroke-width=\"1.4\"/><circle cx=\"36\" cy=\"55\" r=\"3\" fill=\"#f5efe2\" stroke=\"#d4af37\" stroke-width=\"1.2\"/><line x1=\"64\" y1=\"31\" x2=\"64\" y2=\"48\" stroke=\"#e6c35c\" stroke-width=\"1.4\"/><circle cx=\"64\" cy=\"51\" r=\"2.8\" fill=\"#c93b2b\" stroke=\"#d4af37\" stroke-width=\"1.2\"/></g>",
+      "<g transform=\"rotate(22 50 50)\"><path d=\"M50 18 L50 92\" stroke=\"#d4af37\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M50 10 C 42 18, 42 28, 50 34 C 58 28, 58 18, 50 10 Z\" fill=\"#e6c35c\" stroke=\"#b8860b\" stroke-width=\"1.8\"/><path d=\"M34 24 C 40 20, 46 24, 50 30 C 54 24, 60 20, 66 24 C 60 32, 54 34, 50 34 C 46 34, 40 32, 34 24 Z\" fill=\"#c93b2b\" stroke=\"#d4af37\" stroke-width=\"1.5\"/><line x1=\"38\" y1=\"28\" x2=\"38\" y2=\"48\" stroke=\"#e6c35c\" stroke-width=\"1.3\"/><circle cx=\"38\" cy=\"51\" r=\"2.6\" fill=\"#f5efe2\"/></g>"
+    ] },
     // 小玖 假如是拍立得：拍立得机身与彩虹条 · 吐出的白边相纸 · 闪光灯星芒
     instax: { move: 'bob', size: [32, 48], w: 2, a: .9, svg: `
       <g transform="rotate(-8 50 50)">
