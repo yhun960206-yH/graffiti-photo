@@ -97,46 +97,66 @@
   }
 
   /* ───── cover: the picture carries a floating vertical title; the margin carries the seal ───── */
-  .cv { display: grid; grid-template-columns: 1fr; padding-top: var(--bar); position: relative; }
+  .cv { display: grid; grid-template-columns: 1fr; padding: calc(var(--bar) + 8px) var(--gutter) 0; position: relative; z-index: 2; }
   .cv__img {
     grid-column: 1; grid-row: 1; position: relative; height: min(calc(100svh - var(--bar) - 148px), 118vw);
-    overflow: visible; background: transparent; container-type: size; border-radius: var(--r-img);
-    transform: translateZ(0); will-change: opacity;
+    overflow: hidden; background: var(--paper-2); border-radius: var(--r-img);
+    box-shadow: 0 18px 44px -12px rgba(0, 0, 0, .42), 0 0 0 1px rgba(255, 255, 255, .07);
   }
   .cv__img img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: var(--r-img); }
-  .cv__base { will-change: opacity; }
   .cv__blur {
-    position: absolute; inset: -8% -4% -18% -4%; width: 108%; height: 126%; max-width: none; pointer-events: none;
-    transform: translateZ(0);
-    opacity: 0; will-change: opacity;
-    -webkit-mask-image: radial-gradient(ellipse 92% 82% at 50% 42%, #000 32%, rgba(0, 0, 0, .55) 64%, rgba(0, 0, 0, .15) 84%, transparent 100%);
-    mask-image: radial-gradient(ellipse 92% 82% at 50% 42%, #000 32%, rgba(0, 0, 0, .55) 64%, rgba(0, 0, 0, .15) 84%, transparent 100%);
+    position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+    opacity: 0; transform: scale(1.04);
   }
-  .cv__img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to left, rgba(10, 10, 12, .42), rgba(10, 10, 12, 0) 40%); }
+  .cv__img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to left, rgba(10, 10, 12, .42), rgba(10, 10, 12, 0) 42%); }
   .cv__t {
     grid-column: 1; grid-row: 1; justify-self: end; align-self: start;
-    margin: 5% 6% 0 0; position: relative; z-index: 3; pointer-events: none;
+    margin: clamp(20px, 4.5vh, 44px) clamp(18px, 5vw, 42px) 0 0; position: relative; z-index: 3; pointer-events: none;
     writing-mode: vertical-rl; white-space: nowrap; font-family: var(--f-serif); font-weight: 200;
-    font-size: clamp(22px, min(var(--t-display), 7.6svh), 64px); line-height: 1.1; letter-spacing: .24em;
+    font-size: clamp(22px, min(var(--t-display), 6.8svh), 58px); line-height: 1.15; letter-spacing: .22em;
     color: var(--on-image); text-shadow: 0 8px 28px rgba(0, 0, 0, .68), 0 2px 8px rgba(0, 0, 0, .48);
-    will-change: opacity;
     animation: cv-float 5.2s ease-in-out infinite alternate;
   }
   @keyframes cv-float {
     from { translate: 0 0; }
-    to   { translate: 0 -8px; }
+    to   { translate: 0 -6px; }
   }
-  .cv__side { display: flex; align-items: flex-start; gap: 22px; padding: 26px var(--gutter) 0; }
+  .cv__side { display: flex; align-items: flex-start; gap: 22px; padding: 24px 4px 0; position: relative; z-index: 3; }
   .cv__lede { font-family: var(--f-serif); font-weight: 300; font-size: 16px; letter-spacing: .24em; line-height: 1.9; flex: 1; }
   .cv__meta { text-align: right; }
   .cv__date { font-family: var(--f-serif); font-weight: 300; font-size: clamp(17px, 2.2vw, 22px); letter-spacing: .22em; line-height: 1.4; color: var(--ink); margin-bottom: 4px; }
   @media (min-width: 1024px) {
-    .cv { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 0; min-height: min(100svh, 70vw); padding-left: var(--gutter); }
-    .cv__img { grid-column: 4 / -1; grid-row: 1; height: min(calc(100svh - var(--bar)), 66vw); }
-    .cv__img::after { background: linear-gradient(to right, rgba(10, 10, 12, .38), rgba(10, 10, 12, 0) 38%); }
-    .cv__t { grid-column: 4 / -1; grid-row: 1; justify-self: start; margin: 7% 0 0 6%; }
-    .cv__side { grid-column: 1 / 4; grid-row: 1; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 7vh 2vw 6vh 0; }
-    .cv__lede { flex: 0 1 auto; writing-mode: vertical-rl; font-size: clamp(16px, 1.2vw, 20px); letter-spacing: .4em; max-height: 60%; }
+    .cv {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: clamp(20px, 2vw, 36px);
+      padding: calc(var(--bar) + clamp(16px, 2.6vh, 32px)) var(--gutter) 0;
+      align-items: stretch;
+    }
+    .cv__img {
+      grid-column: 4 / -1;
+      grid-row: 1;
+      height: clamp(460px, calc(100svh - var(--bar) - clamp(36px, 6vh, 68px)), 820px);
+    }
+    .cv__img::after { background: linear-gradient(to right, rgba(10, 10, 12, .44), rgba(10, 10, 12, 0) 40%); }
+    .cv__t {
+      grid-column: 4 / -1;
+      grid-row: 1;
+      justify-self: start;
+      align-self: center;
+      margin: 0 0 0 clamp(28px, 3.8vw, 56px);
+      max-height: 84%;
+      font-size: clamp(28px, min(3.8vw, 6.4svh), 56px);
+      letter-spacing: .22em;
+    }
+    .cv__side {
+      grid-column: 1 / 4;
+      grid-row: 1;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: clamp(12px, 2.2vh, 28px) 1vw clamp(12px, 2.2vh, 28px) 0;
+    }
+    .cv__lede { flex: 0 1 auto; writing-mode: vertical-rl; font-size: clamp(15px, 1.15vw, 19px); letter-spacing: .36em; max-height: 58%; }
     .cv__meta { text-align: left; }
   }
 
@@ -146,8 +166,9 @@
   .plate { margin: 0; padding-bottom: var(--capspace, 48px); --cp: 1; --l1: 0px; }
   .plate__body { position: relative; }
   /* the light through the picture on the paper around it (tools/light.py): a tiny blurred map, stretched */
-  main { overflow-x: clip; }                                          /* the glows spread past the screen's sides: cut them there */
-  .glow { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; max-width: none; z-index: -1; pointer-events: none; user-select: none; opacity: var(--glow-a, 1); -webkit-mask-image: radial-gradient(closest-side, #000 38%, rgba(0, 0, 0, .55) 68%, transparent 100%); mask-image: radial-gradient(closest-side, #000 38%, rgba(0, 0, 0, .55) 68%, transparent 100%); }
+  main { position: relative; z-index: 2; overflow-x: clip; }          /* above .decor; cut glows at screen sides */
+  .glow { display: none; position: absolute; left: -28%; top: -28%; width: 156%; height: 156%; max-width: none; z-index: -1; pointer-events: none; user-select: none; opacity: var(--glow-a, .85); }
+  .is-live .glow { display: block; }
   .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); border-radius: var(--rs, var(--r-img)); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
   .plate__body::before {
@@ -221,10 +242,10 @@
      gradient falls into on 8-bit screens, and reads as the tooth of the paper.
      pre-rendered static tile (images/grain.webp) instead of live SVG feTurbulence filter for zero GPU scroll cost */
   body::after {
-    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .07;
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .07;
     background: url("images/grain.webp") repeat 0 0 / 96px 96px;
   }
-  .decor { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: -1; overflow: hidden; pointer-events: none; contain: layout style paint; }
+  .decor { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: 1; overflow: hidden; pointer-events: none; contain: layout style paint; }
   .decor__band { position: absolute; left: 0; top: 0; width: 100%; height: 0; will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translate3d(0, 0, 0); }
   .dc { position: absolute; display: block; transition: opacity .5s var(--e-soft); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .dc__m { display: block; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform, opacity; backface-visibility: hidden; -webkit-backface-visibility: hidden; }

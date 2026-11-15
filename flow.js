@@ -72,19 +72,19 @@
       const top = p.top - Y;
       const nxt = plates[i + 1] || null;
       const nxt2 = plates[i + 2] || null;
-      const nxt3 = plates[i + 3] || null;
-      // release GPU layers for cards already buried 3+ layers deep so 25-photo pages never bloat memory or poke out behind landscape/portrait swaps
+      // release GPU layers for cards already buried 2+ layers deep so 25/46-photo pages never bloat GPU memory during fast fling scroll
       let fadeOut = 0;
-      if (!still() && nxt3) {
-        const n3Top = nxt3.top - Y;
-        const start3 = Math.max(nxt2.stickY + nxt2.h * .75, VH * .72);
-        fadeOut = smooth(clamp((start3 - n3Top) / Math.max(120, start3 - nxt3.stickY)));
+      if (!still() && nxt2) {
+        const n2Top = nxt2.top - Y;
+        const start2 = Math.max(nxt.stickY + nxt.h * .68, VH * .68);
+        fadeOut = smooth(clamp((start2 - n2Top) / Math.max(110, start2 - nxt2.stickY)));
       }
       const buried = !still() && fadeOut >= .99;
       if (buried !== p.buried) {
         p.buried = buried;
         p.el.style.visibility = buried ? 'hidden' : '';
         p.el.style.pointerEvents = buried ? 'none' : '';
+        if (buried && p.live) { p.live = false; p.el.classList.remove('is-live'); }
       }
       if (buried) continue;
 
@@ -95,7 +95,7 @@
         const endAt = nxt.stickY;
         overlap = clamp((startAt - nTop) / Math.max(140, startAt - endAt));
       }
-      const live = !still() && (near(top, p.h, 1.5, .8) || overlap > 0);
+      const live = !still() && near(top, p.h, 1.25, .6) && overlap < .65;
       let zs = 1, zi = 1, tilt = 0, tx = 0, ty = 0, dim = 0, noteA = 1;
       if (live) {
         const d = (top - p.stickY) / VH;                            // >0 while rising toward its sticky spot, <=0 once docked
@@ -201,12 +201,9 @@
     const t = clamp(Y / span, 0, 1);
     if (t === cvProg) return;
     cvProg = t;
-    const blurIn = clamp(t * 1.5, 0, 1);
-    const imgOp = clamp(1 - t * .92, .06, 1);
-    cvImg.style.opacity = imgOp.toFixed(3);
-    if (cvBase) cvBase.style.opacity = clamp(1 - t * 1.65, 0, 1).toFixed(3);
+    const blurIn = clamp(t * 1.35, 0, .82);
     if (cvBlur) cvBlur.style.opacity = blurIn.toFixed(3);
-    if (cvTitle) cvTitle.style.opacity = clamp(1 - t * 1.05, .04, 1).toFixed(3);
+    if (cvTitle) cvTitle.style.opacity = clamp(1 - t * 1.15, 0, 1).toFixed(3);
   }
 
   /* ── 6. light: the paper, lit by whatever picture is above it ──── */
@@ -314,10 +311,10 @@
     };
     (big.decode ? big.decode() : Promise.resolve()).then(swap, () => { next.full = true; upgrading = false; });
   }
-  function warmDecode(limit = 6) {
+  function warmDecode(limit = 3) {
     let n = 0;
     for (const p of plates) {
-      if (!p.decoded && p.img && near(p.top - scrollY, p.h, 3.2, .5)) {
+      if (!p.decoded && p.img && near(p.top - scrollY, p.h, 1.8, .4)) {
         p.decoded = true;
         p.img.loading = 'eager';
         if (p.img.decode) p.img.decode().catch(() => {});
@@ -330,10 +327,10 @@
     }
   }
   let restT = 0;
-  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { warmDecode(4); tint(); upgrade(); }, 260); }, { passive: true });
-  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => warmDecode(6), { once: true });
-  else warmDecode(6);
-  addEventListener('load', () => { warmDecode(8); setTimeout(upgrade, 1200); }, { once: true });
+  addEventListener('scroll', () => { lastScroll = performance.now(); clearTimeout(restT); restT = setTimeout(() => { warmDecode(2); tint(); upgrade(); }, 260); }, { passive: true });
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => warmDecode(3), { once: true });
+  else warmDecode(3);
+  addEventListener('load', () => { warmDecode(4); setTimeout(upgrade, 1200); }, { once: true });
 
   /* ── loop ─────────────────────────────────────────────────────── */
   let ticking = false, dirty = true;

@@ -190,7 +190,7 @@ function volumePage(v, i) {
       <figure class="plate plate--end"${lightOf(v.slug, v.cover) ? ` data-light="${lightOf(v.slug, v.cover)}"` : ''}>
         <div class="plate__body">
           ${lightOf(v.slug, v.cover) ? `<img class="glow" src="../images/series/${v.slug}/glow-${pad(v.cover)}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">\n          ` : ''}<div class="plate__frame vend-card">
-            <img class="vend-card__bg" src="../images/series/${v.slug}/sm-${pad(v.cover)}.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" style="object-position:${v.coverPos || '50% 50%'}">
+            <img class="vend-card__bg" src="../images/series/${v.slug}/blur-${pad(v.cover)}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" style="object-position:${v.coverPos || '50% 50%'}">
             <div class="vend-card__in">
               <div class="vend">
                 <div class="vend__head">

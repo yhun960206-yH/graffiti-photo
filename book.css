@@ -80,9 +80,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: blur(28px) saturate(1.18) brightness(.44);
-    transform: scale(1.16) translateZ(0);
-    opacity: .88;
+    transform: scale(1.06) translateZ(0);
+    opacity: .72;
     pointer-events: none;
   }
   .vend-card::before {
