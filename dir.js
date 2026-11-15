@@ -11,7 +11,16 @@
   const layers = new Map();
   const mqMobile = matchMedia('(max-width: 767px), (max-aspect-ratio: 4/5)');
 
-  const loadStrip = panel => panel.querySelectorAll('img[data-src]').forEach(img => { img.src = img.dataset.src; img.removeAttribute('data-src'); });
+  const bindRetry = img => {
+    img.addEventListener('error', function onErr() {
+      const n = Number(img.dataset.retry || 0);
+      if (n < 2) {
+        img.dataset.retry = String(n + 1);
+        setTimeout(() => { img.src = img.src.split('?')[0] + '?r=' + (n + 1); }, 600 * (n + 1));
+      }
+    });
+  };
+  const loadStrip = panel => panel.querySelectorAll('img[data-src]').forEach(img => { bindRetry(img); img.src = img.dataset.src; img.removeAttribute('data-src'); });
 
   function pickForViewport(btn) {
     const isMob = mqMobile.matches;
