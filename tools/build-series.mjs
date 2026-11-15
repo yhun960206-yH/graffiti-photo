@@ -127,8 +127,8 @@ function cover({ img, smImg, pos, alt, title, side, prefix = '' }) {
     <section class="cv">
       <div class="cv__img">
         <img src="${prefix}${img}"${srcset} alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
-        <h1 class="cv__t" data-float=".12" data-fx="ink">${esc(title)}</h1>
       </div>
+      <h1 class="cv__t" data-float=".12" data-fx="ink">${esc(title)}</h1>
       <div class="cv__side">
         ${SEAL}
         ${side}
