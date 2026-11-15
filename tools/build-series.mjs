@@ -193,16 +193,37 @@ function volumePage(v, i) {
             <img class="vend-card__bg" src="../images/series/${v.slug}/sm-${pad(v.cover)}.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" style="object-position:${v.coverPos || '50% 50%'}">
             <div class="vend-card__in">
               <div class="vend">
-                ${SEAL}
-                <p class="vend__t">${esc(v.title)}</p>
-                <p class="t-note">${[`第${CN[v.no]}卷`, v.date, `${count(v)} 张`, `摄影 ${AUTHOR}`].map(esc).join(' · ')}</p>
-                <p class="t-note">© ${new Date().getFullYear()} ${AUTHOR}　图片未经许可请勿转载</p>
+                <div class="vend__head">
+                  <div class="vend__stamp">
+                    ${SEAL}
+                    <span class="vend__tag">第${CN[v.no]}卷 · 终</span>
+                  </div>
+                  <span class="vend__no" aria-hidden="true">${pad(v.no)}</span>
+                </div>
+                <div class="vend__body">
+                  <p class="vend__t">${esc(v.title)}</p>
+                  ${v.lede ? `<p class="vend__lede">${esc(v.lede)}</p>` : ''}
+                </div>
+                <div class="vend__meta">
+                  <p class="t-note">${[v.date, `${count(v)} 张`, v.gear || `摄影 ${AUTHOR}`].map(esc).join(' · ')}</p>
+                  <p class="t-note">© ${new Date().getFullYear()} ${AUTHOR}　图片未经许可请勿转载</p>
+                </div>
               </div>
-              <nav class="vols" aria-label="其他作品">
-                <a href="${prev.slug}.html"><span class="t-note">上一卷</span><span class="vols__t">${esc(prev.title)}</span></a>
-                <a href="${next.slug}.html"><span class="t-note">下一卷</span><span class="vols__t">${esc(next.title)}</span></a>
-              </nav>
-              <footer class="foot"><a href="../index.html">← ${BOOK}</a><a href="../index.html#works">全部作品</a></footer>
+              <div class="vend-card__side">
+                <nav class="vols" aria-label="其他作品">
+                  <a class="vols__item vols__item--prev" href="${prev.slug}.html">
+                    <span class="vols__k"><span class="vols__arr" aria-hidden="true">←</span> 上一卷 · 第${CN[prev.no]}卷</span>
+                    <span class="vols__t">${esc(prev.title)}</span>
+                    <span class="vols__m">${esc(prev.date)} · ${count(prev)} 张</span>
+                  </a>
+                  <a class="vols__item vols__item--next" href="${next.slug}.html">
+                    <span class="vols__k">下一卷 · 第${CN[next.no]}卷 <span class="vols__arr" aria-hidden="true">→</span></span>
+                    <span class="vols__t">${esc(next.title)}</span>
+                    <span class="vols__m">${esc(next.date)} · ${count(next)} 张</span>
+                  </a>
+                </nav>
+                <footer class="foot"><a href="../index.html">← ${BOOK}首页</a><span class="foot__sep" aria-hidden="true">·</span><a href="../index.html#works">全部作品目录</a></footer>
+              </div>
             </div>
           </div>
           <figcaption class="note"><span class="note__t">卷尾 · ${esc(v.title)}</span><span class="note__d">第${CN[v.no]}卷 · 终</span></figcaption>
