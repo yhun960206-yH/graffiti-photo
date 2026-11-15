@@ -266,7 +266,7 @@
 
 /* ───── layer 2 · the pictures: each grows toward its best place, from the edge it belongs to (flow.js) ───── */
 @layer parts {
-  .is-measuring .sp, .is-measuring .plate { position: relative !important; top: auto !important; }
+  .is-measuring .plate { position: relative !important; top: auto !important; }
   .plate__frame { position: relative; transform-origin: var(--zo, 50% 50%); }
   .plate__frame::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
