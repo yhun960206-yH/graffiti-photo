@@ -1,45 +1,44 @@
 /* ==========================================================
    涂鸦 · 每一卷
-   封面 → 简介（偏右，左侧一条细线）→ 一段一段的图 → 卷尾
-   每一段有自己的位置：偏左 / 偏右 / 居中 / 挂轴 / 屏风 / 错落 / 宽幅 / 宽银幕 / 绘卷
+   封面 → 简介（偏右，左侧一条细线）→ 逐张堆叠的画册 → 卷尾
+   子页面所有图片（横幅与竖幅）共享同一个 .plates 堆叠容器，
+   每一张滑到视口中心时稳稳驻留，下一张从下方滑上来带微倾角度叠在它上面。
    ========================================================== */
 @layer page {
   /* ───── intro ───── */
-  .vi { padding: var(--sec) var(--gutter) 0; }
+  .vi { padding: calc(var(--sec) * .55) var(--gutter) 0; }
   .vi__text { color: var(--ink-soft); }
   .vi__text p:first-child { font-family: var(--f-serif); font-weight: 300; font-size: var(--t-head); line-height: 1.9; letter-spacing: .12em; color: var(--ink); }
   .vi__text p + p { margin-top: 14px; }
-  .vi__date { font-family: var(--f-serif); font-weight: 300; font-size: clamp(20px, 2.6vw, 28px); letter-spacing: .24em; line-height: 1.5; color: var(--ink); margin-top: 18px; }
-  .vi__text + .vi__date { margin-top: 28px; }
-  .vi__meta { margin-top: 6px; }
+  .vi__text + .vi__meta { margin-top: 24px; }
+  .vi__meta { margin-top: 4px; }
 
-  /* ───── the sequence (all subpage photos stack with subtle paper tilt as you scroll up) ───── */
-  .plates { position: relative; padding-bottom: var(--sec); }
-  .sp {
-    position: sticky; top: calc(var(--bar) + 8vh);
-    margin-top: var(--sec);
-    padding: 0 var(--gutter);
+  /* ───── unified sticky stack: every photo (landscape & portrait) stays & stacks in one pile ───── */
+  .plates {
+    position: relative;
+    padding: 0 var(--gutter) calc(var(--sec) * 1.2);
   }
-  .sp:has(.row), .sp:has(.pair), .sp--emaki { position: relative; top: auto; }
-  .sp .plate__frame { box-shadow: 0 -16px 40px -10px rgba(0, 0, 0, .38), 0 12px 28px -8px rgba(0, 0, 0, .28); }
-  .sp--l .plate, .sp--r .plate, .sp--c .plate { width: 100%; margin-inline: auto; }
-  .sp--scroll .plate { width: 82%; margin-inline: auto; }
-  .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }
-  .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
-  .sp--emaki .plate + .plate { margin-top: 12px; }
-  .sp--emaki .plate {
-    position: sticky; top: calc(var(--bar) + 11vh);
-    padding-bottom: 58px;
+  /* dissolve section/group wrappers so every .plate shares .plates as its sticky container and NEVER scrolls off early */
+  .sp, .row, .pair { display: contents; }
+
+  .plates .plate {
+    position: sticky;
+    top: var(--stack-top, calc(var(--bar) + 8vh));
+    margin-top: clamp(96px, 16vh, 160px);
+    margin-inline: auto;
+    /* fit both landscape and portrait photos inside the same central stacking zone so they always overlap in one pile */
+    width: min(100%, calc(66svh * var(--r, 1.5)));
   }
-  .pair { display: grid; gap: 36px; }
-  .pair > .plate { position: sticky; top: calc(var(--bar) + 8vh); }
-  .pair .plate:first-child { z-index: 1; }
-  .pair .plate:last-child { z-index: 2; width: 92%; margin-inline: auto; }
-  @media (max-width: 699px) {
-    .row > .plate { position: sticky; top: calc(var(--bar) + 8vh); }
+  .plates .plate__frame {
+    box-shadow: 0 -14px 36px -8px rgba(0, 0, 0, .42), 0 14px 32px -8px rgba(0, 0, 0, .32), 0 0 0 1px rgba(255, 255, 255, .05);
   }
-  @media (min-width: 700px) {
-    .sp:has(.row) { position: sticky; top: calc(var(--bar) + 8vh); }
+
+  /* ───── side tales sit cleanly below their card in the flow ───── */
+  .plates .tale--side {
+    position: relative;
+    z-index: 60;
+    margin: 20px auto 0;
+    width: min(100%, 34em);
   }
 
   /* ───── end ───── */
@@ -54,27 +53,16 @@
   .plate__frame { cursor: zoom-in; }
 
   @media (min-width: 1024px) {
-    .vi, .vend, .sp { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); }
+    .vi, .vend { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); }
     .vi > * { grid-column: 7 / 12; }
-    .vi::before { content: ""; grid-column: 6 / 7; grid-row: 1 / 4; justify-self: end; width: 1px; background: var(--hair); margin-right: 2vw; }
-    .vi__text { grid-row: 1; } .vi__date { grid-row: 2; } .vi__meta { grid-row: 3; }
+    .vi::before { content: ""; grid-column: 6 / 7; grid-row: 1 / 3; justify-self: end; width: 1px; background: var(--hair); margin-right: 2vw; }
+    .vi__text { grid-row: 1; } .vi__meta { grid-row: 2; }
     .vend > * { grid-column: 7 / 12; }
 
-    /* singles sit off-centre; their width is capped so they fit the screen */
-    .sp .plate { width: min(100%, calc(76vh * var(--r))); margin: 0; }
-    .sp--l .plate { grid-column: 1 / 9; justify-self: start; }
-    .sp--r .plate { grid-column: 5 / 13; justify-self: end; }
-    .sp--c .plate { grid-column: 3 / 11; justify-self: center; }
-    .sp--scroll .plate { grid-column: 5 / 9; justify-self: center; width: min(100%, calc(84vh * var(--r))); }
-    .sp--screen .row { grid-column: 1 / -1; }
-    .sp--wide .plate { grid-column: 1 / -1; justify-self: center; width: min(100%, calc(80vh * var(--r))); margin: 0; --note-in: 20px; }
-    .sp--cinema .plate, .sp--emaki .plate { grid-column: 1 / -1; width: 100%; margin: 0; --note-in: 22px; }
-    .sp--emaki { row-gap: 0; }
-    .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: 0; }
-    .pair { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); align-items: start; gap: 0; }
-    .sp:has(.pair) { position: sticky; top: calc(var(--bar) + 8vh); }
-    .pair .plate:first-child { position: static; grid-column: 1 / 8; width: min(100%, calc(74vh * var(--r))); }
-    .pair .plate:last-child { position: static; grid-column: 9 / 13; width: 100%; margin: 14vw 0 0; }
+    .plates .plate {
+      margin-top: clamp(140px, 20vh, 210px);
+      width: min(76vw, calc(70svh * var(--r, 1.5)));
+    }
 
     .vols { grid-template-columns: 1fr 1fr; }
     .vols a { padding: 48px var(--gutter); border-bottom: 0; }

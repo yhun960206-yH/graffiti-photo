@@ -127,7 +127,7 @@
   .plate__body { position: relative; }
   /* the light through the picture on the paper around it (tools/light.py): a tiny blurred map, stretched */
   main { overflow-x: clip; }                                          /* the glows spread past the screen's sides: cut them there */
-  .glow { position: absolute; left: -100%; top: -100%; width: 300%; height: 300%; max-width: none; z-index: -1; pointer-events: none; user-select: none; }
+  .glow { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; max-width: none; z-index: -1; pointer-events: none; user-select: none; opacity: var(--glow-a, 1); }
   .plate__frame { display: block; width: 100%; aspect-ratio: var(--ar); overflow: hidden; background: var(--paper-2); border-radius: var(--rs, var(--r-img)); }
   .plate__frame img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
   .plate__body::before {
@@ -137,27 +137,16 @@
   }
   .note {
     position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 2; pointer-events: none;
+    opacity: var(--note-a, 1);
     transform: translate3d(calc((1 - var(--cp)) * var(--note-in, 20px)), calc((var(--cp) - 1) * (var(--l1, 0px) + 8px + var(--note-in, 20px))), 0);
   }
   .note__t { display: flex; align-items: baseline; gap: 14px; font-family: var(--f-serif); font-weight: 400; font-size: 13px; line-height: 21px; letter-spacing: .2em; color: color-mix(in srgb, var(--ink) calc(var(--cp) * 100%), #fff); text-shadow: 0 0 16px rgba(0, 0, 0, calc(.5 * (1 - var(--cp)))); white-space: nowrap; }
   .note__n { font-family: var(--f-sans); font-weight: 300; font-size: 10px; letter-spacing: .16em; opacity: .75; }
   .note__d { display: block; margin-top: 0; font-size: 8px; line-height: 1.5; letter-spacing: .1em; color: var(--mute); opacity: clamp(0, calc((var(--cp) - .6) * 1.15), .42); }
 
-  /* ───── screen (屏风): on phone each panel takes full readable width; on tablet/desktop a row of equal-height panels ───── */
-  .row { display: flex; flex-direction: column; gap: 36px; }
+  /* ───── screen (屏风): each panel stacks sequentially as a full readable card ───── */
+  .row { display: contents; }
   .row > .plate { width: 100%; min-width: 0; --note-in: 16px; }
-  @media (min-width: 700px) {
-    .row { flex-direction: row; align-items: flex-start; gap: var(--gap); }
-    .row > .plate { flex: var(--r) 1 0; width: auto; --note-in: 12px; }
-    .row .note__t { font-size: 12px; letter-spacing: .12em; }
-    .row .note__n { display: none; }
-  }
-  @media (min-width: 1024px) {
-    .row { --rowh: 72vh; width: min(100%, calc(var(--rowh) * var(--sum) + var(--gap) * (var(--n) - 1))); margin-inline: auto; }
-    .row > .plate { --note-in: 18px; }
-    .row .note__t { font-size: 12.5px; letter-spacing: .16em; }
-    .row .note__n { display: inline; }
-  }
 
   /* ───── lightbox ───── */
   .lb { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--paper); color: var(--ink); }
@@ -330,7 +319,8 @@
     .note__t { color: var(--ink) !important; }
     [data-float] { transform: none !important; }
     [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
-    .sp, .plate { position: relative !important; top: auto !important; }
+    .sp, .row, .pair { display: block !important; position: relative !important; top: auto !important; }
+    .plate { position: relative !important; top: auto !important; visibility: visible !important; }
     .plate__frame, .plate__frame img { transform: none !important; box-shadow: none !important; }
     .plate__frame::after { opacity: 0 !important; }
     .note, .tale, .vi__text p, .vi__date, .vi__meta, .vend > *, .about > *, .close > *, .cv__t, .cv__lede, .cv__meta, .cv__no, .hx__top, .hx__t, .hx__dir { translate: none !important; }

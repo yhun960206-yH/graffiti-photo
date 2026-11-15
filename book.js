@@ -4,21 +4,42 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const lb = $('.lb'); if (!lb) return;
   const lbImg = $('img', lb), lbT = $('.lb__t', lb), lbC = $('.lb__count', lb);
-  const items = $$('button.plate__frame').map(b => ({ src: $('img', b).dataset.full || $('img', b).getAttribute('src'), alt: $('img', b).alt, t: b.dataset.title, trigger: b }));
-  let at = 0, opener = null;
+  const items = $$('button.plate__frame').map(b => {
+    const img = $('img', b);
+    const sm = img.getAttribute('src');
+    return { sm, full: img.dataset.full || sm, alt: img.alt, t: b.dataset.title, trigger: b };
+  });
+  let at = 0, opener = null, swapTimer = 0, loadToken = 0;
   function render(i) {
+    clearTimeout(swapTimer);
+    const token = ++loadToken;
     at = (i + items.length) % items.length;
     const it = items[at];
-    lbImg.classList.add('is-swap');
-    setTimeout(() => {
-      lbImg.src = it.src; lbImg.alt = it.alt; lbT.textContent = it.t || ''; lbT.hidden = !it.t;
+    const apply = () => {
+      if (token !== loadToken) return;
+      lbImg.alt = it.alt; lbT.textContent = it.t || ''; lbT.hidden = !it.t;
       lbC.textContent = `${at + 1} / ${items.length}`;
-      const done = () => lbImg.classList.remove('is-swap');
-      if (lbImg.complete) requestAnimationFrame(done); else lbImg.onload = done;
-    }, lb.open ? 200 : 0);
+      // show already-decoded thumbnail immediately so opening/switching never flashes blank, then upgrade to full-res
+      lbImg.src = it.sm;
+      lbImg.classList.remove('is-swap');
+      if (it.full && it.full !== it.sm) {
+        const hi = new Image();
+        hi.decoding = 'async';
+        hi.src = it.full;
+        (hi.decode ? hi.decode() : new Promise(r => { hi.onload = r; hi.onerror = r; })).then(() => {
+          if (token === loadToken && lb.open) lbImg.src = it.full;
+        }).catch(() => {});
+      }
+    };
+    if (lb.open) {
+      lbImg.classList.add('is-swap');
+      swapTimer = setTimeout(apply, 140);
+    } else {
+      apply();
+    }
   }
   items.forEach((it, i) => it.trigger.addEventListener('click', () => { opener = it.trigger; render(i); lb.showModal(); document.body.style.overflow = 'hidden'; }));
-  lb.addEventListener('close', () => { document.body.style.overflow = ''; opener && opener.focus({ preventScroll: true }); });
+  lb.addEventListener('close', () => { clearTimeout(swapTimer); loadToken++; document.body.style.overflow = ''; opener && opener.focus({ preventScroll: true }); });
   $('.lb__prev', lb).addEventListener('click', () => render(at - 1));
   $('.lb__next', lb).addEventListener('click', () => render(at + 1));
   $('.lb__close', lb).addEventListener('click', () => lb.close());

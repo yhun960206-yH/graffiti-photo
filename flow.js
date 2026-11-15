@@ -40,25 +40,23 @@
   const readAt = h => h + CAP < VH * .9 ? Math.max(VH * .1, (VH - h - CAP) * (VW < 768 ? .42 : .48)) : VH * .07;
 
   /* ── 1. notes ─────────────────────────────────────────────────── */
-  const TILT_ANGLES = [-2.1, 1.85, -1.5, 2.25, -1.8, 1.6];
+  const TILT_ANGLES = [-2.4, 2.1, -1.7, 2.5, -2.0, 1.85, -2.2, 1.65];
   const plates = $$('.plate').map((el, idx) => ({
     el, idx, sp: el.closest('.sp'),
     body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
-    flat: !!el.closest('.row, .sp--emaki'),                        // panels that touch: only the picture inside breathes
     tiltMax: TILT_ANGLES[idx % TILT_ANGLES.length],
-    top: 0, h: 0, cp: -1, zs: -1, tilt: 0, ty: 0, dim: 0, live: false,
+    top: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, buried: false, live: false,
   }));
-  // give each spread & plate an incrementing z-index so every new photo cleanly stacks above the previous one
-  $$('.sp').forEach((sp, i) => { sp.style.zIndex = String(i + 2); });
+  // give every plate an incrementing z-index so every subsequent photo cleanly stacks above the previous one
   plates.forEach((p, i) => { p.el.style.zIndex = String(i + 2); });
   function notes() {
     for (const p of plates) {
       const top = p.top - Y;
       let cp = 1;
       if (!still() && top + p.h > 0 && top < VH + 48) {
-        // on the photo while it comes up the screen; settled below, with date and settings, by the time it is centred
-        cp = smooth(clamp((readAt(p.h) + VH * .36 - top) / (VH * .32)));
+        // on the photo while it comes up the screen; settled below, with date and settings, by the time it reaches its stack spot
+        cp = smooth(clamp((p.stickY + VH * .34 - top) / (VH * .32)));
       }
       cp = Math.round(cp * 40) / 40;
       if (cp === p.cp) continue;
@@ -67,61 +65,74 @@
     }
   }
 
-  /* ── 3. zoom & sticky card stacking (with subtle paper tilt) ─── */
-  function nextOver(i) {
-    const p = plates[i];
-    const inRowDesk = p.el.closest('.row') && VW >= 700;
-    const inPairDesk = p.el.closest('.pair') && VW >= 1024;
-    for (let j = i + 1; j < plates.length; j++) {
-      const q = plates[j];
-      if ((inRowDesk || inPairDesk) && q.sp === p.sp) continue;     // side-by-side siblings move together on desktop
-      return q;
-    }
-    return null;
-  }
+  /* ── 3. zoom & unified sticky card stacking (landscape + portrait in one pile with paper tilt) ─── */
   function zoom() {
     for (let i = 0; i < plates.length; i++) {
       const p = plates[i];
       const top = p.top - Y;
-      const live = !still() && near(top, p.h, 1.6, 1.2);
-      let zs = 1, zi = 1, tilt = 0, ty = 0, dim = 0;
+      const nxt = plates[i + 1] || null;
+      const buryRef = plates[i + 4] || null;
+      // release GPU layers for cards already buried 4+ layers deep so 25-photo pages never bloat memory
+      const buried = !still() && !!buryRef && (buryRef.top - Y <= buryRef.stickY + 12);
+      if (buried !== p.buried) {
+        p.buried = buried;
+        p.el.style.visibility = buried ? 'hidden' : '';
+      }
+      if (buried) continue;
+
+      let overlap = 0;
+      if (!still() && nxt) {
+        const nTop = nxt.top - Y;
+        const startAt = Math.max(p.stickY + p.h * .85, VH * .78);
+        const endAt = nxt.stickY;
+        overlap = clamp((startAt - nTop) / Math.max(140, startAt - endAt));
+      }
+      const live = !still() && (near(top, p.h, 1.5, .8) || overlap > 0);
+      let zs = 1, zi = 1, tilt = 0, tx = 0, ty = 0, dim = 0, noteA = 1;
       if (live) {
-        const eye = VW < 768 ? VH * .44 : VH * .48;
-        const d = (top + p.h / 2 - eye) / VH;                       // 0 = at optimal viewing level
-        const e = smooth(clamp(1 - Math.abs(d) / .85));
-        zs = .93 + .07 * e; zi = 1.1 - .1 * e;
-        // subtle organic paper angle as a card rises from the bottom toward the reading level, straightening at the centre
+        const d = (top - p.stickY) / VH;                            // >0 while rising toward its sticky spot, <=0 once docked
+        const e = smooth(clamp(1 - Math.max(0, d) / .75));
+        zs = .93 + .07 * e; zi = 1.08 - .08 * e;
         if (d > 0) {
-          const enter = smooth(clamp(d / .75));
-          tilt = -p.tiltMax * .42 * enter;
+          const enter = smooth(clamp(d / .7));
+          tilt = -p.tiltMax * .45 * enter;
         }
       }
-      const nxt = nextOver(i);
-      if (!still() && nxt) {
-        const stickyTop = 52 + VH * .09;
-        const nTop = nxt.top - Y;
-        // starts receding & tilting gently as the next photo rises up to cover it
-        const startAt = stickyTop + Math.max(p.h * .92, VH * .38);
-        const span = Math.max(160, p.h * .88);
-        const overlap = clamp((startAt - nTop) / span);
-        if (overlap > 0) {
-          const se = smooth(overlap);
-          zs *= (1 - .065 * se);
-          tilt = p.tiltMax * se;
-          ty = -12 * se;
-          dim = Math.round(se * .36 * 40) / 40;
+      if (overlap > 0) {
+        const se = smooth(overlap);
+        // depth of the pile: also step back slightly more as i+2 and i+3 arrive on top
+        let extra = 0;
+        const nxt2 = plates[i + 2];
+        if (nxt2) {
+          const o2 = clamp(((nxt.stickY + nxt.h * .7) - (nxt2.top - Y)) / Math.max(140, nxt.h));
+          extra = smooth(o2);
         }
+        zs *= (1 - .06 * se - .03 * extra);
+        tilt = p.tiltMax * (.22 + .78 * se) + (p.tiltMax > 0 ? .5 : -.5) * extra;
+        tx = (p.tiltMax > 0 ? 1 : -1) * (3.5 * se + 2 * extra);
+        ty = -10 * se - 6 * extra;
+        dim = Math.round(clamp(se * .34 + extra * .16, 0, .55) * 40) / 40;
+        noteA = Math.round(clamp(1 - overlap * 2.2, 0, 1) * 20) / 20;
       }
       tilt = Math.round(tilt * 20) / 20;
+      tx = Math.round(tx * 2) / 2;
       ty = Math.round(ty * 2) / 2;
       if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }
-      if (dim !== p.dim && p.frame) { p.dim = dim; p.frame.style.setProperty('--dim', dim ? dim.toFixed(3) : '0'); }
-      if (Math.abs(zs - p.zs) < .001 && Math.abs(tilt - p.tilt) < .04 && Math.abs(ty - p.ty) < .4) continue;
-      p.zs = zs; p.tilt = tilt; p.ty = ty;
+      if (dim !== p.dim && p.frame) {
+        p.dim = dim;
+        p.frame.style.setProperty('--dim', dim ? dim.toFixed(3) : '0');
+        p.body.style.setProperty('--glow-a', (1 - dim * 1.8).toFixed(2));
+      }
+      if (noteA !== p.noteA) {
+        p.noteA = noteA;
+        p.body.style.setProperty('--note-a', String(noteA));
+      }
+      if (Math.abs(zs - p.zs) < .001 && Math.abs(tilt - p.tilt) < .04 && Math.abs(tx - p.tx) < .4 && Math.abs(ty - p.ty) < .4) continue;
+      p.zs = zs; p.tilt = tilt; p.tx = tx; p.ty = ty;
       if (p.frame) {
-        p.frame.style.transform = (zs === 1 && tilt === 0 && ty === 0)
+        p.frame.style.transform = (zs === 1 && tilt === 0 && tx === 0 && ty === 0)
           ? ''
-          : `translate3d(0, ${ty.toFixed(1)}px, 0) scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1) rotate3d(0, 0, 1, ${tilt.toFixed(2)}deg)`;
+          : `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1) rotate3d(0, 0, 1, ${tilt.toFixed(2)}deg)`;
       }
       if (p.img) p.img.style.transform = zi === 1 ? '' : `scale3d(${zi.toFixed(4)}, ${zi.toFixed(4)}, 1)`;
     }
@@ -232,7 +243,14 @@
     root.classList.add('is-measuring');
     lastH = document.documentElement.scrollHeight;
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
-    for (const p of plates) { const r = p.body.getBoundingClientRect(); p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99; }
+    for (const p of plates) {
+      const r = p.body.getBoundingClientRect();
+      p.top = r.top + Y; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99;
+      // centre each photo (whether horizontal or vertical) on the same optical pile axis so all cards overlap in one stack
+      const targetCenter = VW < 768 ? VH * .45 : VH * .49;
+      p.stickY = Math.round(clamp(targetCenter - p.h / 2, 58, VH * .32));
+      p.el.style.setProperty('--stack-top', p.stickY + 'px');
+    }
     // the corner follows the picture: about 1.8% of its shorter side (a small panel ~2px, a big print ~10px)
     for (const p of plates) if (p.frame) {
       const s = Math.min(p.frame.offsetWidth, p.frame.offsetHeight);
