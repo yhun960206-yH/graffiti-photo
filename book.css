@@ -13,18 +13,27 @@
   .vi__text + .vi__date { margin-top: 28px; }
   .vi__meta { margin-top: 6px; }
 
-  /* ───── the sequence (phone first) ───── */
+  /* ───── the sequence (phone first: clean centred viewing, generous image size, sticky stacking on series groups) ───── */
   .plates { padding-bottom: var(--sec); }
   .sp { padding: var(--sec) var(--gutter) 0; }
-  .sp--l .plate { width: 86%; }
-  .sp--r .plate { width: 86%; margin-left: auto; }
-  .sp--c .plate { width: 76%; margin-inline: auto; }
-  .sp--scroll .plate { width: 58%; margin-inline: auto; }
-  .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }  .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
-  .sp--emaki .plate + .plate { margin-top: 0; }
-  .sp--emaki .plate { padding-bottom: 66px; }
-  .pair { display: grid; gap: 0; }
-  .pair .plate:last-child { width: 62%; margin-left: auto; }
+  .sp--l .plate, .sp--r .plate, .sp--c .plate { width: 100%; margin-inline: auto; }
+  .sp--scroll .plate { width: 82%; margin-inline: auto; }
+  .sp--wide .plate, .sp--cinema .plate, .sp--emaki .plate { margin-inline: calc(var(--gutter) * -1); --note-in: 0px; }
+  .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: var(--gutter); }   /* edge-to-edge picture, caption keeps the page margin */
+  .sp--emaki .plate + .plate { margin-top: 12px; }
+  .sp--emaki .plate {
+    position: sticky; top: calc(var(--bar) + 12vh);
+    padding-bottom: 58px;
+  }
+  .sp--emaki .plate + .plate .plate__frame { box-shadow: 0 -14px 34px rgba(0, 0, 0, .34); }
+  .pair { display: grid; gap: 28px; }
+  .pair .plate:first-child { position: sticky; top: calc(var(--bar) + 10vh); z-index: 1; }
+  .pair .plate:last-child { position: relative; z-index: 2; width: 92%; margin-inline: auto; }
+  .pair .plate:last-child .plate__frame { box-shadow: 0 -14px 34px rgba(0, 0, 0, .32); }
+  @media (max-width: 699px) {
+    .row > .plate { position: sticky; top: calc(var(--bar) + 10vh); }
+    .row > .plate + .plate .plate__frame { box-shadow: 0 -14px 34px rgba(0, 0, 0, .32); }
+  }
 
   /* ───── end ───── */
   .vend { padding: var(--sec) var(--gutter) calc(var(--sec) * .6); display: grid; justify-items: start; gap: 10px; }
@@ -55,9 +64,10 @@
     .sp--cinema .plate, .sp--emaki .plate { grid-column: 1 / -1; width: 100%; margin: 0; --note-in: 22px; }
     .sp--emaki { row-gap: 0; }
     .sp--wide .note, .sp--cinema .note, .sp--emaki .note { left: 0; }
-    .pair { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); align-items: start; }
-    .pair .plate:first-child { grid-column: 1 / 8; width: min(100%, calc(74vh * var(--r))); }
-    .pair .plate:last-child { grid-column: 9 / 13; width: 100%; margin: 14vw 0 0; }
+    .pair { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 1.6vw, 28px); align-items: start; gap: 0; }
+    .pair .plate:first-child { position: static; grid-column: 1 / 8; width: min(100%, calc(74vh * var(--r))); }
+    .pair .plate:last-child { position: static; grid-column: 9 / 13; width: 100%; margin: 14vw 0 0; }
+    .pair .plate:last-child .plate__frame { box-shadow: none; }
 
     .vols { grid-template-columns: 1fr 1fr; }
     .vols a { padding: 48px var(--gutter); border-bottom: 0; }

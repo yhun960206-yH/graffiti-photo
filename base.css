@@ -45,7 +45,7 @@
     --gutter: 22px;
     --r-img: clamp(3px, .7vw, 10px); /* photos: a soft corner; each plate's own (flow.js → --rs) follows its size */
     --gap: 6px;            /* 屏风的缝 */
-    --sec: 130px;          /* 段与段之间的「間」 */
+    --sec: 84px;           /* 段与段之间的「間」（手机端更紧凑连贯，桌面端放大） */
     --bar: 52px;
     --safe-b: env(safe-area-inset-bottom, 0px);
     --e-soft: cubic-bezier(.22, 1, .36, 1);
@@ -98,7 +98,7 @@
 
   /* ───── cover: the picture carries a vertical title; the margin carries the seal ───── */
   .cv { display: grid; grid-template-columns: 1fr; padding-top: var(--bar); }
-  .cv__img { position: relative; height: min(calc(100svh - var(--bar) - 120px), 128vw); overflow: hidden; background: var(--paper-2); container-type: size; border-radius: var(--r-img); }
+  .cv__img { position: relative; height: min(calc(100svh - var(--bar) - 148px), 118vw); overflow: hidden; background: var(--paper-2); container-type: size; border-radius: var(--r-img); }
   .cv__img img { width: 100%; height: 100%; object-fit: cover; }
   .cv__img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to left, rgba(10, 10, 12, .38), rgba(10, 10, 12, 0) 38%); }
   .cv__t {
@@ -143,11 +143,15 @@
   .note__n { font-family: var(--f-sans); font-weight: 300; font-size: 10px; letter-spacing: .16em; opacity: .75; }
   .note__d { display: block; margin-top: 0; font-size: 8px; line-height: 1.5; letter-spacing: .1em; color: var(--mute); opacity: clamp(0, calc((var(--cp) - .6) * 1.15), .42); }
 
-  /* ───── screen (屏风): a row of equal-height panels with hairline gaps ───── */
-  .row { display: flex; align-items: flex-start; gap: var(--gap); }
-  .row > .plate { flex: var(--r) 1 0; min-width: 0; --note-in: 12px; }
-  .row .note__t { font-size: 12px; letter-spacing: .12em; }
-  .row .note__n { display: none; }
+  /* ───── screen (屏风): on phone each panel takes full readable width; on tablet/desktop a row of equal-height panels ───── */
+  .row { display: flex; flex-direction: column; gap: 36px; }
+  .row > .plate { width: 100%; min-width: 0; --note-in: 16px; }
+  @media (min-width: 700px) {
+    .row { flex-direction: row; align-items: flex-start; gap: var(--gap); }
+    .row > .plate { flex: var(--r) 1 0; width: auto; --note-in: 12px; }
+    .row .note__t { font-size: 12px; letter-spacing: .12em; }
+    .row .note__n { display: none; }
+  }
   @media (min-width: 1024px) {
     .row { --rowh: 72vh; width: min(100%, calc(var(--rowh) * var(--sum) + var(--gap) * (var(--n) - 1))); margin-inline: auto; }
     .row > .plate { --note-in: 18px; }
@@ -265,10 +269,16 @@
 
 /* ───── layer 2 · the pictures: each grows toward its best place, from the edge it belongs to (flow.js) ───── */
 @layer parts {
-  .plate__frame { transform-origin: var(--zo, 50% 100%); }
+  .plate__frame { position: relative; transform-origin: var(--zo, 50% 50%); }
+  .plate__frame::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: #0a0a0c; opacity: var(--dim, 0);
+  }
   .is-live .plate__frame, .is-live .plate__frame img, .is-live .note { will-change: transform; }   /* a GPU layer only while near the screen */
-  .sp--l { --zo: 0% 100%; }
-  .sp--r { --zo: 100% 100%; }
+  @media (min-width: 1024px) {
+    .sp--l { --zo: 0% 100%; }
+    .sp--r { --zo: 100% 100%; }
+  }
 }
 
 /* ───── layer 3 · the words: a caption that opens into the picture's story (flow.js + text.js) ─────
@@ -278,10 +288,14 @@
   .tale--side { margin-top: 18px; max-width: 30em; }
   .plate > .tale { margin-top: calc(var(--capspace, 64px) + 16px); }
   .plate:has(> .tale) { padding-bottom: 36px; }
-  .sp--l > .tale--side { width: 86%; }
-  .sp--r > .tale--side { width: 86%; margin-left: auto; }
-  .sp--c > .tale--side { width: 76%; margin-inline: auto; }
-  .sp--scroll > .tale--side { width: 58%; margin-inline: auto; }
+  .sp--l > .tale--side, .sp--r > .tale--side, .sp--c > .tale--side { width: 100%; }
+  .sp--scroll > .tale--side { width: 82%; margin-inline: auto; }
+  @media (min-width: 1024px) {
+    .sp--l > .tale--side { width: auto; }
+    .sp--r > .tale--side { width: auto; margin-left: 0; }
+    .sp--c > .tale--side { width: auto; margin-inline: 0; }
+    .sp--scroll > .tale--side { width: auto; margin-inline: 0; }
+  }
   .row .plate .tale { font-size: 12.5px; }
   /* on a wide picture the words float on it */
   .tale--float {
@@ -315,7 +329,9 @@
     .note__t { color: var(--ink) !important; }
     [data-float] { transform: none !important; }
     [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
-    .plate__frame, .plate__frame img { transform: none !important; }
+    .plate { position: relative !important; top: auto !important; }
+    .plate__frame, .plate__frame img { transform: none !important; box-shadow: none !important; }
+    .plate__frame::after { opacity: 0 !important; }
     .note, .tale, .vi__text p, .vi__date, .vi__meta, .vend > *, .about > *, .close > *, .cv__t, .cv__lede, .cv__meta, .cv__no, .hx__top, .hx__t, .hx__dir { translate: none !important; }
     .dc__m { animation: none !important; }
     .dc { translate: none !important; }

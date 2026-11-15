@@ -41,7 +41,7 @@ export const volumes = [
     decor: ['shard', 'blossom', 'bean'],
     gear: 'Canon EOS R5 Mark II · RF50mm F1.8',
     cover: 24, coverPos: '50% 45%',
-    feature: { plate: 8, ar: '3/2', pos: '50% 50%' },
+    feature: { plate: 8, ar: '3/2', pos: '50% 38%' },
     plates: {
       1:  { d: '2026.02.04 · 13:16', x: 'f/4.5 · 1/250 · ISO 100', ar: '3/2' },
       2:  { d: '2026.02.04 · 13:17', x: 'f/4.5 · 1/200 · ISO 100', ar: '2/3' },
@@ -93,7 +93,7 @@ export const volumes = [
     decor: ['loupe', 'bowtie', 'specs', 'ball', 'blossom', 'mote'],
     gear: NZ_TAM, theme: 'night',
     cover: 5, coverPos: '45% 40%',
-    feature: { plate: 2, ar: '2.35/1', pos: '50% 50%' },
+    feature: { plate: 2, ar: '2.35/1', pos: '50% 38%' },
     plates: {
       1:  { d: '2025.12.31', ar: '2.35/1' },
       2:  { d: '2025.12.31', ar: '2.35/1' },

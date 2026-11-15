@@ -36,16 +36,21 @@
   const near = (top, h, before = 1.5, after = .6) => top < VH * before && top + h > -VH * after;
   // where a picture's top sits when it is best seen: the picture and the caption under it centred together
   // (a picture too tall for that sits just under the top bar). Everything about it is finished by then.
-  const CAP = 56;
-  const readAt = h => h + CAP < VH * .9 ? (VH - h - CAP) / 2 : VH * .07;
+  const CAP = 52;
+  const readAt = h => h + CAP < VH * .9 ? Math.max(VH * .1, (VH - h - CAP) * (VW < 768 ? .42 : .48)) : VH * .07;
 
   /* ── 1. notes ─────────────────────────────────────────────────── */
   const plates = $$('.plate').map(el => ({
     el, body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'),
     flat: !!el.closest('.row, .sp--emaki'),                        // panels that touch: only the picture inside breathes
-    top: 0, h: 0, cp: -1, zs: -1, live: false,
+    stackNext: null,
+    top: 0, h: 0, cp: -1, zs: -1, dim: 0, live: false,
   }));
+  for (const grp of $$('.sp--emaki, .pair, .row')) {
+    const items = $$('.plate', grp).map(el => plates.find(p => p.el === el)).filter(Boolean);
+    for (let i = 0; i < items.length - 1; i++) items[i].stackNext = items[i + 1];
+  }
   function notes() {
     for (const p of plates) {
       const top = p.top - Y;
@@ -68,14 +73,30 @@
       const live = !still() && near(top, p.h, 1.5, .5);
       let zs = 1, zi = 1;
       if (live) {
-        const d = (top + p.h / 2 - VH / 2) / VH;                    // 0 = centred on screen
+        const eye = VW < 768 ? VH * .45 : VH * .5;
+        const d = (top + p.h / 2 - eye) / VH;                       // 0 = at optimal viewing level
         const e = smooth(clamp(1 - Math.abs(d) / .85));
-        zs = .9 + .1 * e; zi = 1.14 - .14 * e;
+        zs = .92 + .08 * e; zi = 1.12 - .12 * e;
       }
-      if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }   // a GPU layer only while it moves
+      let dim = 0;
+      const nxt = p.stackNext;
+      const canStack = nxt && (!p.el.closest('.row') || VW < 700) && (!p.el.closest('.pair') || VW < 1024);
+      if (!still() && canStack) {
+        const stickyTop = 52 + VH * .11;
+        const nTop = nxt.top - Y;
+        const overlap = clamp((stickyTop + p.h - nTop) / Math.max(120, p.h * .85));
+        if (overlap > 0) {
+          const se = smooth(overlap);
+          zs *= (1 - .055 * se);
+          dim = Math.round(se * .32 * 40) / 40;
+        }
+      }
+      if (live !== p.live) { p.live = live; p.el.classList.toggle('is-live', live); }
+      if (dim !== p.dim && p.frame) { p.dim = dim; p.frame.style.setProperty('--dim', dim ? dim.toFixed(3) : '0'); }
       if (Math.abs(zs - p.zs) < .001) continue;
       p.zs = zs;
-      if (p.frame && !p.flat) p.frame.style.transform = zs === 1 ? '' : `scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1)`;
+      const allowFrameScale = !p.flat || p.dim > 0 || VW < 700;
+      if (p.frame && allowFrameScale) p.frame.style.transform = zs === 1 ? '' : `scale3d(${zs.toFixed(4)}, ${zs.toFixed(4)}, 1)`;
       if (p.img) p.img.style.transform = zi === 1 ? '' : `scale3d(${zi.toFixed(4)}, ${zi.toFixed(4)}, 1)`;
     }
   }
