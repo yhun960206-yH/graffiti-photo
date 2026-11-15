@@ -33,7 +33,7 @@ const COPY = applyCopy(volumes, join(root, 'copy'));
 
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = n => String(n).padStart(2, '0');
-const CN = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
+const CN = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '二十一', '二十二', '二十三', '二十四', '二十五', '二十六', '二十七', '二十八', '二十九', '三十'];
 const ratio = ar => { const [a, b] = String(ar).split('/').map(Number); return b ? a / b : a; };
 const r4 = x => Math.round(x * 10000) / 10000;
 const count = v => Object.keys(v.plates).length;

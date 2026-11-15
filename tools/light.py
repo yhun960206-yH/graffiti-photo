@@ -102,6 +102,7 @@ for d in sorted(glob.glob(os.path.join(ROOT, 'images/series/*'))):
         per[str(n)] = hexof(toned_paper(L))
         g = im.copy(); g.thumbnail((56, 56))
         glow(lin(np.asarray(g).astype(float) / 255), dark, os.path.join(d, f'glow-{n:02d}.webp'))
+        bim = im.copy(); bim.thumbnail((320, 320), Image.Resampling.LANCZOS); bim.filter(ImageFilter.GaussianBlur(radius=14)).save(os.path.join(d, f'blur-{n:02d}.webp'), 'WEBP', quality=78)
     out[slug] = {'night': dark, 'plates': per}
     print(f'{slug:9s}', ' '.join(per.values()))
 json.dump(out, open(os.path.join(ROOT, 'tools/light.json'), 'w'), indent=2)
