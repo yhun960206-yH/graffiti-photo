@@ -180,19 +180,33 @@
   const words = [];
   const cvEl = document.querySelector('.cv');
   const cvImg = document.querySelector('.cv__img');
+  const cvBase = document.querySelector('.cv__base');
+  const cvBlur = document.querySelector('.cv__blur');
+  const cvTitle = document.querySelector('.cv__t');
   const platesBox = document.getElementById('plates');
   let cvSpan = 0, cvProg = -1;
   function depth() {
-    if (!cvEl) return;
+    if (!cvImg) return;
     if (still()) {
-      if (cvProg !== 0) { cvProg = 0; cvEl.style.setProperty('--cv-p', '0'); }
+      if (cvProg !== 0) {
+        cvProg = 0;
+        cvImg.style.opacity = '1';
+        if (cvBase) cvBase.style.opacity = '1';
+        if (cvBlur) cvBlur.style.opacity = '0';
+        if (cvTitle) cvTitle.style.opacity = '1';
+      }
       return;
     }
-    const span = cvSpan || Math.max(280, VH * .68);
+    const span = cvSpan || Math.max(220, VH * .52);
     const t = clamp(Y / span, 0, 1);
     if (t === cvProg) return;
     cvProg = t;
-    cvEl.style.setProperty('--cv-p', t.toFixed(4));
+    const blurIn = clamp(t * 1.45, 0, 1);
+    const imgOp = clamp(1 - t * .92, .06, 1);
+    cvImg.style.opacity = imgOp.toFixed(3);
+    if (cvBase) cvBase.style.opacity = (1 - blurIn * .92).toFixed(3);
+    if (cvBlur) cvBlur.style.opacity = blurIn.toFixed(3);
+    if (cvTitle) cvTitle.style.opacity = clamp(1 - t * 1.05, .04, 1).toFixed(3);
   }
 
   /* ── 6. light: the paper, lit by whatever picture is above it ──── */
@@ -244,7 +258,7 @@
     root.classList.add('is-measuring');
     for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     // 1. Read all layout geometry in a single clean pass (zero interleaved style writes = zero layout thrashing)
-    if (cvImg) cvSpan = Math.max(260, cvImg.getBoundingClientRect().height * .92);
+    if (cvImg) cvSpan = Math.max(220, cvImg.getBoundingClientRect().height * .65);
     else if (cvEl) cvSpan = Math.max(260, cvEl.getBoundingClientRect().height * .82);
     cvProg = -1;
     const targetCenter = VW < 768 ? VH * .45 : VH * .49;

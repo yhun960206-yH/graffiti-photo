@@ -12,7 +12,7 @@ tools/light.py —— 把每张照片当成一张被光照透的幻灯片：光�
      预先做成很小的模糊图（几 KB），网页上放大铺在照片后面——浏览器不用做任何实时模糊。
 """
 import json, glob, os
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageFilter
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -121,13 +121,14 @@ function spread(v, s, nums) {
 }
 
 /* the cover: a picture with the title set vertically on it, a margin with the seal */
-function cover({ img, smImg, pos, alt, title, side, prefix = '' }) {
+function cover({ img, smImg, blurImg, pos, alt, title, side, prefix = '' }) {
   const srcset = smImg ? ` srcset="${prefix}${smImg} 900w, ${prefix}${img} 2400w" sizes="(max-width: 768px) 100vw, 75vw"` : '';
+  const bSrc = blurImg || (smImg ? smImg.replace('/sm-', '/blur-').replace('.jpg', '.webp') : img);
   return `
     <section class="cv">
       <div class="cv__img">
         <img class="cv__base" src="${prefix}${img}"${srcset} alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
-        <img class="cv__blur" src="${prefix}${smImg || img}" alt="" aria-hidden="true" style="object-position:${pos || '50% 50%'}" decoding="async">
+        <img class="cv__blur" src="${prefix}${bSrc}" alt="" aria-hidden="true" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
       </div>
       <h1 class="cv__t" data-float=".12" data-fx="ink">${esc(title)}</h1>
       <div class="cv__side">
