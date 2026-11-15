@@ -37,6 +37,30 @@ const NZ_50 = 'Nikon Z 8 · 50mm f/1.8';
 
 export const volumes = [
   {
+    slug: 'polaroid', kind: '人像 · 拍立得', year: '2026', date: '2026.03.06',
+    decor: ['instax', 'film', 'spark'],
+    gear: 'Instant Film', theme: 'night',
+    cover: 2, coverPos: '50% 42%',
+    feature: { plate: 2, ar: '67/80', pos: '50% 42%' },
+    plates: {
+      1: { d: '2026.03.06', ar: '67/80' },
+      2: { d: '2026.03.06', ar: '67/80' },
+      3: { d: '2026.03.06', ar: '67/80' },
+      4: { d: '2026.03.06', ar: '67/80' },
+      5: { d: '2026.03.06', ar: '67/80' },
+      6: { d: '2026.03.06', ar: '67/80' },
+      7: { d: '2026.03.06', ar: '67/80' },
+      8: { d: '2026.03.06', ar: '67/80' },
+    },
+    spreads: [
+      { layout: 'single', align: 'l', plates: [1] },
+      { layout: 'screen', plates: [2, 3] },
+      { layout: 'single', align: 'r', plates: [4] },
+      { layout: 'pair', plates: [5, 6] },
+      { layout: 'screen', plates: [7, 8] },
+    ],
+  },
+  {
     slug: 'lane', kind: '人像 · 街头', year: '2026', date: '2026.02.04',
     decor: ['shard', 'blossom', 'bean'],
     gear: 'Canon EOS R5 Mark II · RF50mm F1.8',

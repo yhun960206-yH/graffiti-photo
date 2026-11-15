@@ -19,6 +19,32 @@
      soft: a glow — may sit behind text, only its centre has to be on paper */
   const INK = '#2b2a27';
   const M = {
+    // 小玖 假如是拍立得：拍立得机身与彩虹条 · 吐出的白边相纸 · 闪光灯星芒
+    instax: { move: 'bob', size: [32, 48], w: 2, a: .9, svg: `
+      <g transform="rotate(-8 50 50)">
+        <rect x="14" y="18" width="72" height="58" rx="9" fill="#f3efe6" stroke="${INK}" stroke-width="3"/>
+        <rect x="22" y="25" width="16" height="10" rx="2" fill="#cfe3ea" stroke="${INK}" stroke-width="2.2"/>
+        <circle cx="72" cy="30" r="4.5" fill="#d9534f"/>
+        <rect x="46" y="48" width="8" height="26" fill="#e05a47"/>
+        <rect x="48.5" y="48" width="3" height="26" fill="#5bc0de"/>
+        <circle cx="50" cy="46" r="16" fill="${INK}"/><circle cx="50" cy="46" r="9" fill="#5c6f7e"/><circle cx="46" cy="42" r="2.8" fill="#fff"/>
+        <line x1="20" y1="70" x2="80" y2="70" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+      </g>` },
+    film: { move: 'drift', size: [28, 44], w: 4, a: .9, svg: [
+      `<g transform="rotate(-14 50 50)">
+        <rect x="20" y="10" width="60" height="76" rx="3" fill="#f7f4ec" stroke="#b8b2a6" stroke-width="2"/>
+        <rect x="26" y="16" width="48" height="48" fill="#2b3033"/>
+        <path d="M34 52 q8 -14 16 -4 t16 -8" fill="none" stroke="#f7f4ec" stroke-width="2.2" stroke-linecap="round" opacity=".8"/>
+      </g>`,
+      `<g transform="rotate(12 50 50)">
+        <rect x="20" y="10" width="60" height="76" rx="3" fill="#f7f4ec" stroke="#b8b2a6" stroke-width="2"/>
+        <rect x="26" y="16" width="48" height="48" fill="#322d31"/>
+        <circle cx="50" cy="38" r="10" fill="none" stroke="#f4dc9a" stroke-width="2" opacity=".75"/>
+      </g>`,
+    ] },
+    spark: { move: 'tumble', size: [16, 26], w: 3, a: .88, svg: `
+      <path d="M50 8 Q50 50 92 50 Q50 50 50 92 Q50 50 8 50 Q50 50 50 8 Z" fill="#fff8e7" stroke="#e6d296" stroke-width="2" stroke-linejoin="round"/>` },
+
     // 巷子里：贴满墙的青花碎瓷片 · 古着店门口的粉色花 · 黑板上的粉笔咖啡豆
     shard: { move: 'tumble', size: [30, 58], w: 4, a: .9, svg: [
       ['M10 34 L44 6 L86 18 L94 56 L64 92 L22 82 Z', 'M26 46 q11 -13 22 0 t22 0', '<circle cx="38" cy="66" r="5"/><path d="M58 24 l6 8 l8 -6" fill="none" stroke-width="2.5"/>'],
