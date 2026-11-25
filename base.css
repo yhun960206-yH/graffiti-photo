@@ -75,18 +75,22 @@
 }
 
 @layer parts {
-  /* ───── top bar ───── */
+  /* ───── top bar: blends seamlessly into the background with a delicate hairline ───── */
   .bar {
     position: fixed; inset: 0 0 auto 0; z-index: 50; height: var(--bar);
     display: flex; align-items: center; gap: 28px; padding: 0 var(--gutter);
     font-size: 13px; letter-spacing: .24em;
-    background: color-mix(in srgb, var(--paper) 97%, transparent);
+    color: rgba(244, 241, 234, .92);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, .55);
+    background: linear-gradient(to bottom, rgba(var(--bar-rgb, 10, 10, 12), .36) 0%, rgba(var(--bar-rgb, 10, 10, 12), .1) 68%, transparent 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, .45);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .1);
     transition: transform .6s var(--e-soft);
   }
   .bar.is-hidden { transform: translateY(-100%); }
   .bar__home { margin-right: auto; font-family: var(--f-serif); letter-spacing: .34em; min-height: 44px; display: flex; align-items: center; }
   .bar a:hover { opacity: .55; }
-  .bar__n { color: var(--mute); font-size: var(--t-note); }
+  .bar__n { color: rgba(235, 233, 228, .66); font-size: var(--t-note); }
 
   /* ───── seal: a small vermilion stamp ───── */
   .seal {

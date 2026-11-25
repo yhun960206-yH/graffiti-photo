@@ -236,7 +236,7 @@
     const key = c.join(',');
     if (key === barTint) return;
     barTint = key;
-    bar.style.backgroundColor = `rgba(${key},.97)`;
+    bar.style.setProperty('--bar-rgb', key);
     if (meta && !scrolling()) {
       const hex = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
       if (hex !== metaHex) { metaHex = hex; meta.content = hex; }
