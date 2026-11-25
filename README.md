@@ -45,6 +45,7 @@
 | 文件 / 目录 | 作用 |
 |---|---|
 | `index.html` | 首页（目录 `@works`、季节 `@season`、统计 `@total`、年份 `@year` 由构建脚本自动更新） |
+| `about.html` / `about.css` | 个人信息名片页（点击全站任意朱红印章 `.seal` 进入） |
 | `series/*.html` | 各卷独立页面，**由 `tools/build-series.mjs` 自动生成，勿手改** |
 | `404.html` | 深色极简 404 页 |
 | `base.css` | 共用基础：CSS `@layer` 分层、设计 Token、自托管字体、顶栏、朱印、封面、图注、灯箱、动效与长截图规则 |

@@ -55,7 +55,7 @@ const count = v => Object.keys(v.plates).length;
 const item = x => (typeof x === 'object' ? x : { n: x });
 volumes.forEach((v, i) => { v.no = i + 1; });
 
-const SEAL = `<span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>`;
+const SEAL = `<a class="seal" href="../about.html" aria-label="涂鸦 · 个人信息" title="查看个人信息"><span>涂</span><span>鸦</span></a>`;
 
 /* automatic spreads by ratio, used when a volume has no `spreads` */
 function autoSpreads(v) {
@@ -352,6 +352,13 @@ html = html.replace(/<!-- @total -->[^<]*<!-- \/@total -->/g, `<!-- @total -->${
 if (season) html = html.replace(/<!-- @season -->[^<]*<!-- \/@season -->/g, `<!-- @season -->${season}<!-- /@season -->`);
 html = html.replace(/<!-- @year -->[^<]*<!-- \/@year -->/g, `<!-- @year -->${nowYear}<!-- /@year -->`);
 writeFileSync(indexPath, html);
+const aboutPath = join(root, 'about.html');
+if (existsSync(aboutPath)) {
+  let aboutHtml = readFileSync(aboutPath, 'utf8');
+  aboutHtml = aboutHtml.replace(/<!-- @total -->[^<]*<!-- \/@total -->/g, `<!-- @total -->${cnNum(volumes.length)}卷 · ${total} 张<!-- /@total -->`);
+  aboutHtml = aboutHtml.replace(/<!-- @year -->[^<]*<!-- \/@year -->/g, `<!-- @year -->${nowYear}<!-- /@year -->`);
+  writeFileSync(aboutPath, aboutHtml);
+}
 console.log(`index.html  ·  ${volumes.length} volumes · ${total} photos${season ? ` · ${season}` : ''}`);
 
 /* ═════════ cache busting ═════════
@@ -367,7 +374,8 @@ const stampFonts = file => {
   const s = readFileSync(file, 'utf8'), h = s.replace(/(fonts\/)([\w-]+\.woff2)(?:\?v=\w+)?/g, (m, a, f) => fontVer[f] ? `${a}${f}?v=${fontVer[f]}` : m);
   if (h !== s) writeFileSync(file, h);
 };
-[join(root, 'base.css'), indexPath, join(root, '404.html'), ...volumes.map(v => join(outDir, `${v.slug}.html`))].forEach(stampFonts);
+const extraPages = [indexPath, join(root, '404.html'), ...(existsSync(aboutPath) ? [aboutPath] : [])];
+[join(root, 'base.css'), ...extraPages, ...volumes.map(v => join(outDir, `${v.slug}.html`))].forEach(stampFonts);
 const ASSETS = readdirSync(root).filter(f => /\.(css|js)$/.test(f));
 // line endings ignored: Windows checkouts have CRLF, GitHub's runner LF — both must give the same stamp
 const hash = f => createHash('sha1').update(readFileSync(join(root, f), 'utf8').replace(/\r\n/g, '\n')).digest('hex').slice(0, 8);
@@ -377,7 +385,7 @@ const stamp = file => {
     (m, a, pre, f) => ver[f] ? `${a}${pre}${f}?v=${ver[f]}"` : m);
   writeFileSync(file, h);
 };
-[indexPath, join(root, '404.html'), ...volumes.map(v => join(outDir, `${v.slug}.html`))].forEach(stamp);
+[...extraPages, ...volumes.map(v => join(outDir, `${v.slug}.html`))].forEach(stamp);
 console.log(`cache  ·  ${ASSETS.map(f => `${f}?v=${ver[f]}`).join(' ')}`);
 
 /* ═════════ proofing: proof.html (only on this computer — not published) ═════════
