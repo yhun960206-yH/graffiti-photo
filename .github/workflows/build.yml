@@ -53,17 +53,8 @@ jobs:
       - name: 字体：收进新出现的字
         run: python tools/fonts.py ~/_fonts-src && node tools/build-series.mjs > /dev/null
 
-      # 生成的结果存回仓库，电脑和手机下次取回时就是最新的（推送由机器人完成，不会再触发这一流程）
-      - name: 存回仓库
-        run: |
-          rm -f proof.html
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then echo "没有需要存回的改动"; else
-            git commit -q -m "自动生成：网页与字体"
-            git push || echo "::warning::存回仓库失败（期间可能又有推送），网站照常发布"
-          fi
+      - name: 清理校对页
+        run: rm -f proof.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
@@ -71,3 +62,14 @@ jobs:
           path: .
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      # 生成的结果存回仓库，电脑和手机下次取回时就是最新的（放在部署之后，避免提前推新提交导致 deploy-pages 校验失败）
+      - name: 存回仓库
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "没有需要存回的改动"; else
+            git commit -q -m "自动生成：网页与字体"
+            git push || echo "::warning::存回仓库失败（期间可能又有推送），网站照常发布"
+          fi
