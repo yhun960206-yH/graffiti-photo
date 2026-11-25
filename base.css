@@ -256,7 +256,6 @@
   /* fixed numbers only inside keyframes, so the GPU can run them without the page; each motif's own
      turn (--r) and opacity sit on the still wrapper */
   .dc { opacity: var(--a); rotate: var(--r, 0deg); }
-  .dc.hush { opacity: .12; }
   .dc__m { opacity: 1; animation: none var(--d) var(--dl) infinite ease-in-out var(--dir) both; animation-play-state: paused; }
   .dc.on .dc__m { animation-play-state: running; }
   .dc--fall    { animation-name: dc-fall;    animation-timing-function: linear; }
@@ -360,7 +359,6 @@
     .decor { position: absolute; inset: auto; left: 0; top: 0; }
     .plate { --cp: 1 !important; }
     .note__t { color: var(--ink) !important; }
-    [data-float] { transform: none !important; }
     [data-fx] .ch { opacity: 1 !important; filter: none !important; transform: none !important; }
     .sp, .row, .pair { display: block !important; position: relative !important; top: auto !important; }
     .cv { --cv-p: 0 !important; } .cv__img, .cv__t, .cv__base { opacity: 1 !important; } .cv__blur { opacity: 0 !important; }

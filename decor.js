@@ -201,13 +201,9 @@
   // the same page always gets the same arrangement
   const seedOf = s => [...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619), 2166136261) >>> 0;
   const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  const BLOCK = '.plate__frame, .cv__img, .hx, .bar, img:not(.glow)';
-  const WORDS = 'p, h1, h2, .plate, .note, .seal, .vols a, .foot, .dir';
-  const TEXT = 'p, h1, h2, .note, .tale, .dir, .vols a';           // what a passing motif must not cover
-
   // a still turn for each motif: loose things lie any way up, upright things only lean a little
   const turn = p => p.soft || p.m.move === 'glide' ? 0 : ['fall', 'drift', 'tumble'].includes(p.m.move) ? p.rot % 360 : p.sw * .25;
-  let items = [], bands = [], built = '', wordRects = [], moving = false, stableVH = innerHeight, stableVW = innerWidth;
+  let items = [], bands = [], built = '', moving = false, stableVH = innerHeight, stableVW = innerWidth;
   let lastScrollAt = -1e9;
   function build() {
     if (performance.now() - lastScrollAt < 360) { scheduleBuild(240); return; }
@@ -229,7 +225,6 @@
       : [...document.querySelectorAll('.plate__frame')].map(el => rect(el, 6)).filter(Boolean);
     const blocks = [...plateRects, ...[...document.querySelectorAll('.cv__img, .hx, .bar')].map(el => rect(el, 6)).filter(Boolean)];
     const words = [...plateRects, ...[...document.querySelectorAll('.vi, .vend, .vols, .foot, .dir, .cv__side')].map(el => rect(el, 14)).filter(Boolean)];
-    wordRects = [...document.querySelectorAll('.vi p, .vend p, .vols a, .dir')].map(el => rect(el, 22)).filter(Boolean);
     const hit = (list, x0, y0, x1, y1) => list.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
 
     // the page is cut into bands; each band has its own fixed random numbers,

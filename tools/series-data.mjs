@@ -8,14 +8,12 @@
 //
 // 图片字段   d 日期时间 · x 拍摄参数 · ar 版面比例（裁切）· pos 裁切焦点
 //
-// 版式（spreads）—— 每一项是一「段」，看图时在这里停一下：
-//   single  单张，align: 'l' 偏左 / 'r' 偏右 / 'c' 居中（留白不对称）
-//   scroll  挂轴：竖长裁切（默认 1:2），窄而高，四周大片留白
-//   screen  屏风：一行 2–3 张等高，缝隙极窄
-//   pair    错落的一大一小
-//   wide    16:9 宽幅          cinema 宽银幕（2.35:1）
-//   emaki   绘卷：几张宽银幕上下相接，像展开的长卷
-//   单张可以写成 { n: 6, ar: '1/2', pos: '50% 30%' } 来改这一处的裁切
+// 版式（spreads）—— 控制内页出图顺序、局部裁切覆盖（ar/pos）与故事呈现方式：
+//   当前内页（book.css）统一采用单列居中粘性堆叠卡片流（.plates），
+//   spreads 中的 single / scroll / screen / pair / wide / cinema / emaki 仍用于：
+//   1. 决定各张照片的阅读顺序与编号（图 01 为封面，其余按 spreads 顺序编号）
+//   2. 覆盖单张裁切与焦点，如 { n: 6, ar: '1/2', pos: '50% 30%' }（scroll 默认 1/2，emaki 默认 2.35/1）
+//   3. 决定故事位置：wide / cinema / emaki 浮在图上，其余排在图旁/图下；同时供 proof.html 校对参考
 //
 // 卷的其他字段
 //   cover 封面图 · coverPos 封面焦点 · feature 首页代表图 { plate, ar, pos }

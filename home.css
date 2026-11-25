@@ -17,11 +17,59 @@
   .hx { display: grid; color: #fff; isolation: isolate; background: #141416; }
   .hx > * { grid-area: 1 / 1; }
   .hx__bg { position: sticky; top: 0; height: 100svh; overflow: hidden; z-index: -1; border-radius: var(--r-img); }
-  .hx__bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.06); transition: opacity 1.4s var(--e-soft), transform 3.2s var(--e-soft); }
-  .hx__bg img.is-on { opacity: 1; transform: none; }
-  .hx__bg::after { content: ""; position: absolute; inset: 0; background:
+  .hx__layer { position: absolute; inset: 0; opacity: 0; transition: opacity 1.3s var(--e-soft); overflow: hidden; }
+  .hx__layer.is-on { opacity: 1; }
+  .hx__layer img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 3.2s var(--e-soft); }
+  .hx__layer.is-on img { transform: none; }
+
+  /* 横屏窗口无横图：竖图完整居右，左侧以图片左边缘三段色值无缝渐变延伸 */
+  .hx__layer--right {
+    --seam: max(0px, calc(100% - 100svh * var(--ar, 0.67)));
+    background:
+      linear-gradient(to right,
+        color-mix(in srgb, var(--base, #141416) 76%, var(--e2, #141416)) 0%,
+        color-mix(in srgb, var(--base, #141416) 36%, transparent) calc(var(--seam) * .72),
+        transparent calc(var(--seam) + 28px)),
+      linear-gradient(to bottom, var(--e1, #141416) 0%, var(--e2, #141416) 50%, var(--e3, #141416) 100%);
+  }
+  .hx__layer--right img {
+    left: auto; right: 0; top: 0; bottom: 0;
+    width: auto; height: 100%; max-width: 100%;
+    transform-origin: right center;
+    transform: scale(1.03);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, .48) 5%, rgba(0, 0, 0, .9) 11%, #000 18%, #000 100%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, .48) 5%, rgba(0, 0, 0, .9) 11%, #000 18%, #000 100%);
+  }
+
+  /* 竖屏窗口无竖图：横/方图完整居顶（避开顶栏），下方以图片下边缘三段色值无缝渐变延伸 */
+  .hx__layer--top {
+    --seam: min(100%, calc(var(--bar) + 100vw / var(--ar, 1.5)));
+    background:
+      linear-gradient(to bottom,
+        color-mix(in srgb, var(--base, #141416) 72%, var(--e2, #141416)) 0%,
+        transparent calc(var(--bar) + 12px),
+        transparent max(var(--bar), calc(var(--seam) - 28px)),
+        color-mix(in srgb, var(--base, #141416) 44%, transparent) calc(var(--seam) + (100% - var(--seam)) * .36),
+        color-mix(in srgb, var(--base, #141416) 82%, var(--e2, #141416)) 100%),
+      linear-gradient(to right, var(--e1, #141416) 0%, var(--e2, #141416) 50%, var(--e3, #141416) 100%);
+  }
+  .hx__layer--top img {
+    top: var(--bar); left: 0; right: 0; bottom: auto;
+    width: 100%; height: auto; max-height: calc(100% - var(--bar));
+    transform-origin: center top;
+    transform: scale(1.03);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 80%, rgba(0, 0, 0, .52) 92%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 80%, rgba(0, 0, 0, .52) 92%, transparent 100%);
+  }
+
+  .hx__bg::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; transition: opacity .9s var(--e-soft); background:
       linear-gradient(to top, rgba(10, 10, 12, .76), rgba(10, 10, 12, .08) 46%, rgba(10, 10, 12, .22)),
       linear-gradient(to right, rgba(10, 10, 12, .28), rgba(10, 10, 12, 0) 52%); }
+  .hx__bg.is-right::after { background:
+      linear-gradient(to right, rgba(10, 10, 12, .56) 0%, rgba(10, 10, 12, .26) 42%, rgba(10, 10, 12, 0) 68%),
+      linear-gradient(to top, rgba(10, 10, 12, .48), rgba(10, 10, 12, .04) 40%, rgba(10, 10, 12, .16)); }
+  .hx__bg.is-top::after { background:
+      linear-gradient(to top, rgba(10, 10, 12, .68) 0%, rgba(10, 10, 12, .34) 48%, rgba(10, 10, 12, .26) 78%, rgba(10, 10, 12, .38) 100%); }
 
   .hx__fg { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; padding: calc(var(--bar) + 22px) var(--gutter) calc(30px + var(--safe-b)); }
   .hx__top { display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: start; }

@@ -1,18 +1,15 @@
 /* ==========================================================
    flow.js —— 看图的节奏（主页与每一卷共用）
 
-   1. NOTES  每张图的说明：图片还在下方、来到最佳位置时，说明压在图上
-             （白字，只有编号与标题）；图片继续往上走，说明落到图下，
-             补出日期与参数。屏幕外的图一律是「落在图下」的成品状态，
-             所以长截图、打印永远完整。
-   3. ZOOM   图片离最佳位置越近越大：从它所在的一侧（偏左的从左下角、偏右的从右下角）长出来，
-             里面的照片同时轻轻退远一点。屏幕外、长截图里都是原大。
-   4. TALE   图的故事（.tale）随图片滑过一个字一个字出来；往回滑，又一个字一个字收回去。
-   6. LIGHT  页面背景是「被照片透过的光照着的纸」：每张图那一段的纸是它投下的颜色，图与图之间慢慢过渡。
-             整页是一条预先算好的渐变（尺寸变了才重算），滚动时不用做任何事；顶栏跟着当前位置的颜色。
-   5. DEPTH  层次全靠滚动时的速度差：图片与页面同速（基准）；背景插画比它快（在后，decor.js）；
-             文字比它慢（在前）——图注稍慢，正文、故事更慢，大标题最慢。
-             每个字块在屏幕正中时回到原位，所以静止阅读时版式不变；长截图里一律原位。
+   1. NOTES  每张图的说明：图片进入视口时说明压在图上（白字，只有标题）；
+             滑至驻留位前落到图下，补出时间与参数。屏幕外一律是「落在图下」
+             的成品状态，所以长截图、打印永远完整。
+   2. STACK  统一粘性堆叠：横幅与竖幅共用同一堆叠流，逐张微倾叠放；
+             被压两层以上的旧卡片自动隐藏并释放 GPU 图层，长卷快速滑动不爆内存。
+   3. TALE   图的故事（.tale）随图片滑过逐字展开；往回滑再逐字收起。
+   4. COVER  封面滚出时平滑叠加预烘焙模糊层（blur-NN.webp）并淡出标题。
+   5. LIGHT  页面背景为「被照片透过的光照着的纸」：每张图对应一段底色，
+             整页合成单条静态渐变（仅尺寸变化时重算），顶栏颜色随之平滑过渡。
    ========================================================== */
 (() => {
   const root = document.documentElement;
@@ -42,8 +39,8 @@
   /* ── 1. notes ─────────────────────────────────────────────────── */
   const TILT_ANGLES = [-2.6, 2.2, -1.8, 2.8, -2.3, 1.9, -2.5, 2.1];
   const plates = $$('.plate').map((el, idx) => ({
-    el, idx, sp: el.closest('.sp'),
-    body: el.querySelector('.plate__body'), note: el.querySelector('.note'), t: el.querySelector('.note__t'),
+    el, idx,
+    body: el.querySelector('.plate__body'),
     frame: el.querySelector('.plate__frame'), img: el.querySelector('.plate__frame img'), glow: el.querySelector('.glow'),
     isEnd: el.classList.contains('plate--end'), tiltMax: el.classList.contains('plate--end') ? 0 : TILT_ANGLES[idx % TILT_ANGLES.length],
     top: 0, left: 0, right: 0, h: 0, stickY: 88, cp: -1, zs: -1, tilt: 0, tx: 0, ty: 0, dim: 0, noteA: 1, cardA: 1, covered: false, buried: false, live: false, decoded: false,
@@ -176,8 +173,7 @@
     }
   }
 
-  /* ── 5. cover fade & depth: fade cover smoothly as the reader scrolls up into the stack ── */
-  const words = [];
+  /* ── 4. cover fade: fade cover smoothly as the reader scrolls up into the stack ── */
   const cvEl = document.querySelector('.cv');
   const cvImg = document.querySelector('.cv__img');
   const cvBase = document.querySelector('.cv__base');
@@ -253,22 +249,18 @@
     if (innerWidth !== VW || !VH) { VW = innerWidth; VH = innerHeight; }
     Y = scrollY;
     root.classList.add('is-measuring');
-    for (const w of words) if (w.off) w.el.style.translate = '';       // measure the words where they really sit
     // 1. Read all layout geometry in a single clean pass (zero interleaved style writes = zero layout thrashing)
     if (cvImg) cvSpan = Math.max(220, cvImg.getBoundingClientRect().height * .65);
     else if (cvEl) cvSpan = Math.max(260, cvEl.getBoundingClientRect().height * .82);
     cvProg = -1;
     const targetCenter = VW < 768 ? VH * .45 : VH * .49;
     const rsList = [];
-    let maxH = 0;
     for (const p of plates) {
       const r = p.body.getBoundingClientRect();
       p.top = r.top + Y; p.left = r.left; p.right = r.right; p.h = r.height; p.cp = p.zs = -1; p.tilt = 99;
       p.stickY = Math.round(clamp(targetCenter - p.h / 2, 58, VH * .32));
-      if (p.h > maxH) maxH = p.h;
       rsList.push(Math.min(r.width, r.height));
     }
-    for (const w of words) { const r = w.el.getBoundingClientRect(); w.top = r.top + Y; w.h = r.height; w.off = 0; }
     // 2. Write all CSS variables in one batch after reads complete
     if (platesBox && plates.length > 1) {
       const last = plates[plates.length - 1];
@@ -359,7 +351,7 @@
   frame();
 
   /* a long screenshot or a print needs every picture: fetch the rest then (only then — on a phone
-     fetching all 78 big pictures in the background would make scrolling stutter) */
+     fetching all full-res pictures in the background would make scrolling stutter) */
   const fetchAll = () => {
     const lazy = $$('img[loading="lazy"]');
     const next = () => {

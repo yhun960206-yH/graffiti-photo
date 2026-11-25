@@ -2,6 +2,7 @@
 // 取回线上的改动 → 生成网页 → 收进新出现的字 → 提交 → 推送到 GitHub
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
+import { createConnection } from 'node:net';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
@@ -10,8 +11,28 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const tool = (p, fallback) => (existsSync(p) ? p : fallback);
 const GIT = tool(join(homedir(), 'tools', 'mingit', 'cmd', 'git.exe'), 'git');
 const NODE = process.execPath;
-const PROXY = 'http://127.0.0.1:7897';
-const env = { ...process.env, HTTPS_PROXY: process.env.HTTPS_PROXY || PROXY, HTTP_PROXY: process.env.HTTP_PROXY || PROXY };
+const LOCAL_PROXY_HOST = '127.0.0.1';
+const LOCAL_PROXY_PORT = 7897;
+
+// 仅在系统未显式配置代理、且本机 7897 端口确实在监听时才注入代理，无代理环境下自动直连
+const portOpen = (host, port, ms = 150) => new Promise(resolve => {
+  const s = createConnection({ host, port });
+  const done = ok => { s.destroy(); resolve(ok); };
+  s.setTimeout(ms, () => done(false));
+  s.once('connect', () => done(true));
+  s.once('error', () => done(false));
+});
+
+const env = { ...process.env };
+if (!env.HTTPS_PROXY && !env.HTTP_PROXY && !env.https_proxy && !env.http_proxy) {
+  if (await portOpen(LOCAL_PROXY_HOST, LOCAL_PROXY_PORT)) {
+    const proxy = `http://${LOCAL_PROXY_HOST}:${LOCAL_PROXY_PORT}`;
+    env.HTTPS_PROXY = proxy;
+    env.HTTP_PROXY = proxy;
+    console.log(`[网络] 检测到本机代理 ${proxy}`);
+  }
+}
+
 const run = (cmd, args, quiet) => execFileSync(cmd, args, { cwd: root, env, stdio: quiet ? 'pipe' : 'inherit', encoding: 'utf8' });
 const msg = process.argv.slice(2).join(' ') || '更新文案';
 const fontsSrc = join(root, '..', '_fonts-src');

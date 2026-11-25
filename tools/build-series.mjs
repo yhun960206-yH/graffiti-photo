@@ -10,6 +10,7 @@ import * as data from './series-data.mjs';
 // the colour each picture casts on the paper, and its glow (made by tools/light.py)
 const LIGHT = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'light.json'), 'utf8'));
 const lightOf = (slug, n) => (LIGHT[slug] && LIGHT[slug].plates[n]) || '';
+const edgeOf = (slug, n) => (LIGHT[slug] && LIGHT[slug].edges && LIGHT[slug].edges[n]) || null;
 // dark paper: whatever light.py decided from the pictures, or the volume's own theme
 const darkOf = v => (LIGHT[v.slug] && LIGHT[v.slug].night) || v.theme === 'night';
 const { volumes, AUTHOR, BOOK } = data;
@@ -33,7 +34,21 @@ const COPY = applyCopy(volumes, join(root, 'copy'));
 
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = n => String(n).padStart(2, '0');
-const CN = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '二十一', '二十二', '二十三', '二十四', '二十五', '二十六', '二十七', '二十八', '二十九', '三十'];
+const DIG = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+const cnNum = n => {
+  if (n <= 10) return n === 10 ? '十' : DIG[n];
+  if (n < 20) return '十' + DIG[n % 10];
+  if (n < 100) return DIG[Math.floor(n / 10)] + '十' + (n % 10 ? DIG[n % 10] : '');
+  return String(n);
+};
+const seasonOf = dateStr => {
+  const m = String(dateStr || '').match(/^(\d{4})\.(\d{2})/);
+  if (!m) return '';
+  const yr = [...m[1]].map(d => DIG[Number(d)]).join('');
+  const mo = Number(m[2]);
+  const s = mo >= 3 && mo <= 5 ? '春' : mo >= 6 && mo <= 8 ? '夏' : mo >= 9 && mo <= 11 ? '秋' : '冬';
+  return `${yr} ${s}`;
+};
 const ratio = ar => { const [a, b] = String(ar).split('/').map(Number); return b ? a / b : a; };
 const r4 = x => Math.round(x * 10000) / 10000;
 const count = v => Object.keys(v.plates).length;
@@ -130,7 +145,7 @@ function cover({ img, smImg, blurImg, pos, alt, title, side, prefix = '' }) {
         <img class="cv__base" src="${prefix}${img}"${srcset} alt="${esc(alt)}" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
         <img class="cv__blur" src="${prefix}${bSrc}" alt="" aria-hidden="true" style="object-position:${pos || '50% 50%'}" fetchpriority="high" decoding="async">
       </div>
-      <h1 class="cv__t" data-float=".12" data-fx="ink">${esc(title)}</h1>
+      <h1 class="cv__t" data-fx="ink">${esc(title)}</h1>
       <div class="cv__side">
         ${SEAL}
         ${side}
@@ -147,7 +162,7 @@ function volumePage(v, i) {
     ${spread(v, s, nums)}
     </section>`).join('');
   const ledeHtml = v.lede ? `<p class="cv__lede">${esc(v.lede)}</p>\n        ` : '';
-  const side = `${ledeHtml}<div class="cv__meta"><p class="cv__date">${esc(v.date)}</p><p class="t-note">第${CN[v.no]}卷 · ${count(v)} 张</p></div>`;
+  const side = `${ledeHtml}<div class="cv__meta"><p class="cv__date">${esc(v.date)}</p><p class="t-note">第${cnNum(v.no)}卷 · ${count(v)} 张</p></div>`;
   const desc = v.lede ? `${v.lede}　${AUTHOR}的摄影作品。` : `${v.title} · ${v.date} · ${count(v)} 张 · ${AUTHOR}的摄影作品。`;
   const ogDesc = v.lede || `${v.date} · ${count(v)} 张`;
   const essayHtml = (v.essay && v.essay.length)
@@ -196,7 +211,7 @@ function volumePage(v, i) {
                 <div class="vend__head">
                   <div class="vend__stamp">
                     ${SEAL}
-                    <span class="vend__tag">第${CN[v.no]}卷 · 终</span>
+                    <span class="vend__tag">第${cnNum(v.no)}卷 · 终</span>
                   </div>
                   <span class="vend__no" aria-hidden="true">${pad(v.no)}</span>
                 </div>
@@ -212,12 +227,12 @@ function volumePage(v, i) {
               <div class="vend-card__side">
                 <nav class="vols" aria-label="其他作品">
                   <a class="vols__item vols__item--prev" href="${prev.slug}.html">
-                    <span class="vols__k"><span class="vols__arr" aria-hidden="true">←</span> 上一卷 · 第${CN[prev.no]}卷</span>
+                    <span class="vols__k"><span class="vols__arr" aria-hidden="true">←</span> 上一卷 · 第${cnNum(prev.no)}卷</span>
                     <span class="vols__t">${esc(prev.title)}</span>
                     <span class="vols__m">${esc(prev.date)} · ${count(prev)} 张</span>
                   </a>
                   <a class="vols__item vols__item--next" href="${next.slug}.html">
-                    <span class="vols__k">下一卷 · 第${CN[next.no]}卷 <span class="vols__arr" aria-hidden="true">→</span></span>
+                    <span class="vols__k">下一卷 · 第${cnNum(next.no)}卷 <span class="vols__arr" aria-hidden="true">→</span></span>
                     <span class="vols__t">${esc(next.title)}</span>
                     <span class="vols__m">${esc(next.date)} · ${count(next)} 张</span>
                   </a>
@@ -226,7 +241,7 @@ function volumePage(v, i) {
               </div>
             </div>
           </div>
-          <figcaption class="note"><span class="note__t">卷尾 · ${esc(v.title)}</span><span class="note__d">第${CN[v.no]}卷 · 终</span></figcaption>
+          <figcaption class="note"><span class="note__t">卷尾 · ${esc(v.title)}</span><span class="note__d">第${cnNum(v.no)}卷 · 终</span></figcaption>
         </div>
       </figure>
     </div>
@@ -253,7 +268,7 @@ function volumePage(v, i) {
 
 volumes.forEach((v, i) => {
   writeFileSync(join(outDir, `${v.slug}.html`), volumePage(v, i));
-  console.log(`series/${v.slug}.html  ·  第${CN[v.no]}卷 ${v.title}  ·  ${count(v)} 张  ·  ${spreadsOf(v).map(s => s.layout + (s.align || '')).join(' ')}`);
+  console.log(`series/${v.slug}.html  ·  第${cnNum(v.no)}卷 ${v.title}  ·  ${count(v)} 张  ·  ${spreadsOf(v).map(s => s.layout + (s.align || '')).join(' ')}`);
 });
 
 /* ═════════ homepage: the directory on the cover ═════════
@@ -261,24 +276,41 @@ volumes.forEach((v, i) => {
    the cover picture behind turns into that volume's picture. */
 const THUMBS = 6;
 const ratioOf = ar => { const [w, h] = String(ar || '1/1').split('/').map(Number); return (w && h) ? w / h : 1; };
+function plateRatio(v, n) {
+  const e = edgeOf(v.slug, n);
+  if (e && e.r) return e.r;
+  return ratioOf(v.plates[n]?.ar);
+}
 function pickPlate(v, wantLand) {
   const f = v.feature || { plate: v.cover };
   const check = wantLand ? (r => r > 1.05) : (r => r < 0.95);
+  const finish = (n, pos, matched) => {
+    const e = edgeOf(v.slug, n);
+    const ar = r4(plateRatio(v, n));
+    const fit = matched ? 'cover' : (wantLand ? 'right' : 'top');
+    const edge = e ? (wantLand ? e.l : e.b).join(',') : '';
+    return { n, pos, ar, fit, edge };
+  };
   if (!wantLand && f.plateM && v.plates[f.plateM]) {
-    return { n: f.plateM, pos: f.posM || v.plates[f.plateM].pos || '50% 35%' };
+    return finish(f.plateM, f.posM || v.plates[f.plateM].pos || '50% 35%', check(plateRatio(v, f.plateM)));
   }
-  if (f.plate && v.plates[f.plate] && check(ratioOf(v.plates[f.plate].ar))) {
-    return { n: f.plate, pos: f.pos || v.plates[f.plate].pos || '50% 38%' };
+  if (f.plate && v.plates[f.plate] && check(plateRatio(v, f.plate))) {
+    return finish(f.plate, f.pos || v.plates[f.plate].pos || '50% 38%', true);
   }
-  if (v.cover && v.plates[v.cover] && check(ratioOf(v.plates[v.cover].ar))) {
-    return { n: v.cover, pos: v.coverPos || v.plates[v.cover].pos || '50% 35%' };
+  if (v.cover && v.plates[v.cover] && check(plateRatio(v, v.cover))) {
+    return finish(v.cover, v.coverPos || v.plates[v.cover].pos || '50% 35%', true);
   }
   const nums = numbers(v);
   const ordered = Object.keys(v.plates).map(Number).sort((a, b) => (nums[a] ?? 999) - (nums[b] ?? 999) || a - b);
-  let hit = ordered.find(n => check(ratioOf(v.plates[n].ar)));
-  if (!hit && !wantLand) hit = ordered.find(n => ratioOf(v.plates[n].ar) <= 1.05);
+  let hit = ordered.find(n => check(plateRatio(v, n)));
+  if (hit) {
+    return finish(hit, (hit === f.plate && f.pos) || (hit === v.cover && v.coverPos) || v.plates[hit].pos || '50% 38%', true);
+  }
+  // No plate matches the viewport orientation: pick the closest fallback and mark for edge-extended uncropped display
+  if (!wantLand) hit = ordered.find(n => plateRatio(v, n) <= 1.05);
   const chosen = hit || f.plate || v.cover || ordered[0];
-  return { n: chosen, pos: (chosen === f.plate && f.pos) || (chosen === v.cover && v.coverPos) || v.plates[chosen].pos || '50% 38%' };
+  const pos = (chosen === f.plate && f.pos) || (chosen === v.cover && v.coverPos) || v.plates[chosen].pos || '50% 38%';
+  return finish(chosen, pos, false);
 }
 function entry(v, i) {
   const desk = pickPlate(v, true), mob = pickPlate(v, false), href = `series/${v.slug}.html`;
@@ -286,10 +318,12 @@ function entry(v, i) {
   const order = Object.keys(nums).map(Number).sort((a, b) => nums[a] - nums[b]).slice(0, THUMBS);
   const strip = order.map(n => `<a href="${href}" tabindex="-1"><img data-src="images/series/${v.slug}/sm-${pad(n)}.jpg" alt="${esc(v.plates[n].t || `${v.title} ${pad(nums[n])}`)}" style="aspect-ratio:${v.plates[n].ar}" decoding="async"></a>`).join('');
   const ledeLine = v.lede ? `\n              <p class="dir__lede">${esc(v.lede)}</p>` : '';
+  const deskMeta = `data-light="${lightOf(v.slug, desk.n)}" data-bg="images/series/${v.slug}/${pad(desk.n)}.jpg" data-pos="${desk.pos}" data-ar="${desk.ar}" data-fit="${desk.fit}"${desk.edge ? ` data-edge="${desk.edge}"` : ''}`;
+  const mobMeta = `data-light-m="${lightOf(v.slug, mob.n)}" data-bg-m="images/series/${v.slug}/${pad(mob.n)}.jpg" data-pos-m="${mob.pos}" data-ar-m="${mob.ar}" data-fit-m="${mob.fit}"${mob.edge ? ` data-edge-m="${mob.edge}"` : ''}`;
   return `
         <li class="dir__i" style="--k:${i}">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" data-light="${lightOf(v.slug, desk.n)}" data-light-m="${lightOf(v.slug, mob.n)}" data-bg="images/series/${v.slug}/${pad(desk.n)}.jpg" data-pos="${desk.pos}" data-bg-m="images/series/${v.slug}/${pad(mob.n)}.jpg" data-pos-m="${mob.pos}">
-            <span class="dir__no">${CN[v.no]}</span><span class="dir__t">${esc(v.title)}</span><span class="dir__m">${esc(v.date.slice(0, 7))}</span>
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-${v.slug}" ${deskMeta} ${mobMeta}>
+            <span class="dir__no">${cnNum(v.no)}</span><span class="dir__t">${esc(v.title)}</span><span class="dir__m">${esc(v.date.slice(0, 7))}</span>
           </button>
           <div class="dir__p" id="dir-${v.slug}" role="region" aria-label="${esc(v.title)}">
             <div class="dir__in">${ledeLine}
@@ -302,7 +336,7 @@ function entry(v, i) {
 }
 const works = `<!-- @works:start -->
       <ol class="dir">${volumes.map(entry).join('')}
-${upcoming.map((u, k) => `        <li class="dir__i is-later" style="--k:${volumes.length + k}"><span class="dir__h"><span class="dir__no">${CN[volumes.length + k + 1]}</span><span class="dir__t">${esc(u.title)}</span><span class="dir__m">${esc(u.note)}</span></span></li>`).join('\n')}
+${upcoming.map((u, k) => `        <li class="dir__i is-later" style="--k:${volumes.length + k}"><span class="dir__h"><span class="dir__no">${cnNum(volumes.length + k + 1)}</span><span class="dir__t">${esc(u.title)}</span><span class="dir__m">${esc(u.note)}</span></span></li>`).join('\n')}
       </ol>
 <!-- @works:end -->`;
 
@@ -312,9 +346,13 @@ const re = /<!-- @works:start -->[\s\S]*?<!-- @works:end -->/;
 if (!re.test(html)) throw new Error('index.html: @works markers not found');
 html = html.replace(re, () => works);
 const total = volumes.reduce((s, v) => s + count(v), 0);
-html = html.replace(/<!-- @total -->[^<]*<!-- \/@total -->/g, `<!-- @total -->${CN[volumes.length]}卷 · ${total} 张<!-- /@total -->`);
+const season = seasonOf(volumes[0]?.date);
+const nowYear = new Date().getFullYear();
+html = html.replace(/<!-- @total -->[^<]*<!-- \/@total -->/g, `<!-- @total -->${cnNum(volumes.length)}卷 · ${total} 张<!-- /@total -->`);
+if (season) html = html.replace(/<!-- @season -->[^<]*<!-- \/@season -->/g, `<!-- @season -->${season}<!-- /@season -->`);
+html = html.replace(/<!-- @year -->[^<]*<!-- \/@year -->/g, `<!-- @year -->${nowYear}<!-- /@year -->`);
 writeFileSync(indexPath, html);
-console.log(`index.html  ·  ${volumes.length} volumes · ${total} photos`);
+console.log(`index.html  ·  ${volumes.length} volumes · ${total} photos${season ? ` · ${season}` : ''}`);
 
 /* ═════════ cache busting ═════════
    GitHub Pages lets browsers keep css/js for ~10 minutes; after an update a page could pair new HTML with old styles.
@@ -348,8 +386,8 @@ console.log(`cache  ·  ${ASSETS.map(f => `${f}?v=${ver[f]}`).join(' ')}`);
 const fontChars = existsSync(join(root, 'fonts', 'chars.txt')) ? new Set(readFileSync(join(root, 'fonts', 'chars.txt'), 'utf8')) : null;
 const shown = s => [...String(s || '')].filter(c => c.charCodeAt(0) > 0x7e && !/\s/.test(c));
 const missing = new Set();
-if (fontChars) for (const v of volumes) {
-  const all = [v.title, v.lede, ...(v.essay || []), ...Object.values(v.plates).flatMap(p => [p.t, p.s])];
+if (fontChars) {
+  const all = [season, ...volumes.flatMap(v => [v.title, v.lede, ...(v.essay || []), ...Object.values(v.plates).flatMap(p => [p.t, p.s])])];
   for (const s of all) for (const c of shown(s)) if (!fontChars.has(c)) missing.add(c);
 }
 const LAYOUT = { single: '单张', scroll: '挂轴', screen: '一排小图', pair: '一对', wide: '宽幅', cinema: '宽银幕', emaki: '绘卷' };

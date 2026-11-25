@@ -4,3 +4,4 @@ desktop.ini
 node_modules/
 *.crdownload
 proof.html
+__pycache__/

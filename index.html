@@ -18,8 +18,8 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" as="font" type="font/woff2" href="fonts/serif.woff2?v=a8d6f04e" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="fonts/sans.woff2?v=f2bdc407" crossorigin>
-  <link rel="stylesheet" href="base.css?v=78321a18">
-  <link rel="stylesheet" href="home.css?v=3030cfc7">
+  <link rel="stylesheet" href="base.css?v=f088da21">
+  <link rel="stylesheet" href="home.css?v=140ac3e5">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"ProfilePage","mainEntity":{"@type":"Person","name":"涂鸦","description":"个人摄影，人像为主，也拍人文风景与扫街"}}
   </script>
@@ -36,13 +36,15 @@
   <main id="top">
     <section class="hx" id="works" aria-label="封面与目录">
       <div class="hx__bg" aria-hidden="true">
-        <img class="is-on" src="images/series/summer/01.jpg" srcset="images/series/summer/sm-01.jpg 900w, images/series/summer/01.jpg 2400w" sizes="100vw" alt="" style="object-position:50% 24%" fetchpriority="high">
+        <div class="hx__layer is-on" data-base>
+          <img src="images/series/summer/01.jpg" srcset="images/series/summer/sm-01.jpg 900w, images/series/summer/01.jpg 2400w" sizes="100vw" alt="" style="object-position:50% 24%" fetchpriority="high">
+        </div>
       </div>
       <div class="hx__fg">
         <div class="hx__top">
           <span class="seal" aria-hidden="true"><span>涂</span><span>鸦</span></span>
           <p class="hx__lede" data-fx="rise" data-fx-delay="900">为了记住，按下快门。</p>
-          <p class="hx__meta">第一号　二〇二六 冬　<!-- @total -->十七卷 · 215 张<!-- /@total --></p>
+          <p class="hx__meta">第一号　<!-- @season -->二〇二六 春<!-- /@season -->　<!-- @total -->十七卷 · 215 张<!-- /@total --></p>
         </div>
         <h1 class="hx__t" data-fx="ink">涂鸦</h1>
         <nav class="hx__dir" aria-label="作品目录">
@@ -50,7 +52,7 @@
 <!-- @works:start -->
       <ol class="dir">
         <li class="dir__i" style="--k:0">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-aman" data-light="#271a12" data-light-m="#271a12" data-bg="images/series/aman/01.jpg" data-pos="50% 32%" data-bg-m="images/series/aman/01.jpg" data-pos-m="50% 32%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-aman" data-light="#271a12" data-bg="images/series/aman/01.jpg" data-pos="50% 32%" data-ar="0.6667" data-fit="right" data-edge="#000000,#cf8230,#382409" data-light-m="#271a12" data-bg-m="images/series/aman/01.jpg" data-pos-m="50% 32%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#59401f,#95744d,#a88455">
             <span class="dir__no">一</span><span class="dir__t">阿瞒·汉服</span><span class="dir__m">2026.03</span>
           </button>
           <div class="dir__p" id="dir-aman" role="region" aria-label="阿瞒·汉服">
@@ -62,7 +64,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:1">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-polaroid" data-light="#2f3434" data-light-m="#2f3434" data-bg="images/series/polaroid/02.jpg" data-pos="50% 42%" data-bg-m="images/series/polaroid/02.jpg" data-pos-m="50% 42%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-polaroid" data-light="#2f3434" data-bg="images/series/polaroid/02.jpg" data-pos="50% 42%" data-ar="0.8378" data-fit="right" data-edge="#dcdcdc,#dcdcdc,#dcdcdc" data-light-m="#2f3434" data-bg-m="images/series/polaroid/02.jpg" data-pos-m="50% 42%" data-ar-m="0.8378" data-fit-m="cover" data-edge-m="#dcdcdc,#dcdcdc,#dcdcdc">
             <span class="dir__no">二</span><span class="dir__t">小玖·假如是拍立得</span><span class="dir__m">2026.03</span>
           </button>
           <div class="dir__p" id="dir-polaroid" role="region" aria-label="小玖·假如是拍立得">
@@ -74,7 +76,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:2">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-rem" data-light="#2d3340" data-light-m="#383133" data-bg="images/series/rem/04.jpg" data-pos="50% 38%" data-bg-m="images/series/rem/02.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-rem" data-light="#2d3340" data-bg="images/series/rem/04.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#8d8885,#c2baaf,#b9aea0" data-light-m="#383133" data-bg-m="images/series/rem/02.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#322d32,#5a6275,#93a9cb">
             <span class="dir__no">三</span><span class="dir__t">饺椒·雷姆私设</span><span class="dir__m">2026.02</span>
           </button>
           <div class="dir__p" id="dir-rem" role="region" aria-label="饺椒·雷姆私设">
@@ -86,7 +88,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:3">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-mingxi" data-light="#323335" data-light-m="#282324" data-bg="images/series/mingxi/02.jpg" data-pos="50% 38%" data-bg-m="images/series/mingxi/01.jpg" data-pos-m="50% 35%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-mingxi" data-light="#323335" data-bg="images/series/mingxi/02.jpg" data-pos="50% 38%" data-ar="1.7787" data-fit="cover" data-edge="#fcfdff,#fcfdff,#f9fafc" data-light-m="#282324" data-bg-m="images/series/mingxi/01.jpg" data-pos-m="50% 35%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#948e98,#775a53,#866e6a">
             <span class="dir__no">四</span><span class="dir__t">冥汐·重返未来 1999</span><span class="dir__m">2026.02</span>
           </button>
           <div class="dir__p" id="dir-mingxi" role="region" aria-label="冥汐·重返未来 1999">
@@ -98,7 +100,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:4">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-lane" data-light="#261d1c" data-light-m="#2c2525" data-bg="images/series/lane/08.jpg" data-pos="50% 38%" data-bg-m="images/series/lane/02.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-lane" data-light="#261d1c" data-bg="images/series/lane/08.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#25302b,#75463f,#b77672" data-light-m="#2c2525" data-bg-m="images/series/lane/02.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#8d8d9b,#504d4e,#777376">
             <span class="dir__no">五</span><span class="dir__t">巷子里</span><span class="dir__m">2026.02</span>
           </button>
           <div class="dir__p" id="dir-lane" role="region" aria-label="巷子里">
@@ -110,7 +112,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:5">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-daoxu" data-light="#181516" data-light-m="#181516" data-bg="images/series/daoxu/02.jpg" data-pos="50% 38%" data-bg-m="images/series/daoxu/03.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-daoxu" data-light="#181516" data-bg="images/series/daoxu/02.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#12110f,#0f0f0f,#100f0e" data-light-m="#181516" data-bg-m="images/series/daoxu/03.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#1f1e1e,#1b1b1b,#0b0b0a">
             <span class="dir__no">六</span><span class="dir__t">稻序·私设</span><span class="dir__m">2026.01</span>
           </button>
           <div class="dir__p" id="dir-daoxu" role="region" aria-label="稻序·私设">
@@ -122,7 +124,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:6">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-yearend" data-light="#161616" data-light-m="#131718" data-bg="images/series/yearend/02.jpg" data-pos="50% 38%" data-bg-m="images/series/yearend/05.jpg" data-pos-m="45% 40%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-yearend" data-light="#161616" data-bg="images/series/yearend/02.jpg" data-pos="50% 38%" data-ar="2.3438" data-fit="cover" data-edge="#aca3a0,#222424,#151a1a" data-light-m="#131718" data-bg-m="images/series/yearend/05.jpg" data-pos-m="45% 40%" data-ar-m="1" data-fit-m="top" data-edge-m="#0c1315,#0d1215,#0c1319">
             <span class="dir__no">七</span><span class="dir__t">新一与毛利兰</span><span class="dir__m">2025.12</span>
           </button>
           <div class="dir__p" id="dir-yearend" role="region" aria-label="新一与毛利兰">
@@ -134,7 +136,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:7">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-bear" data-light="#1c140e" data-light-m="#1c140e" data-bg="images/series/bear/03.jpg" data-pos="50% 30%" data-bg-m="images/series/bear/03.jpg" data-pos-m="50% 30%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-bear" data-light="#1c140e" data-bg="images/series/bear/03.jpg" data-pos="50% 30%" data-ar="0.6667" data-fit="right" data-edge="#010101,#392a28,#1b2830" data-light-m="#1c140e" data-bg-m="images/series/bear/03.jpg" data-pos-m="50% 30%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#211512,#010101,#0e0b06">
             <span class="dir__no">八</span><span class="dir__t">小熊帽</span><span class="dir__m">2025.01</span>
           </button>
           <div class="dir__p" id="dir-bear" role="region" aria-label="小熊帽">
@@ -146,7 +148,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:8">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-xiaoyu" data-light="#201d19" data-light-m="#1e1a16" data-bg="images/series/xiaoyu/02.jpg" data-pos="50% 38%" data-bg-m="images/series/xiaoyu/03.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-xiaoyu" data-light="#201d19" data-bg="images/series/xiaoyu/02.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#8a8886,#627377,#9c9693" data-light-m="#1e1a16" data-bg-m="images/series/xiaoyu/03.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#1a110c,#1c1a16,#382922">
             <span class="dir__no">九</span><span class="dir__t">小渝·JK</span><span class="dir__m">2025.01</span>
           </button>
           <div class="dir__p" id="dir-xiaoyu" role="region" aria-label="小渝·JK">
@@ -158,7 +160,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:9">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-train" data-light="#171614" data-light-m="#3d2e20" data-bg="images/series/train/02.jpg" data-pos="50% 40%" data-bg-m="images/series/train/07.jpg" data-pos-m="50% 30%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-train" data-light="#171614" data-bg="images/series/train/02.jpg" data-pos="50% 40%" data-ar="1.5" data-fit="cover" data-edge="#474643,#988d83,#161511" data-light-m="#3d2e20" data-bg-m="images/series/train/07.jpg" data-pos-m="50% 30%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#e5b89b,#251f17,#363124">
             <span class="dir__no">十</span><span class="dir__t">冬日的列车</span><span class="dir__m">2025.01</span>
           </button>
           <div class="dir__p" id="dir-train" role="region" aria-label="冬日的列车">
@@ -170,7 +172,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:10">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-birthday" data-light="#1f1614" data-light-m="#201612" data-bg="images/series/birthday/06.jpg" data-pos="50% 38%" data-bg-m="images/series/birthday/02.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-birthday" data-light="#1f1614" data-bg="images/series/birthday/06.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#010201,#030403,#020202" data-light-m="#201612" data-bg-m="images/series/birthday/02.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#704f3f,#120908,#18110e">
             <span class="dir__no">十一</span><span class="dir__t">yǔyǔ·生日</span><span class="dir__m">2024.09</span>
           </button>
           <div class="dir__p" id="dir-birthday" role="region" aria-label="yǔyǔ·生日">
@@ -182,7 +184,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:11">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-lynette" data-light="#373132" data-light-m="#373132" data-bg="images/series/lynette/02.jpg" data-pos="50% 38%" data-bg-m="images/series/lynette/02.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-lynette" data-light="#373132" data-bg="images/series/lynette/02.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#312d31,#43434a,#c2b9bc" data-light-m="#373132" data-bg-m="images/series/lynette/02.jpg" data-pos-m="50% 38%" data-ar-m="1.5" data-fit-m="top" data-edge-m="#6d615e,#6c5954,#54443d">
             <span class="dir__no">十二</span><span class="dir__t">初初·琳妮特</span><span class="dir__m">2024.09</span>
           </button>
           <div class="dir__p" id="dir-lynette" role="region" aria-label="初初·琳妮特">
@@ -194,7 +196,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:12">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-wedding" data-light="#20241e" data-light-m="#373132" data-bg="images/series/wedding/01.jpg" data-pos="50% 38%" data-bg-m="images/series/wedding/06.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-wedding" data-light="#20241e" data-bg="images/series/wedding/01.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#5c6356,#323c20,#c0c5dc" data-light-m="#373132" data-bg-m="images/series/wedding/06.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#5d4b4c,#684845,#4b3f39">
             <span class="dir__no">十三</span><span class="dir__t">婚礼·玫瑰心情</span><span class="dir__m">2024.09</span>
           </button>
           <div class="dir__p" id="dir-wedding" role="region" aria-label="婚礼·玫瑰心情">
@@ -206,7 +208,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:13">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-hana" data-light="#241509" data-light-m="#142116" data-bg="images/series/hana/02.jpg" data-pos="50% 38%" data-bg-m="images/series/hana/03.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-hana" data-light="#241509" data-bg="images/series/hana/02.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#150c0a,#372108,#854501" data-light-m="#142116" data-bg-m="images/series/hana/03.jpg" data-pos-m="50% 38%" data-ar-m="0.5625" data-fit-m="cover" data-edge-m="#182718,#162018,#20341f">
             <span class="dir__no">十四</span><span class="dir__t">哈娜</span><span class="dir__m">2024.09</span>
           </button>
           <div class="dir__p" id="dir-hana" role="region" aria-label="哈娜">
@@ -218,7 +220,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:14">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-summer" data-light="#111a18" data-light-m="#121c17" data-bg="images/series/summer/10.jpg" data-pos="50% 40%" data-bg-m="images/series/summer/22.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-summer" data-light="#111a18" data-bg="images/series/summer/10.jpg" data-pos="50% 40%" data-ar="1.5" data-fit="cover" data-edge="#7e7068,#798a5d,#8c9663" data-light-m="#121c17" data-bg-m="images/series/summer/22.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#1c211f,#a0a9ae,#84b267">
             <span class="dir__no">十五</span><span class="dir__t">五月的树荫</span><span class="dir__m">2024.05</span>
           </button>
           <div class="dir__p" id="dir-summer" role="region" aria-label="五月的树荫">
@@ -230,7 +232,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:15">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-cafe" data-light="#241d1a" data-light-m="#313332" data-bg="images/series/cafe/04.jpg" data-pos="50% 55%" data-bg-m="images/series/cafe/05.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-cafe" data-light="#241d1a" data-bg="images/series/cafe/04.jpg" data-pos="50% 55%" data-ar="1.7787" data-fit="cover" data-edge="#b2a296,#121c24,#101a20" data-light-m="#313332" data-bg-m="images/series/cafe/05.jpg" data-pos-m="50% 38%" data-ar-m="1" data-fit-m="top" data-edge-m="#1f363c,#4f473c,#1e353b">
             <span class="dir__no">十六</span><span class="dir__t">辣条·甜品店</span><span class="dir__m">2024.03</span>
           </button>
           <div class="dir__p" id="dir-cafe" role="region" aria-label="辣条·甜品店">
@@ -242,7 +244,7 @@
           </div>
         </li>
         <li class="dir__i" style="--k:16">
-          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-xiaomei" data-light="#3a302c" data-light-m="#191511" data-bg="images/series/xiaomei/02.jpg" data-pos="50% 38%" data-bg-m="images/series/xiaomei/07.jpg" data-pos-m="50% 38%">
+          <button class="dir__h" type="button" aria-expanded="false" aria-controls="dir-xiaomei" data-light="#3a302c" data-bg="images/series/xiaomei/02.jpg" data-pos="50% 38%" data-ar="1.5" data-fit="cover" data-edge="#9c8980,#a4918a,#938179" data-light-m="#191511" data-bg-m="images/series/xiaomei/07.jpg" data-pos-m="50% 38%" data-ar-m="0.6667" data-fit-m="cover" data-edge-m="#0d1015,#0d1015,#0d1015">
             <span class="dir__no">十七</span><span class="dir__t">小美·咖啡馆</span><span class="dir__m">2024.02</span>
           </button>
           <div class="dir__p" id="dir-xiaomei" role="region" aria-label="小美·咖啡馆">
@@ -277,14 +279,14 @@
   </main>
 
   <footer class="foot">
-    <span>© 2026 涂鸦　图片未经许可请勿转载</span>
+    <span>© <!-- @year -->2026<!-- /@year --> 涂鸦　图片未经许可请勿转载</span>
     <a href="#top">回到顶部 ↑</a>
   </footer>
 
   <script src="text.js?v=768c7423" defer></script>
-  <script src="flow.js?v=67fe6c9e" defer></script>
+  <script src="flow.js?v=247d68c5" defer></script>
   <script src="home.js?v=4ae7cf5d" defer></script>
-  <script src="dir.js?v=c153a8f8" defer></script>
-  <script src="decor.js?v=b2c0d88f" defer></script>
+  <script src="dir.js?v=65db41eb" defer></script>
+  <script src="decor.js?v=e5a5c582" defer></script>
 </body>
 </html>
